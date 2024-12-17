@@ -307,7 +307,7 @@ export class QuestMaterials {
       closeDialog(this.mat.entity)
       this.deliverAllPiecesClick()
     }, 3000)
-    this.questIndicator.updateStatus(IndicatorState.INTERROGATION)
+    this.questIndicator.updateStatus(IndicatorState.ARROW)
   }
 
   spawnparticles() {
@@ -359,6 +359,7 @@ export class QuestMaterials {
       Animator.stopAllAnimations(this.mat.entity)
       Animator.getClip(this.mat.entity, 'Idle').playing = true
     }, 1500)
+    this.gameController.questPuzzle.questIndicator.updateStatus(IndicatorState.ARROW)
   }
 
   setWalletConnection() {

@@ -312,7 +312,7 @@ export class SpawnIsland {
     }, 1500)
   }
   dialogAtPilar() {
-    this.questIndicator.updateStatus(IndicatorState.EXCLAMATION)
+    this.questIndicator.updateStatus(IndicatorState.ARROW)
   }
   onCloseRewardUI() {
     this.activateBridge()
@@ -321,6 +321,7 @@ export class SpawnIsland {
     Animator.getClip(this.tobor.entity, 'Robot_Idle').playing = true
     this.gameController.uiController.widgetTasks.showTasks(true, TaskType.Simple)
     this.gameController.spawnIsland.bubbleTalk.openBubble(HELP_BEIZER, false)
+    this.gameController.questEmote.questIndicator.updateStatus(IndicatorState.ARROW)
   }
   activatePilar() {
     AudioManager.instance().playTowerCharge(this.gameController.mainInstance.s0_Z3_Quest_Pillar_Art_4__01)

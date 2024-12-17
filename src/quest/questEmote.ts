@@ -15,7 +15,7 @@ import {
 import { GameController } from '../controllers/gameController'
 import { closeDialogWindow, openDialogWindow } from 'dcl-npc-toolkit'
 import { AudioManager } from '../imports/components/audio/audio.manager'
-import { QuestIndicator } from '../imports/components/questIndicator'
+import { IndicatorState, QuestIndicator } from '../imports/components/questIndicator'
 import { FloorCircleTargeter } from '../imports/components/targeter'
 import { ZONE_1_EMOTE_1, ZONE_1_EMOTE_2, ZONE_1_EMOTE_3, ZONE_1_EMOTE_4 } from '../jsonData/textsTutorialBubble'
 import { Color4, Quaternion, Vector3 } from '@dcl/sdk/math'
@@ -333,6 +333,7 @@ export class QuestEmote {
       this.activatePilar()
       //Bridge Turn ON
       this.activateBridge()
+      this.gameController.questMaterial.questIndicator.updateStatus(IndicatorState.ARROW)
       this.firstTimeClosingRewardUI = false
     }
     this.dialogQuestFinished()

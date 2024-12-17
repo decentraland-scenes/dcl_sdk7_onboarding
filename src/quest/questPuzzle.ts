@@ -157,7 +157,7 @@ export class QuestPuzzle {
         openDialogWindow(this.kit.entity, this.gameController.dialogs.kitDialog, 4)
         this.taskTalkSwap()
         this.clicOnNPC2PuzzleCompleted()
-        this.questIndicator.updateStatus(IndicatorState.INTERROGATION)
+        this.questIndicator.updateStatus(IndicatorState.ARROW)
       }, 1000)
     }
   }
