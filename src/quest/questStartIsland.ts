@@ -319,7 +319,7 @@ export class SpawnIsland {
     this.activatePilar()
     Animator.stopAllAnimations(this.tobor.entity)
     Animator.getClip(this.tobor.entity, 'Robot_Idle').playing = true
-    this.gameController.uiController.widgetTasks.showTasks(true, TaskType.Multiple)
+    this.gameController.uiController.widgetTasks.showTasks(true, TaskType.Simple)
     this.gameController.spawnIsland.bubbleTalk.openBubble(HELP_BEIZER, false)
   }
   activatePilar() {
