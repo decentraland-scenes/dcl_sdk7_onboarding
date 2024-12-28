@@ -1,10 +1,14 @@
+import { cameraManager } from "../cinematic/cameraManager"
+import { vanityTracks } from "../cinematic/vanityTracks"
+import { gameController } from ".."
+
 export type Objectives = {
   text: { en: string }
   missionInfo: { en: string }
   fontSize: number
   vAlign: string
   completed: boolean
-  callback?: Function
+  action?: Function,
 }
 export type Tasks = {
   texts: Objectives[] //All missions of a quest
@@ -23,7 +27,10 @@ export const textQuests: Tasks[] = [
         },
         fontSize: 14,
         vAlign: '0%',
-        completed: false
+        completed: false,
+        action: () => {
+          cameraManager.startVanityTrack(vanityTracks.SemiCircle, gameController.spawnIsland.tobor.entity, false)
+        }
       }
     ]
   },
@@ -108,7 +115,8 @@ export const textQuests: Tasks[] = [
         },
         fontSize: 14,
         vAlign: '0%',
-        completed: false
+        completed: false,
+        action: () => cameraManager.startVanityTrack(vanityTracks.SemiCircle, gameController.questMaterial.mat.entity, false)
       }
     ]
   },

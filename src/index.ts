@@ -1,4 +1,7 @@
 import { GameController } from './controllers/gameController'
+
+export let gameController: GameController
+
 export function main() {
-  const gameController = new GameController()
+   gameController = new GameController()
 }

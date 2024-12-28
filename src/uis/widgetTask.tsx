@@ -99,6 +99,7 @@ export class WidgetTasks {
       this.checkImageVisible3 = false
     }
     this.setMarginPositions()
+    visible && this.currentTask.action && this.currentTask.action()
   }
   showTick(visible: boolean, index: number) {
     switch (index) {
