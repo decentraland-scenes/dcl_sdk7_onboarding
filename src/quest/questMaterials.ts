@@ -381,7 +381,8 @@ export class QuestMaterials {
     this.afterEndQuestClick()
   }
   showWearableUI() {
-    this.gameController.uiController.popUpUI.show(POPUP_STATE.Vest)
+    //this.gameController.uiController.popUpUI.show(POPUP_STATE.Vest)
+    this.giveReward()
   }
   giveReward() {
     this.claim.claimToken()

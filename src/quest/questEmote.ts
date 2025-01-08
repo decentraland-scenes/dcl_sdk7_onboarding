@@ -296,7 +296,8 @@ export class QuestEmote {
     if (this.walletConected === false) {
       this.gameController.uiController.popUpUI.show(POPUP_STATE.TwoButtons)
     } else {
-      this.gameController.uiController.popUpUI.show(POPUP_STATE.OneButton)
+      //this.gameController.uiController.popUpUI.show(POPUP_STATE.OneButton)
+      this.giveReward()
     }
   }
   activateBridge() {

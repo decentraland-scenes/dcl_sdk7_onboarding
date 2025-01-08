@@ -25,13 +25,15 @@ export class ClaimWearableRequest {
   retryUI: ui.CustomPrompt
   onTheWay: ui.CustomPrompt
   walletConnected: boolean = false
-  uiMsg: string = 'An unexpected error occurred: \n'
   captchaTitle: PromptText
   captchaImage: PromptIcon
   captchaHelpText: PromptText
   captchaFillInBox: PromptInput
   captchaButtonE: PromptButton
   captchaButtonF: PromptButton
+  private msgRetryUi?: PromptText
+  private retryCD = 4
+  private isRetryInCD = false
   constructor(
     gameController: GameController,
     campaign: ClaimTokenRequestArgs,
@@ -123,8 +125,8 @@ export class ClaimWearableRequest {
     })
   }
   createRetryUI() {
-    const titleRetryUi = this.retryUI.addText({
-      value: this.uiMsg,
+    this.msgRetryUi = this.retryUI.addText({
+      value: 'An unexpected error occurred',
       xPosition: -140,
       yPosition: 80,
       color: Color4.Black(),
@@ -136,8 +138,19 @@ export class ClaimWearableRequest {
       xPosition: 100,
       yPosition: -120,
       onMouseDown: () => {
+        if(this.isRetryInCD) return
         this.retryUI.hide()
-        this.gameController.questMaterial.giveReward()
+        this.isRetryInCD = true
+        promptButtonE.grayOut()
+        promptButtonE.text = 'Wait'
+        this.gameController.questEmote.giveReward()
+
+        utils.timers.setTimeout(()=>{
+          this.retryCD += 2
+          this.isRetryInCD = false
+          promptButtonE.text = 'Retry'
+          promptButtonE.enable()
+        }, this.retryCD*1000)
       }
     })
 
@@ -274,9 +287,17 @@ export class ClaimWearableRequest {
     console.log('Reward received json: ', json)
 
     if (json.ok === false) {
+      this.claimInProgress.hide()
+      if(this.msgRetryUi) this.msgRetryUi.value = 'An unexpected error occurred: \n' + json.code
+      this.retryUI.show()
       console.log('ERROR:' + json.error)
+      return;
     }
 
+    this.claimInProgress.hide()
+    this.createOnTheWayUI(json.data[0].image, json.data[0].id)
+    this.onTheWay.show()
+    this.gameController.questMaterial.setRewardTrue()
     this.alreadyClaimed.push(campaign_key)
   }
   async validateCaptcha(captcha: string, captcha_id: string, campaign: string, campaign_key: string) {
@@ -315,7 +336,7 @@ export class ClaimWearableRequest {
     this.captchaUI.hide()
     if (json.ok === false) {
       console.log('ERROR:' + json.error)
-      this.uiMsg = 'An unexpected error occurred: \n' + json.error
+      if(this.msgRetryUi) this.msgRetryUi.value = 'An unexpected error occurred: \n' + json.code
       this.retryUI.show()
       return false
     } else {

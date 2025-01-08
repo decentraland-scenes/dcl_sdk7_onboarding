@@ -3,7 +3,7 @@ export type ClaimConfigInstType = {
   campaignKeys: Record<string, string>
 }
 
-export const USE_CAPTCHA: boolean = true
+export const USE_CAPTCHA: boolean = false
 
 export type ClaimTokenRequestArgs = {
   claimServer: string
@@ -14,18 +14,18 @@ export const configEmote: ClaimTokenRequestArgs = {
   claimServer: 'https://rewards.decentraland.org',
   campaign: '2d9f5517-e513-4b9e-bab5-0d46ba2ad614',
   campaign_key:
-    'B0FUpe79T9y7h0TlmrKQpy2fVRflE0ueurUNRroq1hQ=.Wv5bHZhAfaPIic2LNJKPjVBEDF8NCKdcPl6hAgTKamM='
+    '+LsKlzkXTumoP4dLjQ4Csi2fVRflE0ueurUNRroq1hQ=.rsTrxYpUUyeauWrt5oRDv2dgQ8NFa45em2M8gHzsYt8='
 }
 
 export const configVest: ClaimTokenRequestArgs = {
   claimServer: 'https://rewards.decentraland.org',
   campaign: '2d9f5517-e513-4b9e-bab5-0d46ba2ad614',
   campaign_key:
-    'vEiD3FinRpa9HG+xa4U4TS2fVRflE0ueurUNRroq1hQ=.MNH2pcpVpKeEetzqzhY3vPLyLzwpNyLzb7LG7js7dQI='
+    'E1HS5p11S3SNAjK2ThRuGi2fVRflE0ueurUNRroq1hQ=.fG2nut7UFx78MRgHx5coLyrvlsYPKpgW7LPJc6trqX8='
 }
 export const configCap: ClaimTokenRequestArgs = {
   claimServer: 'https://rewards.decentraland.org',
   campaign: '2d9f5517-e513-4b9e-bab5-0d46ba2ad614',
   campaign_key:
-    'hP9HkTJyS2KPoiGHNDOEZC2fVRflE0ueurUNRroq1hQ=.VuaWGlUbcypiFTPexU6CHZ8KQpWLL34X7h0ea/G2fxM='
+    'NYpZP1GXQlePsRIiYvvNgS2fVRflE0ueurUNRroq1hQ=.m04oze9kbuXZLkydR1fyF3Cja+MCpXMm64HNYGLeVwE='
 }
