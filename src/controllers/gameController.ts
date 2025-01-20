@@ -1,3 +1,4 @@
+import { initAudioEntities } from '../imports/components/audio/sounds'
 import { MainInstace } from '../instance/mainInstance'
 import { Dialogs } from '../jsonData/npc_dialogs'
 import { QuestEmote } from '../quest/questEmote'
@@ -28,5 +29,7 @@ export class GameController {
     this.questMaterial = new QuestMaterials(this)
     this.questPortal = new QuestPortal(this)
     this.timeStamp = setPlayerTime()
+
+    initAudioEntities()
   }
 }
