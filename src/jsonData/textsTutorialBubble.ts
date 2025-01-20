@@ -2,7 +2,7 @@
 //mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
 
 //Tobor Dialogs
-export const CLICKME = 'Over here!'
+export const CLICKME = '<b>Over here!</b>'
 export const OVERHERE = 'Hey!'
 export const JUMP = 'Press the <b>SPACE BAR</b> to jump.'
 export const HELP_BEIZER = 'Talk to Bezier at the next island.'

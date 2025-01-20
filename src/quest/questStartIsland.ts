@@ -28,7 +28,7 @@ import { IndicatorState, QuestIndicator } from '../imports/components/questIndic
 import { AudioManager } from '../imports/components/audio/audio.manager'
 import { activateSoundPillar1 } from '../imports/components/audio/sounds'
 import { TaskType } from '../uis/widgetTask'
-import { HELP_BEIZER, JUMP } from '../jsonData/textsTutorialBubble'
+import { CLICKME, HELP_BEIZER, JUMP, OVERHERE } from '../jsonData/textsTutorialBubble'
 import { point1, point2, point3 } from '../jsonData/npcData'
 import { sendTrak } from '../utils/segment'
 import { NPC } from '../imports/components/npc.class'
@@ -99,6 +99,7 @@ export class SpawnIsland {
     this.tobor.activateBillBoard(true)
     this.bubbleTalk = new BubbleTalk(this.tobor.bubbleAttach)
     this.tobor.setChildScaleYAxis(3.1)
+    this.bubbleTalk.openBubble(CLICKME, true)
 
     this.targeterCircle = new FloorCircleTargeter(
       Vector3.create(0, 0, 0),

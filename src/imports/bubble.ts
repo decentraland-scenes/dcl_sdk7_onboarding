@@ -30,7 +30,7 @@ export class BubbleTalk {
     this.textEntity = engine.addEntity()
     Transform.create(this.textEntity, { position: Vector3.create(0, 0.8, -0.04), parent: this.centerEntity })
     TextShape.create(this.textEntity).text = this.text
-    TextShape.getMutable(this.textEntity).fontSize = 1.6
+    TextShape.getMutable(this.textEntity).fontSize = 2.3
     TextShape.getMutable(this.textEntity).textColor = Color4.Black()
     TextShape.getMutable(this.textEntity).textAlign = TextAlignMode.TAM_MIDDLE_CENTER
 
