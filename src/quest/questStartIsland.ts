@@ -183,6 +183,8 @@ export class SpawnIsland {
     sendTrak('z0_quest0_00', this.gameController.timeStamp)
     AudioManager.instance().playMainAmbience(true)
     AudioManager.instance().play('waterfall', { volume: 1, loop: true, position: Vector3.create(226.94, 70, 130.37) })
+
+    this.gameController.uiController.popUpControls.showLookControlsUI()
   }
 
   activeCables(bActive: boolean) {
@@ -203,8 +205,11 @@ export class SpawnIsland {
     Animator.getClip(this.tobor.entity, 'Talk').playing = true
     this.targeterCircle.showCircle(false)
     this.gameController.uiController.widgetTasks.showTick(true, 0)
+    this.gameController.uiController.popUpControls.hideLookControlsUI()
+    this.gameController.uiController.popUpControls.hideCursorLockControlsUI()
   }
   startMoveQuest() {
+    this.gameController.uiController.popUpControls.showMoveControlsUI()
     this.tobor.activateBillBoard(false)
 
     Tween.createOrReplace(this.tobor.entity, {
@@ -283,7 +288,8 @@ export class SpawnIsland {
     })
   }
   jumpquest() {
-    this.gameController.uiController.popUpControls.spaceContainerVisible = true
+    //this.gameController.uiController.popUpControls.spaceContainerVisible = true
+    this.gameController.uiController.popUpControls.showJumpControlsUI()
     this.gameController.uiController.widgetTasks.setText(1, 0)
     this.gameController.uiController.widgetTasks.showTasks(true, TaskType.Simple)
     Transform.getMutable(this.gameController.mainInstance.s0_Fence_Art_02).scale = Vector3.create(0, 0, 0)
@@ -304,6 +310,8 @@ export class SpawnIsland {
   }
   completeJumpQuest() {
     sendTrak('z0_quest0_01', this.gameController.timeStamp)
+    this.gameController.uiController.popUpControls.hideMoveControlsUI()
+    this.gameController.uiController.popUpControls.hideJumpControlsUI()
     this.gameController.uiController.popUpControls.spaceContainerVisible = false
     this.gameController.uiController.widgetTasks.showTick(true, 0)
     utils.timers.setTimeout(() => {

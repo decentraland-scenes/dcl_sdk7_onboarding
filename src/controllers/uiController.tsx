@@ -5,13 +5,14 @@ import { PopUpControls } from '../uis/popUpControls'
 import { KeyBoardUI } from '../uis/keyboardUI'
 import { Popup } from '../uis/popupUI'
 import { WidgetTasks } from '../uis/widgetTask'
+import { engine, PointerLock } from '@dcl/sdk/ecs'
 
 export class UIController {
   public gameController: GameController
   public popUpControls: PopUpControls
   public keyBoardUI: KeyBoardUI
   public popUpUI: Popup
-  public pointerLock: boolean = false
+  public isPointerLocked: boolean = false
   public widgetTasks: WidgetTasks
   uiComponent: () => ReactEcs.JSX.Element[]
   constructor(gameController: GameController) {
@@ -29,6 +30,7 @@ export class UIController {
       this.popUpUI.popupUI(),
       this.popUpUI.controlUI(),
       this.popUpControls.emoteUI(),
+      this.popUpControls.controlsUI(),
       this.widgetTasks.widgetTask(),
       this.popUpUI.popupUIEmote(),
       this.gameController.questEmote.claim.claimInProgress.render(),
@@ -47,5 +49,17 @@ export class UIController {
     ]
     ReactEcsRenderer.setUiRenderer(this.uiComponent)
     this.keyBoardUI.isVisible = true
+
+    this.listenToPointerLockChange()
   }
+
+  listenToPointerLockChange() {
+      PointerLock.onChange(engine.CameraEntity, (pointerLock) => {
+        if(!pointerLock) {
+          this.isPointerLocked = false
+          return;
+        }
+        this.isPointerLocked = pointerLock.isPointerLocked
+      })
+    }
 }

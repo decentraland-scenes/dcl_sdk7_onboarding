@@ -41,6 +41,9 @@ export class KeyBoardUI {
         })
       }
     }, fadeInterval)
+    
+
+    //this.uiController.gameController.questEmote.giveReward()
   }
 
   mainUi(): ReactEcs.JSX.Element {

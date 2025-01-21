@@ -137,10 +137,13 @@ export class QuestPuzzle {
     this.connect_game.activatePieces()
     this.bubbleTalk.openBubble(ZONE_2_PUZZLE_0, true)
     this.puzzleQuest()
+    this.gameController.uiController.popUpControls.showCameraControlsUI()
   }
   cameraModeAngleCheck() {
     // engine.addSystem( this.gameController.uiController.popUpControls.checkCameraMode)
     this.gameController.uiController.popUpControls.showPuzzlesUis()
+    this.gameController.uiController.popUpControls.hideAllControlsUI()
+    this.gameController.uiController.popUpControls.showCameraControlsUI()
     // this.gameController.uiController.popUpControls.checkCameraMode()
   }
   puzzleQuest() {
@@ -226,6 +229,7 @@ export class QuestPuzzle {
     Animator.getClip(this.kit.entity, 'Idle').playing = true
     this.activatePilar()
     this.gameController.questPortal.initQuestPortal()
+    this.gameController.uiController.popUpControls.hideCameraControlsUI()
   }
   activatePilar() {
     AudioManager.instance().playTowerCharge(this.gameController.mainInstance.s0_Z3_Quest_Pillar_Art_2__01)

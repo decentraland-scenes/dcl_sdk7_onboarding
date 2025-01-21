@@ -21,8 +21,8 @@ export class GameController {
   questPuzzle: QuestPuzzle
   constructor() {
     this.mainInstance = new MainInstace(this)
-    this.spawnIsland = new SpawnIsland(this)
     this.uiController = new UIController(this)
+    this.spawnIsland = new SpawnIsland(this)
     this.dialogs = new Dialogs(this)
     this.questEmote = new QuestEmote(this)
     this.questPuzzle = new QuestPuzzle(this)

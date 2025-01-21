@@ -187,7 +187,8 @@ export class QuestEmote {
     this.questIndicator.hide()
   }
   startEmoteQuest() {
-    this.gameController.uiController.popUpControls.emoteContainerVisible = true
+    //this.gameController.uiController.popUpControls.emoteContainerVisible = true
+    this.gameController.uiController.popUpControls.showEmoteLockControlsUI()
     this.emoteQuest()
   }
   emoteQuest() {
@@ -267,7 +268,8 @@ export class QuestEmote {
     this.bubbleTalk.closeBubbleInTime()
     Animator.stopAllAnimations(this.bezier.entity)
     Animator.getClip(this.bezier.entity, 'Celebrate').playing = true
-    this.gameController.uiController.popUpControls.emoteContainerVisible = false
+    //this.gameController.uiController.popUpControls.emoteContainerVisible = false
+    this.gameController.uiController.popUpControls.hideEmoteLockControlsUI()
     utils.timers.setTimeout(() => {
       Animator.stopAllAnimations(this.bezier.entity)
       Animator.getClip(this.bezier.entity, 'Talk').playing = true

@@ -133,6 +133,8 @@ export class QuestMaterials {
   startQuest() {
     this.setQuestStartDialog()
     sendTrak('z2_quest2_00', this.gameController.timeStamp)
+    this.gameController.uiController.popUpControls.hideAllControlsUI()
+    this.gameController.uiController.popUpControls.showInteractLockControlsUI()
   }
   spawnBlockToNextIsalnd() {
     Transform.createOrReplace(this.blocker, {
@@ -360,6 +362,10 @@ export class QuestMaterials {
       Animator.getClip(this.mat.entity, 'Idle').playing = true
     }, 1500)
     this.gameController.questPuzzle.questIndicator.updateStatus(IndicatorState.ARROW)
+    this.gameController.uiController.popUpControls.hideInteractControlsUI()
+    utils.timers.setTimeout(() => {
+      this.gameController.uiController.popUpControls.showRunLockControlsUI()
+    }, 3000)
   }
 
   setWalletConnection() {
