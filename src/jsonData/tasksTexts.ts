@@ -1,6 +1,6 @@
 export type Objectives = {
   text: { en: string }
-  missionInfo: { en: string }
+  missionInfo: { en: string, steps?: number }
   fontSize: number
   vAlign: string
   completed: boolean
@@ -87,7 +87,8 @@ export const textQuests: Tasks[] = [
           en: 'Help Bezier'
         },
         missionInfo: {
-          en: 'Do 3 emotes by pressing: \nB + any number.'
+          en: 'Do 3 emotes by pressing: \nB + any number.',
+          steps: 3
         },
         fontSize: 14,
         vAlign: '0%',
@@ -121,7 +122,8 @@ export const textQuests: Tasks[] = [
           en: 'Search components'
         },
         missionInfo: {
-          en: 'Search and collect triangles \nand material boxes.'
+          en: 'Search and collect triangles \nand material boxes.',
+          steps: 2
         },
         fontSize: 14,
         vAlign: '0%',
@@ -172,7 +174,8 @@ export const textQuests: Tasks[] = [
           en: 'Restore the energy'
         },
         missionInfo: {
-          en: 'Fix the connections \nto restore the energy.'
+          en: 'Fix the connections \nto restore the energy.',
+          steps: 3
         },
         fontSize: 14,
         vAlign: '0%',

@@ -198,6 +198,7 @@ export class QuestEmote {
       this.currentEmote = emote?.emoteUrn
       console.log('Emote played: ', emote.emoteUrn)
       this.emoteMoves++
+      this.gameController.uiController.widgetTasks.setStepCount(this.emoteMoves)
       this.checkEmoteMoves()
     })
   }
@@ -207,11 +208,17 @@ export class QuestEmote {
       this.bubbleTalk.openBubble(ZONE_1_EMOTE_1, true)
       this.addTicks(1)
       this.spawnParticles()
+      utils.timers.setTimeout(() => {
+        AudioManager.instance().playOnce('pop_up_close', { volume: 1, parent: engine.CameraEntity })
+      }, 500)
     } else if (this.emoteMoves === 2) {
       sendTrak('z1_quest1_02', this.gameController.timeStamp)
       this.bubbleTalk.closeBubbleInTime()
       this.addTicks(2)
       this.spawnParticles()
+      utils.timers.setTimeout(() => {
+        AudioManager.instance().playOnce('pop_up_close', { volume: 1, parent: engine.CameraEntity })
+      }, 500)
       utils.timers.setTimeout(() => {
         this.bubbleTalk.openBubble(ZONE_1_EMOTE_2, true)
       }, 100)
@@ -220,6 +227,9 @@ export class QuestEmote {
       this.bubbleTalk.closeBubbleInTime()
       this.addTicks(3)
       this.spawnParticles()
+      utils.timers.setTimeout(() => {
+        AudioManager.instance().playOnce('pop_up_close', { volume: 1, parent: engine.CameraEntity })
+      }, 500)
       utils.timers.setTimeout(() => {
         this.bubbleTalk.openBubble(ZONE_1_EMOTE_3, true)
       }, 100)
