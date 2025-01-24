@@ -6,6 +6,7 @@ import { QuestMaterials } from '../quest/questMaterials'
 import { QuestPortal } from '../quest/questPortals'
 import { QuestPuzzle } from '../quest/questPuzzle'
 import { SpawnIsland } from '../quest/questStartIsland'
+import { initCameraModiers } from '../utils/camera'
 import { setPlayerTime } from '../utils/setPlayerTime'
 import { UIController } from './uiController'
 
@@ -31,5 +32,6 @@ export class GameController {
     this.timeStamp = setPlayerTime()
 
     initAudioEntities()
+    initCameraModiers()
   }
 }
