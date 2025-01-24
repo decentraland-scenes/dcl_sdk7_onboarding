@@ -29,6 +29,5 @@ export class GameController {
     this.questMaterial = new QuestMaterials(this)
     this.questPortal = new QuestPortal(this)
     this.timeStamp = setPlayerTime()
-    cameraManager.initCamera()
   }
 }

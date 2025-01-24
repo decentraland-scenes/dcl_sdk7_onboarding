@@ -29,7 +29,8 @@ export const textQuests: Tasks[] = [
         vAlign: '0%',
         completed: false,
         action: () => {
-          cameraManager.startVanityTrack(vanityTracks.SemiCircle, gameController.spawnIsland.tobor.entity, false)
+          // cameraManager.startVanityTrack(vanityTracks.SemiCircle, gameController.spawnIsland.tobor.entity, false)
+          cameraManager.orbitEntity(gameController.spawnIsland.tobor.entity)
         }
       }
     ]
@@ -116,7 +117,10 @@ export const textQuests: Tasks[] = [
         fontSize: 14,
         vAlign: '0%',
         completed: false,
-        action: () => cameraManager.startVanityTrack(vanityTracks.SemiCircle, gameController.questMaterial.mat.entity, false)
+        action: () => {
+          // cameraManager.startVanityTrack(vanityTracks.SemiCircle, gameController.questMaterial.mat.entity, false)
+          cameraManager.orbitEntity(gameController.questMaterial.mat.entity)
+        }
       }
     ]
   },

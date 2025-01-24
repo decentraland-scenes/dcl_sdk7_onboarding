@@ -1,4 +1,4 @@
-import { engine, Entity, InputAction, InputModifier, inputSystem, MainCamera, PBTween, PointerEventType, Schemas, TextAlignMode, Transform, TransformType, Tween, TweenLoop, TweenSequence, Vector3Type, VirtualCamera } from "@dcl/sdk/ecs"
+import { EasingFunction, engine, Entity, InputAction, InputModifier, inputSystem, MainCamera, PBTween, PointerEventType, Schemas, TextAlignMode, Transform, TransformType, Tween, TweenLoop, TweenSequence, tweenSystem, Vector3Type, VirtualCamera } from "@dcl/sdk/ecs"
 import { Color4, Quaternion, Vector3 } from "@dcl/sdk/math"
 import { vanityTracks } from "./vanityTracks"
 
@@ -47,7 +47,7 @@ export const BlackFade = engine.defineComponent(
 )
 
 class CameraManager {
-    camPostionParent: Entity
+    camPositionParent: Entity
     camRotationParent: Entity
     camEntity: Entity
     vanityRoot: Entity
@@ -55,6 +55,7 @@ class CameraManager {
     currentRotTrack: Quaternion[]
     lastIndex: number = 0
     modifierButtonPressed: Boolean = false
+    cameraInitialized = false
 
     constructor() {
 
@@ -106,12 +107,12 @@ class CameraManager {
         //     }
         // })
 
-        this.camPostionParent = engine.addEntity()
-        Transform.create(this.camPostionParent, { position: Vector3.Zero() })
+        this.camPositionParent = engine.addEntity()
+        Transform.create(this.camPositionParent, { position: Vector3.Zero() })
 
         this.camRotationParent = engine.addEntity()
         Transform.create(this.camRotationParent, {
-            parent: this.camPostionParent
+            parent: this.camPositionParent
         })
 
         this.camEntity = engine.addEntity()
@@ -123,9 +124,12 @@ class CameraManager {
         Transform.create(this.vanityRoot, {
             position: Vector3.create(48, 1, 30)
         })
-        
+
     }
     initCamera() {
+
+        if (this.cameraInitialized) return
+        this.cameraInitialized = true
 
         Transform.createOrReplace(this.camEntity, {
             parent: this.camRotationParent
@@ -174,15 +178,16 @@ class CameraManager {
     }
 
     startPathTrack(track: any, loop: boolean) {
+        this.initCamera()
 
-        Transform.getMutable(this.camPostionParent).parent = engine.RootEntity
+        Transform.getMutable(this.camPositionParent).parent = engine.RootEntity
 
         const sampleRate = 5
         const frameTime = 30 / sampleRate
         this.loadCameraTrack(track)
         this.blockCamera()
 
-        LerpTransformComponent.createOrReplace(this.camPostionParent, {
+        LerpTransformComponent.createOrReplace(this.camPositionParent, {
             pathPos: this.currentPosTrack,
             pathRot: this.currentRotTrack,
             startPos: this.currentPosTrack[0] ? this.currentPosTrack[0] : Vector3.create(8, 1, 4),
@@ -201,12 +206,13 @@ class CameraManager {
     }
 
     startVanityTrack(track: any, targetEntity: Entity, loop: boolean) {
+        this.initCamera()
 
         // let playerPos = Transform.get(engine.PlayerEntity).position
 
         const pos = Transform.get(targetEntity).position
         Transform.getMutable(this.vanityRoot).position = Vector3.create(pos.x, pos.y, pos.z)
-        Transform.getMutable(this.camPostionParent).parent = this.vanityRoot
+        Transform.getMutable(this.camPositionParent).parent = this.vanityRoot
 
         const sampleRate = 7
         const frameTime = 30 / sampleRate
@@ -215,7 +221,7 @@ class CameraManager {
         blockPlayer()
 
 
-        LerpTransformComponent.createOrReplace(this.camPostionParent, {
+        LerpTransformComponent.createOrReplace(this.camPositionParent, {
             pathPos: this.currentPosTrack,
             pathRot: this.currentRotTrack,
             startPos: this.currentPosTrack[0] ? this.currentPosTrack[0] : Vector3.create(4, 1, 4),
@@ -233,6 +239,64 @@ class CameraManager {
         })
     }
 
+    orbitEntity(targetEntity: Entity) {
+
+        const targetPosition = getWorldPosition(targetEntity)
+
+        const camPositionParent = engine.addEntity()
+        Transform.createOrReplace(camPositionParent, {
+            position: targetPosition,
+            rotation: Quaternion.fromEulerDegrees(0, 180, 0)
+        })
+
+        const camRotationParent = engine.addEntity()
+        Transform.createOrReplace(camRotationParent, {
+            parent: camPositionParent
+        })
+
+        const camEntity = engine.addEntity()
+        Transform.createOrReplace(camEntity, {
+            parent: camRotationParent,
+            position: Vector3.create(0, 2, -6)
+        })
+
+        VirtualCamera.createOrReplace(camEntity, {
+            defaultTransition: {
+                transitionMode: VirtualCamera.Transition.Time(0)
+            },
+        })
+
+        // this.blockCamera()
+        MainCamera.createOrReplace(engine.CameraEntity, {
+            virtualCameraEntity: camEntity,
+        })
+
+        blockPlayer()
+
+        console.log("CREATING TWEEN")
+        Tween.createOrReplace(camRotationParent, {
+            mode: Tween.Mode.Rotate({
+                start: Quaternion.fromEulerDegrees(0, 0, 0),
+                end: Quaternion.fromEulerDegrees(0, 160, 0)
+            }),
+            duration: 5000,
+            easingFunction: EasingFunction.EF_LINEAR
+        })
+
+        engine.addSystem(() => {
+            const tweenCompleted = tweenSystem.tweenCompleted(camRotationParent)
+            if (tweenCompleted) {
+                console.log("REMOVING TWEEN")
+                // freeCamera()
+                MainCamera.getMutable(engine.CameraEntity).virtualCameraEntity = undefined
+                freePlayer()
+                engine.removeEntity(camPositionParent)
+                engine.removeEntity(camRotationParent)
+                engine.removeEntity(camEntity)
+                engine.removeSystem("camera-tween")
+            }
+        }, undefined, "camera-tween")
+    }
 }
 
 export let cameraManager = new CameraManager()
@@ -332,24 +396,68 @@ export function freeCamera() {
     }
 }
 
-export function blockPlayer(){
+export function blockPlayer() {
     InputModifier.createOrReplace(engine.PlayerEntity, {
         mode: {
-          $case: 'standard',
-          standard: {
-            disableAll: true
-          }
+            $case: 'standard',
+            standard: {
+                disableAll: true
+            }
         }
-      })
+    })
 }
 
-export function freePlayer(){
+export function freePlayer() {
     InputModifier.createOrReplace(engine.PlayerEntity, {
         mode: {
-          $case: 'standard',
-          standard: {
-            disableAll: false
-          }
+            $case: 'standard',
+            standard: {
+                disableAll: false
+            }
         }
-      })
+    })
+}
+
+export function getWorldPosition(entity: Entity, position = Vector3.Zero()): Vector3 {
+
+    const transform = Transform.get(entity)
+    //No transform
+    if (!transform) return Vector3.Zero()
+
+    let scaledPosition = { ...transform.position }
+    //Scale relative position by parent scale
+    if (transform.parent) {
+        const parentTransform = Transform.get(transform.parent)
+        if (parentTransform) {
+            scaledPosition.x = scaledPosition.x * parentTransform.scale.x
+            scaledPosition.y = scaledPosition.y * parentTransform.scale.y
+            scaledPosition.z = scaledPosition.z * parentTransform.scale.z
+        }
+    }
+    //Update position
+    position.x = position.x + scaledPosition.x
+    position.y = position.y + scaledPosition.y
+    position.z = position.z + scaledPosition.z
+
+    //No more parents
+    if (!transform.parent) return position;
+
+    //Get world position of the parent
+    return Vector3.add(getWorldPosition(transform.parent, position), Vector3.rotate(transform.position, getWorldRotation(transform.parent)))
+}
+
+export function getWorldRotation(entity: Entity): Quaternion {
+
+    let transform = Transform.getOrNull(entity)
+
+    if (!transform)
+        return Quaternion.Identity()
+
+    let parent = transform.parent
+
+    if (!parent) {
+        return transform.rotation
+    } else {
+        return Quaternion.multiply(transform.rotation, getWorldRotation(parent))
+    }
 }
