@@ -1,9 +1,10 @@
-import { Entity, engine, Transform, VirtualCamera, MainCamera, CameraModeArea, CameraType } from "@dcl/sdk/ecs";
+import { Entity, engine, Transform, VirtualCamera, MainCamera, CameraModeArea, CameraType, AvatarModifierArea, AvatarModifierType } from "@dcl/sdk/ecs";
 import { Quaternion, Vector3 } from "@dcl/sdk/math";
 import * as utils from '@dcl-sdk/utils'
 
 var customCameraEnt: Entity
 var forceCameraArea: Entity
+var hideAvatarArea: Entity
 var forcedFirstPersonInCameraBlock = false
 export function initCameraModiers() {
     try {
@@ -28,6 +29,13 @@ export function initCameraModiers() {
                 parent: engine.PlayerEntity
             })
         }
+        if(!hideAvatarArea) {
+            hideAvatarArea = engine.addEntity()
+            Transform.create(hideAvatarArea, {
+                position: Vector3.Zero(),
+                parent: engine.PlayerEntity
+            })
+        }
     } catch (error) {
         console.error(error); 
     }
@@ -48,11 +56,12 @@ export function blockCamera(position: Vector3, rotation: Quaternion, bForceFirst
 
         //Force 1st person some frames before blocking the camera to avoid 3rd person camera bug with block camera
         forceFirstPerson()
+        hideAvatar()
         utils.timers.setTimeout(()=>{
             MainCamera.createOrReplace(engine.CameraEntity, {
                 virtualCameraEntity: customCameraEnt,
             })
-        }, 50)
+        }, 100)
         
     } catch (error) {
         console.error(error); 
@@ -67,7 +76,8 @@ export function freeCamera() {
             //After a couple of frames, stop forcing 1st person camera mode, the transition is smooth with the release of the virtual camera and the change of mode won't be noticed
             utils.timers.setTimeout(() => {
                 freeCameraMode()
-            }, 50)
+                showAvatar()
+            }, 100)
         }
     } catch (error) {
         console.error(error); 
@@ -94,4 +104,21 @@ export function forceThirdPerson() {
         area: Vector3.create(4, 3, 4),
         mode: CameraType.CT_THIRD_PERSON,
     })
+}
+
+function hideAvatar() {
+    if(AvatarModifierArea.has(hideAvatarArea)) return;
+
+    AvatarModifierArea.create(hideAvatarArea, {
+        area: Vector3.create(4, 3, 4),
+        modifiers: [AvatarModifierType.AMT_HIDE_AVATARS],
+        excludeIds: []
+    })
+}
+function showAvatar() {
+    try {
+        AvatarModifierArea.deleteFrom(hideAvatarArea)
+    } catch (error) {
+        console.error(error); 
+    }
 }

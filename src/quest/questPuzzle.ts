@@ -72,6 +72,7 @@ export class QuestPuzzle {
     this.targeterCircle.setCircleScale(0.4)
     this.questIndicator = new QuestIndicator(this.kit.entity)
     Transform.getMutable(this.questIndicator.icon).position = Vector3.create(0, 2.1, 0)
+    this.questIndicator.hide()
     this.connect_game = new ConnectMiniGame(this.gameController)
     this.bubbleTalk = new sideBubbleTalk(this.kit.bubbleAttach)
     this.bubbleTalk.closeBubbleInTime()
@@ -161,6 +162,7 @@ export class QuestPuzzle {
         this.taskTalkSwap()
         this.clicOnNPC2PuzzleCompleted()
         this.questIndicator.updateStatus(IndicatorState.ARROW)
+        this.questIndicator.showWithAnim()
       }, 1000)
     }
   }

@@ -164,6 +164,7 @@ export class ClaimEmoteTokenRequest {
       yPosition: -120,
       onMouseDown: () => {
         this.retryUI.hide()
+        this.gameController.questEmote.onCloseRewardUI()
       }
     })
   }
@@ -279,6 +280,9 @@ export class ClaimEmoteTokenRequest {
     } catch (error) {
       console.log(METHOD_NAME, 'error fetching from token server ', url)
       console.log(METHOD_NAME, 'error', error)
+      this.claimInProgress.hide()
+      if(this.msgRetryUi) this.msgRetryUi.value = 'An unexpected error occurred'
+      this.retryUI.show()
     }
   }
   async processResponse(response: any, campaign_key: string) {

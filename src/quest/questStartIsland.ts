@@ -32,6 +32,8 @@ import { CLICKME, HELP_BEIZER, JUMP, OVERHERE } from '../jsonData/textsTutorialB
 import { point1, point2, point3 } from '../jsonData/npcData'
 import { sendTrak } from '../utils/segment'
 import { NPC } from '../imports/components/npc.class'
+import { blockCamera, forceFirstPerson, freeCamera, freeCameraMode } from '../utils/camera'
+import { lockPlayer, unlockPlayer } from '../utils/blockPlayer'
 
 export class SpawnIsland {
   tobor: NPC
@@ -204,6 +206,7 @@ export class SpawnIsland {
     Animator.stopAllAnimations(this.tobor.entity)
     Animator.getClip(this.tobor.entity, 'Talk').playing = true
     this.targeterCircle.showCircle(false)
+    this.questIndicator.hide()
     this.gameController.uiController.widgetTasks.showTick(true, 0)
     this.gameController.uiController.popUpControls.hideLookControlsUI()
     this.gameController.uiController.popUpControls.hideCursorLockControlsUI()
@@ -322,15 +325,63 @@ export class SpawnIsland {
   }
   dialogAtPilar() {
     this.questIndicator.updateStatus(IndicatorState.ARROW)
+    this.questIndicator.showWithAnim()
   }
   onCloseRewardUI() {
-    this.activateBridge()
-    this.activatePilar()
-    Animator.stopAllAnimations(this.tobor.entity)
-    Animator.getClip(this.tobor.entity, 'Robot_Idle').playing = true
-    this.gameController.uiController.widgetTasks.showTasks(true, TaskType.Simple)
-    this.gameController.spawnIsland.bubbleTalk.openBubble(HELP_BEIZER, false)
-    this.gameController.questEmote.questIndicator.updateStatus(IndicatorState.ARROW)
+    this.targeterCircle.showCircle(false)
+    this.questIndicator.hide()
+    //Camera animations
+
+    //Blocks camera after force a 1st person, the transition is smooth and the change of camera won't be noticed
+    const moveToPosition = Vector3.create(203.60,64.89,129.5)
+    const afterCameraTarget = Vector3.add(Transform.get(this.gameController.questEmote.bezier.entity).position, Vector3.create(0,40,0))
+    const cameraPoint = Vector3.create(199,66,127)
+    blockCamera(
+      cameraPoint, 
+      Quaternion.fromLookAt(cameraPoint, Vector3.add(Transform.get(this.gameController.questEmote.bezier.entity).position, Vector3.create(0,40,0))),
+      true
+    )
+    //If player is in front of the camera, move it inmidetlly
+    //if(
+    //  Vector3.distance(cameraPoint, Transform.get(this.gameController.questEmote.bezier.entity).position) 
+    //  > Vector3.distance(Transform.get(engine.PlayerEntity).position, Transform.get(this.gameController.questEmote.bezier.entity).position)
+    //) {
+    //  movePlayerTo({
+    //    newRelativePosition: moveToPosition,
+    //    cameraTarget: afterCameraTarget
+    //  })
+    //}
+    //Lock player controls
+    lockPlayer()
+    //500ms to wait for block camera traveling
+    utils.timers.setTimeout(() => {
+      //Bridge & indicator animations
+      this.gameController.questEmote.npcSayHi()
+      this.activateBridge()
+      this.activatePilar()
+      Animator.stopAllAnimations(this.tobor.entity)
+      Animator.getClip(this.tobor.entity, 'Robot_Idle').playing = true
+      this.gameController.uiController.widgetTasks.showTasks(true, TaskType.Simple)
+      this.gameController.spawnIsland.bubbleTalk.openBubble(HELP_BEIZER, false)
+      this.gameController.questEmote.questIndicator.updateStatus(IndicatorState.ARROW)
+      this.gameController.questEmote.questIndicator.showWithAnim()
+      //Release camera after animations (1000ms)
+      utils.timers.setTimeout(() => {
+        //While the camera is still blocked, move the player & camera look to the desired target
+        
+        movePlayerTo({
+          newRelativePosition: moveToPosition,
+          cameraTarget: afterCameraTarget
+        })
+        //Wait some frames until move player is finished (500ms here because of desired anim time)
+        utils.timers.setTimeout(() => {
+          //Free the camera and unlock plaver controls, the 1st person camera is still being forced to avoid 3rd person camera rotation bug on release camera
+          freeCamera()
+          unlockPlayer()
+  
+        }, 500)
+      }, 1000)
+    }, 500)
   }
   activatePilar() {
     AudioManager.instance().playTowerCharge(this.gameController.mainInstance.s0_Z3_Quest_Pillar_Art_4__01)

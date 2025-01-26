@@ -130,7 +130,7 @@ export class EmoteControlsUI {
                             positionType: 'relative',
                             margin: { left: '5px' },
                             }}
-                            value="<b>To Open The EMote Wheel</b>"
+                            value="<b>To Open The Emote Wheel</b>"
                             fontSize={KEY_TEXT_FONT_SIZE}
                             font="sans-serif"
                             color={Color4.White()}

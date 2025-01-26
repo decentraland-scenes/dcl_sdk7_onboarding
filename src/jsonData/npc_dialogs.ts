@@ -57,7 +57,10 @@ import {
   THIRD_ISLAND_6,
   THIRD_ISLAND_7,
   THIRD_ISLAND_8,
-  THIRD_ISLAND_9
+  THIRD_ISLAND_9,
+  SECOND_ISLAND_9,
+  SECOND_ISLAND_11,
+  SECOND_ISLAND_10
 } from './textsTutorialPopups'
 import { POPUP_STATE } from '../uis/popupUI'
 
@@ -133,6 +136,11 @@ export class Dialogs {
       {
         text: SECOND_ISLAND_2,
         typeSpeed: this.typeSpeed,
+        portrait: surprisedBezier
+      },
+      {
+        text: SECOND_ISLAND_3,
+        typeSpeed: this.typeSpeed,
         portrait: surprisedBezier,
         isEndOfDialog: true,
         triggeredByNext: () => {
@@ -140,37 +148,55 @@ export class Dialogs {
         }
       },
       {
-        text: SECOND_ISLAND_3,
-        portrait: surprisedBezier,
-        typeSpeed: this.typeSpeed
-      },
-      {
         text: SECOND_ISLAND_4,
-        portrait: happyBezier,
+        portrait: surprisedBezier,
         typeSpeed: this.typeSpeed
       },
       {
         text: SECOND_ISLAND_5,
         portrait: happyBezier,
+        typeSpeed: this.typeSpeed,
         isEndOfDialog: true,
         triggeredByNext: () => {
           this.gameController.questEmote.setWalletConnection()
         },
-        typeSpeed: this.typeSpeed
       },
       {
         text: SECOND_ISLAND_6,
+        portrait: happyBezier,
+        typeSpeed: this.typeSpeed
+      },
+      {
+        text: SECOND_ISLAND_7,
+        portrait: happyBezier,
+        typeSpeed: this.typeSpeed,
+        isEndOfDialog: true,
+        triggeredByNext: () => {
+          this.gameController.questEmote.cameraAndBridgeAnim()
+        },
+      },
+      {
+        text: SECOND_ISLAND_8,
+        portrait: talkingBezier,
+        isEndOfDialog: true,
+        triggeredByNext: () => {
+          this.gameController.questEmote.finishAfterRewardDialog()
+        },
+        typeSpeed: this.typeSpeed
+      },
+      {
+        text: SECOND_ISLAND_9,
         portrait: talkingBezier,
         isEndOfDialog: true,
         typeSpeed: this.typeSpeed
       },
       {
-        text: SECOND_ISLAND_7,
+        text: SECOND_ISLAND_10,
         portrait: talkingBezier,
         typeSpeed: this.typeSpeed
       },
       {
-        text: SECOND_ISLAND_8,
+        text: SECOND_ISLAND_11,
         portrait: talkingBezier,
         isEndOfDialog: true,
         triggeredByNext: () => {

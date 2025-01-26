@@ -521,6 +521,7 @@ export class Popup {
                 this.uiController.gameController.questEmote.onCloseRewardUI()
               } else if (POPUP_STATE.OneButton) {
                 this.hide(POPUP_STATE.OneButton)
+                this.uiController.gameController.questEmote.onCloseRewardUI()
               }
             }}
           >

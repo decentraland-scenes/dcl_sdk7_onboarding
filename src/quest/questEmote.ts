@@ -28,6 +28,9 @@ import { ClaimEmoteTokenRequest } from '../claim/claimEmote'
 import { configEmote } from '../claim/config'
 import { sendTrak } from '../utils/segment'
 import { NPC } from '../imports/components/npc.class'
+import { lockPlayer, unlockPlayer } from '../utils/blockPlayer'
+import { movePlayerTo } from '~system/RestrictedActions'
+import { blockCamera, freeCamera } from '../utils/camera'
 
 export class QuestEmote {
   gameController: GameController
@@ -46,6 +49,11 @@ export class QuestEmote {
   firstTimeClosingRewardUI: boolean = true
   arrows: Entity[]
   claim: ClaimEmoteTokenRequest
+
+  private readonly talkCameraPoint = Vector3.create(162.54,67.33,104.62)
+  private readonly bridgeCameraPoint = Vector3.create(167.06,67.33,115.58)
+  private readonly talkPlayerPoint = Vector3.create(163.79,65.97,106.08)
+
   constructor(gameController: GameController) {
     this.gameController = gameController
     this.claim = new ClaimEmoteTokenRequest(
@@ -115,6 +123,7 @@ export class QuestEmote {
     )
     this.questIndicator = new QuestIndicator(this.bezier.entity)
     Transform.getMutable(this.questIndicator.icon).position = Vector3.create(0, 2.5, 0)
+    this.questIndicator.hide()
     this.targeterCircle.showCircle(true)
     this.targeterCircle.setCircleScale(0.4)
     this.loadTagData()
@@ -157,13 +166,7 @@ export class QuestEmote {
       1,
       [{ type: 'box', scale: Vector3.create(15, 5, 15) }],
       () => {
-        AudioManager.instance().playOnce('npc_1_salute', { volume: 1, parent: this.bezier.entity })
-        Animator.stopAllAnimations(this.bezier.entity)
-        Animator.playSingleAnimation(this.bezier.entity, 'Hi')
-        utils.timers.setTimeout(() => {
-          Animator.stopAllAnimations(this.bezier.entity)
-          Animator.playSingleAnimation(this.bezier.entity, 'Idle')
-        }, 5000)
+        this.npcSayHi()
         engine.removeEntity(triggerHi)
       },
       () => {
@@ -171,23 +174,48 @@ export class QuestEmote {
       }
     )
   }
+  npcSayHi(){
+    AudioManager.instance().playOnce('npc_1_salute', { volume: 1, parent: this.bezier.entity })
+    Animator.stopAllAnimations(this.bezier.entity)
+    Animator.playSingleAnimation(this.bezier.entity, 'Hi')
+    utils.timers.setTimeout(() => {
+      Animator.stopAllAnimations(this.bezier.entity)
+      Animator.playSingleAnimation(this.bezier.entity, 'Idle')
+    }, 5000)
+  }
 
   startInteract() {
-    sendTrak('z1_quest1_00', this.gameController.timeStamp)
-    this.gameController.uiController.widgetTasks.showTick(true, 0)
-    utils.timers.setTimeout(() => {
-      this.gameController.uiController.widgetTasks.setText(4, 0)
-      this.gameController.uiController.widgetTasks.showTasks(true, TaskType.Simple)
-    }, 1500)
-    AudioManager.instance().playOnce('npc_1_salute', { volume: 0.6, parent: this.bezier.entity })
-    openDialogWindow(this.bezier.entity, this.gameController.dialogs.bezierDialog, 0)
-    Animator.stopAllAnimations(this.bezier.entity)
-    Animator.getClip(this.bezier.entity, 'Talk').playing = true
-    this.targeterCircle.showCircle(false)
-    this.questIndicator.hide()
+
+    //Block player & setup camera
+    lockPlayer()
+    blockCamera(
+      this.talkCameraPoint,
+      Quaternion.fromLookAt(this.talkCameraPoint, Vector3.create(Transform.get(this.bezier.entity).position.x, this.talkCameraPoint.y, Transform.get(this.bezier.entity).position.z)),
+      true
+    )
+    utils.timers.setTimeout(()=>{  
+      movePlayerTo({
+        newRelativePosition: this.talkPlayerPoint,
+        cameraTarget: Vector3.create(Transform.get(this.bezier.entity).position.x, this.talkCameraPoint.y, Transform.get(this.bezier.entity).position.z)
+      })
+      sendTrak('z1_quest1_00', this.gameController.timeStamp)
+      this.gameController.uiController.widgetTasks.showTick(true, 0)
+      utils.timers.setTimeout(() => {
+        this.gameController.uiController.widgetTasks.setText(4, 0)
+        this.gameController.uiController.widgetTasks.showTasks(true, TaskType.Simple)
+      }, 1500)
+      AudioManager.instance().playOnce('npc_1_salute', { volume: 0.6, parent: this.bezier.entity })
+      openDialogWindow(this.bezier.entity, this.gameController.dialogs.bezierDialog, 0)
+      Animator.stopAllAnimations(this.bezier.entity)
+      Animator.getClip(this.bezier.entity, 'Talk').playing = true
+      this.targeterCircle.showCircle(false)
+      this.questIndicator.hide()
+    }, 500)
   }
   startEmoteQuest() {
     //this.gameController.uiController.popUpControls.emoteContainerVisible = true
+    unlockPlayer()
+    freeCamera()
     this.gameController.uiController.popUpControls.showEmoteLockControlsUI()
     this.emoteQuest()
   }
@@ -257,23 +285,36 @@ export class QuestEmote {
     }
   }
   completeQuestDialog() {
-    openDialogWindow(this.bezier.entity, this.gameController.dialogs.bezierDialog, 3)
-    this.gameController.uiController.widgetTasks.showTick(true, 0)
-    this.gameController.uiController.widgetTasks.showTick(true, 1)
-    utils.timers.setTimeout(() => {
-      this.gameController.uiController.widgetTasks.showTick(false, 0)
-      this.gameController.uiController.widgetTasks.setText(5, 0)
-      this.gameController.uiController.widgetTasks.showTasks(true, TaskType.Simple)
-    }, 1500)
-    this.bubbleTalk.closeBubbleInTime()
-    Animator.stopAllAnimations(this.bezier.entity)
-    Animator.getClip(this.bezier.entity, 'Celebrate').playing = true
-    //this.gameController.uiController.popUpControls.emoteContainerVisible = false
-    this.gameController.uiController.popUpControls.hideEmoteLockControlsUI()
-    utils.timers.setTimeout(() => {
+    //Block player & setup camera
+    lockPlayer()
+    blockCamera(
+      this.talkCameraPoint,
+      Quaternion.fromLookAt(this.talkCameraPoint, Vector3.create(Transform.get(this.bezier.entity).position.x, this.talkCameraPoint.y, Transform.get(this.bezier.entity).position.z)),
+      true
+    )
+    utils.timers.setTimeout(()=>{  
+      movePlayerTo({
+        newRelativePosition: this.talkPlayerPoint,
+        cameraTarget: Vector3.add(Transform.get(this.gameController.mainInstance.s0_En_Npc2_01).position, Vector3.create(0,1,0))
+      })
+      openDialogWindow(this.bezier.entity, this.gameController.dialogs.bezierDialog, 4)
+      this.gameController.uiController.widgetTasks.showTick(true, 0)
+      this.gameController.uiController.widgetTasks.showTick(true, 1)
+      utils.timers.setTimeout(() => {
+        this.gameController.uiController.widgetTasks.showTick(false, 0)
+        this.gameController.uiController.widgetTasks.setText(5, 0)
+        this.gameController.uiController.widgetTasks.showTasks(true, TaskType.Simple)
+      }, 1500)
+      this.bubbleTalk.closeBubbleInTime()
       Animator.stopAllAnimations(this.bezier.entity)
-      Animator.getClip(this.bezier.entity, 'Talk').playing = true
-    }, 3000)
+      Animator.getClip(this.bezier.entity, 'Celebrate').playing = true
+      //this.gameController.uiController.popUpControls.emoteContainerVisible = false
+      this.gameController.uiController.popUpControls.hideEmoteLockControlsUI()
+      utils.timers.setTimeout(() => {
+        Animator.stopAllAnimations(this.bezier.entity)
+        Animator.getClip(this.bezier.entity, 'Talk').playing = true
+      }, 3000)
+    }, 500)
   }
   spawnParticles() {
     const particle = engine.addEntity()
@@ -332,13 +373,34 @@ export class QuestEmote {
   }
   onCloseRewardUI() {
     if (this.firstTimeClosingRewardUI) {
+      openDialogWindow(this.bezier.entity, this.gameController.dialogs.bezierDialog, 6)
+      this.firstTimeClosingRewardUI = false
+    }
+    else this.dialogQuestFinished()
+  }
+  cameraAndBridgeAnim() {
+    //freeCamera()
+    blockCamera(
+      this.bridgeCameraPoint, 
+      Quaternion.fromLookAt(this.bridgeCameraPoint, Vector3.add(Transform.get(this.gameController.mainInstance.s0_En_Npc2_01).position, Vector3.create(0,1,0))),
+      true
+    )
+    utils.timers.setTimeout(()=>{
       //Pilar Turn ON
       this.activatePilar()
       //Bridge Turn ON
       this.activateBridge()
       this.gameController.questMaterial.questIndicator.updateStatus(IndicatorState.ARROW)
-      this.firstTimeClosingRewardUI = false
-    }
+      this.gameController.questMaterial.questIndicator.showWithAnim()
+      utils.timers.setTimeout(()=>{
+        openDialogWindow(this.bezier.entity, this.gameController.dialogs.bezierDialog, 8)
+      }, 1000)
+    }, 500)
+ 
+  }
+  finishAfterRewardDialog() {
+    freeCamera()
+    unlockPlayer()
     this.dialogQuestFinished()
   }
   getBridgeArrow() {
@@ -376,8 +438,7 @@ export class QuestEmote {
   }
   giveReward() {
     this.claim.claimToken()
-    this.onCloseRewardUI()
-    //....
+    //this.onCloseRewardUI()
   }
   setRewardTrue() {
     this.hasReward = true
@@ -406,7 +467,7 @@ export class QuestEmote {
   remindPlayerOfReward() {
     pointerEventsSystem.removeOnPointerDown(this.bezier.npcChild)
     console.log('remind player of reward')
-    openDialogWindow(this.bezier.entity, this.gameController.dialogs.bezierDialog, 7)
+    openDialogWindow(this.bezier.entity, this.gameController.dialogs.bezierDialog, 11)
     this.bubbleTalk.closeBubbleInTime()
     Animator.stopAllAnimations(this.bezier.entity)
     Animator.playSingleAnimation(this.bezier.entity, 'Talk')
@@ -418,7 +479,7 @@ export class QuestEmote {
   tellPlayerToFindMat() {
     console.log('tell player to find mat')
     if (this.walletConected === true) {
-      openDialogWindow(this.bezier.entity, this.gameController.dialogs.bezierDialog, 6)
+      openDialogWindow(this.bezier.entity, this.gameController.dialogs.bezierDialog, 9)
     }
     PointerEvents.deleteFrom(this.bezier.npcChild)
     this.bubbleTalk.openBubble(ZONE_1_EMOTE_4, true)

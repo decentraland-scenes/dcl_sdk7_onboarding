@@ -96,6 +96,7 @@ export class QuestMaterials {
     this.mat.activateBillBoard(true)
     this.mat.setChildScaleYAxis(3.1)
     this.questIndicator = new QuestIndicator(this.mat.entity)
+    this.questIndicator.hide()
     this.bubbleTalk = new sideBubbleTalk(this.mat.bubbleAttach)
     this.bubbleTalk.closeBubbleInTime()
     this.targeterCircle = new FloorCircleTargeter(
@@ -310,6 +311,7 @@ export class QuestMaterials {
       this.deliverAllPiecesClick()
     }, 3000)
     this.questIndicator.updateStatus(IndicatorState.ARROW)
+    this.questIndicator.showWithAnim()
   }
 
   spawnparticles() {
@@ -362,6 +364,7 @@ export class QuestMaterials {
       Animator.getClip(this.mat.entity, 'Idle').playing = true
     }, 1500)
     this.gameController.questPuzzle.questIndicator.updateStatus(IndicatorState.ARROW)
+    this.gameController.questPuzzle.questIndicator.showWithAnim()
     this.gameController.uiController.popUpControls.hideInteractControlsUI()
     utils.timers.setTimeout(() => {
       this.gameController.uiController.popUpControls.showRunLockControlsUI()
