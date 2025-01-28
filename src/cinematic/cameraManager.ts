@@ -1,4 +1,4 @@
-import { CameraModeArea, CameraType, EasingFunction, engine, Entity, InputAction, InputModifier, inputSystem, MainCamera, PBTween, PointerEventType, Schemas, TextAlignMode, Transform, TransformType, Tween, TweenLoop, TweenSequence, tweenSystem, Vector3Type, VirtualCamera } from "@dcl/sdk/ecs"
+import { AvatarModifierArea, AvatarModifierType, CameraModeArea, CameraType, EasingFunction, engine, Entity, InputAction, InputModifier, inputSystem, MainCamera, PBTween, PointerEventType, Schemas, TextAlignMode, Transform, TransformType, Tween, TweenLoop, TweenSequence, tweenSystem, Vector3Type, VirtualCamera } from "@dcl/sdk/ecs"
 import { Color4, Quaternion, Vector3 } from "@dcl/sdk/math"
 import { vanityTracks } from "./vanityTracks"
 import * as utils from '@dcl-sdk/utils'
@@ -7,12 +7,12 @@ import { gameController } from ".."
 
 export let fadeColor: Color4 = Color4.fromHexString("#00000000")
 
-enum FADE_STATE {
-    IDLE,
-    GOING_BLACK,
-    FULLY_BLACK,
-    FADING_OUT
-}
+// enum FADE_STATE {
+//     IDLE,
+//     GOING_BLACK,
+//     FULLY_BLACK,
+//     FADING_OUT
+// }
 //var customCameraEnt: Entity
 const PathTransportData = {
     pathPos: Schemas.Array(Schemas.Vector3),
@@ -37,17 +37,17 @@ export const LerpTransformComponent = engine.defineComponent(
     PathTransportData
 )
 
-export const BlackFade = engine.defineComponent(
-    'BlackFadeComponent',
-    {
-        fraction: Schemas.Float,
-        currentValue: Schemas.Number,
-        duration: Schemas.Number,
-        offTime: Schemas.Number,
-        elapsedTime: Schemas.Number,
-        state: Schemas.EnumNumber<FADE_STATE>(FADE_STATE, FADE_STATE.IDLE)
-    }
-)
+// export const BlackFade = engine.defineComponent(
+//     'BlackFadeComponent',
+//     {
+//         fraction: Schemas.Float,
+//         currentValue: Schemas.Number,
+//         duration: Schemas.Number,
+//         offTime: Schemas.Number,
+//         elapsedTime: Schemas.Number,
+//         state: Schemas.EnumNumber<FADE_STATE>(FADE_STATE, FADE_STATE.IDLE)
+//     }
+// )
 
 class CameraManager {
     camPositionParent: Entity
@@ -60,6 +60,9 @@ class CameraManager {
     modifierButtonPressed: Boolean = false
     cameraInitialized = false
 
+    forcedFirstPersonInCameraBlock = false
+    forceCameraArea: Entity
+    hideAvatarArea: Entity
     constructor() {
 
         this.currentPosTrack = []
@@ -83,6 +86,17 @@ class CameraManager {
             position: Vector3.create(48, 1, 30)
         })
 
+        this.hideAvatarArea = engine.addEntity()
+        Transform.create(this.hideAvatarArea, {
+            position: Vector3.Zero(),
+            parent: engine.PlayerEntity
+        })
+
+        this.forceCameraArea = engine.addEntity()
+        Transform.create(this.forceCameraArea, {
+            position: Vector3.Zero(),
+            parent: engine.PlayerEntity
+        })
     }
 
     initCamera() {
@@ -99,6 +113,15 @@ class CameraManager {
             },
         })
         
+        function stopAnimationTrack() {
+            const pathGroup = engine.getEntitiesWith(Transform, LerpTransformComponent)
+
+            for (let [obj] of pathGroup) {
+                let lerp = LerpTransformComponent.getMutable(obj)
+                lerp.active = false
+            }
+        }
+
         function cameraAnimationSystem(dt: number) {
             //POSITION TRACK
             const pathGroup = engine.getEntitiesWith(Transform, LerpTransformComponent)
@@ -154,8 +177,10 @@ class CameraManager {
 
     }
 
-    blockCamera(position?: Vector3, target?: Vector3, transitionSpeed = 0.5) {
+    async blockCamera(position: Vector3, target: Vector3,  bForceFirstPerson: boolean = false, transitionSpeed = 0.5) {
         try {
+            this.forcedFirstPersonInCameraBlock = bForceFirstPerson
+
             // let camEntityTf = Transform.getMutable(this.camEntity)
             VirtualCamera.getMutable(this.camEntity).defaultTransition = { transitionMode: VirtualCamera.Transition.Time(transitionSpeed) }
             let camPositionParentTransform = Transform.getMutable(this.camPositionParent)
@@ -165,15 +190,44 @@ class CameraManager {
             camPositionParentTransform.rotation = Quaternion.Identity()
 
             if(position) camPositionParentTransform.position = position
-            if(position && target) {
-                // camPositionParentTransform.rotation = Quaternion.fromLookAt(position, target)
-                camRotationParentTransform.rotation = Quaternion.fromLookAt(position, target)
+            if(position && target) camRotationParentTransform.rotation = Quaternion.fromLookAt(position, target)
+            
+            if(!bForceFirstPerson){
+                MainCamera.createOrReplace(engine.CameraEntity, {
+                    virtualCameraEntity: this.camEntity,
+                })
+                return
             }
-            console.log("Block camera: ", JSON.stringify(Transform.get(engine.CameraEntity)))
+
+            this.forceFirstPerson()
+            this.hideAvatar()
+            await wait_ms(100)
             MainCamera.createOrReplace(engine.CameraEntity, {
                 virtualCameraEntity: this.camEntity,
             })
 
+            return
+
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    async freeCamera(){
+        try {
+            MainCamera.getMutable(engine.CameraEntity).virtualCameraEntity = undefined
+            
+            if(this.forcedFirstPersonInCameraBlock) {     
+                //After a couple of frames, stop forcing 1st person camera mode, the transition is smooth with the release of the virtual camera and the change of mode won't be noticed
+                utils.timers.setTimeout(() => {
+                    this.freeCameraMode()
+                    this.showAvatar()
+
+                    return
+                }, 100)
+            }
+            else return
+    
         } catch (error) {
             console.error(error);
         }
@@ -204,7 +258,7 @@ class CameraManager {
     async startPathTrack(track: any, loop: boolean, finalPos: Vector3, finalCamTarget: Vector3) {
         this.initCamera()
 
-        this.blockCamera(undefined, undefined, 0)
+        this.blockCamera(finalPos, finalCamTarget, false, 0)
 
         Transform.getMutable(this.camPositionParent).parent = engine.RootEntity
 
@@ -213,7 +267,7 @@ class CameraManager {
         this.loadCameraTrack(track)
         
         lockPlayer()
-        forceFirstPerson()
+        this.forceFirstPerson()
 
         await wait_ms(100)
 
@@ -237,14 +291,14 @@ class CameraManager {
         await this.checkIfLerpTransformComplete(this.camPositionParent)
 
         await wait_ms(50)
-        this.blockCamera(finalPos, finalCamTarget, 0.5)
+        this.blockCamera(finalPos, finalCamTarget, false, 0.5)
 
         await wait_ms(50)
         unlockPlayer()
-        freeCamera()
+        await this.freeCamera()
 
         await wait_ms(50)
-        freeCameraMode()
+        this.freeCameraMode()
 
         return
     }
@@ -253,7 +307,7 @@ class CameraManager {
         this.initCamera()
 
         // let playerPos = Transform.get(engine.PlayerEntity).position
-        this.blockCamera(undefined, undefined, 0)
+        this.blockCamera(finalPos, finalCamTarget, false, 0)
 
         const pos = Transform.get(targetEntity).position
         Transform.getMutable(this.vanityRoot).position = Vector3.create(pos.x, pos.y, pos.z)
@@ -264,7 +318,7 @@ class CameraManager {
         this.loadCameraTrack(track)
         
         lockPlayer()
-        forceFirstPerson()
+        this.forceFirstPerson()
 
         await wait_ms(100)
 
@@ -288,14 +342,14 @@ class CameraManager {
         await this.checkIfLerpTransformComplete(this.camPositionParent)
 
         await wait_ms(50)
-        this.blockCamera(finalPos, finalCamTarget, 0.5)
+        this.blockCamera(finalPos, finalCamTarget, false, 0.5)
 
         await wait_ms(50)
         unlockPlayer()
-        freeCamera()
+        await this.freeCamera()
 
         await wait_ms(50)
-        freeCameraMode()
+        this.freeCameraMode()
 
         return
     }
@@ -312,12 +366,12 @@ class CameraManager {
 
         // await wait_ms(500)
         console.log('orbitEntity. forceFirstPerson')
-        forceFirstPerson()
+        this.forceFirstPerson()
 
         await wait_ms(100)
         console.log('orbitEntity. blockCamera')
 
-        this.blockCamera(finalPos, finalCamTarget, 0)
+        this.blockCamera(finalPos, finalCamTarget, false, 0)
 
         // await wait_ms(5000)
         console.log('orbitEntity. start camera tween.')
@@ -385,7 +439,7 @@ class CameraManager {
 
         // await wait_ms(100)
         // console.log('blockCamera')
-        this.blockCamera(finalPos, finalCamTarget, 0.5)
+        this.blockCamera(finalPos, finalCamTarget, false, 0.5)
         // console.log("movePlayerTo. pos:", JSON.stringify(finalPos), 'target:', JSON.stringify(finalCamTarget))
         // movePlayerTo({
         //     // newRelativePosition: Vector3.create(224.127, 68.7368, 124.0051), // spawn island
@@ -397,11 +451,11 @@ class CameraManager {
         await wait_ms(50)
         // console.log("unlockPlayer and freeCamera")
         unlockPlayer()
-        freeCamera()
+        await this.freeCamera()
 
         await wait_ms(50)
         // console.log("freeCameraMode")
-        freeCameraMode()
+        this.freeCameraMode()
 
         return
     }
@@ -429,6 +483,43 @@ class CameraManager {
             }, undefined, "check-lerp-complete")
         })
     }
+    
+    hideAvatar() {
+        if(AvatarModifierArea.has(this.hideAvatarArea)) return;
+
+        AvatarModifierArea.create(this.hideAvatarArea, {
+            area: Vector3.create(4, 3, 4),
+            modifiers: [AvatarModifierType.AMT_HIDE_AVATARS],
+            excludeIds: []
+        })
+    }
+    showAvatar() {
+        try {
+            AvatarModifierArea.deleteFrom(this.hideAvatarArea)
+        } catch (error) {
+            console.error(error); 
+        }
+    }
+    freeCameraMode(){
+        try {
+            CameraModeArea.deleteFrom(this.forceCameraArea)
+        } catch (error) {
+            console.error(error); 
+        }
+    }
+    forceFirstPerson() {
+        CameraModeArea.createOrReplace(this.forceCameraArea, {
+            area: Vector3.create(4, 3, 4),
+            mode: CameraType.CT_FIRST_PERSON,
+        })
+    }
+    forceThirdPerson() {
+
+        CameraModeArea.createOrReplace(this.forceCameraArea, {
+            area: Vector3.create(4, 3, 4),
+            mode: CameraType.CT_THIRD_PERSON,
+        })
+    }
 }
 
 export let cameraManager = new CameraManager()
@@ -445,62 +536,42 @@ export let cameraManager = new CameraManager()
 //     }
 // }
 
-export function stopAnimationTrack() {
-    const pathGroup = engine.getEntitiesWith(Transform, LerpTransformComponent)
+// let firstPersonArea: Entity | null = null
+// export function forceFirstPerson(){
+//     if(!firstPersonArea){
+//         firstPersonArea = engine.addEntity()
 
-    for (let [obj] of pathGroup) {
+//         Transform.create(firstPersonArea, {
+//             parent: engine.RootEntity
+//         })
 
-        let lerp = LerpTransformComponent.getMutable(obj)
-        lerp.active = false
-
-
-    }
-}
-
-let firstPersonArea: Entity | null = null
-export function forceFirstPerson(){
-    if(!firstPersonArea){
-        firstPersonArea = engine.addEntity()
-
-        Transform.create(firstPersonArea, {
-            parent: engine.RootEntity
-        })
-
-        CameraModeArea.create(firstPersonArea, {
-            area: Vector3.create(4, 3, 4),
-            mode: CameraType.CT_FIRST_PERSON,
-        })
-    }
+//         CameraModeArea.create(firstPersonArea, {
+//             area: Vector3.create(4, 3, 4),
+//             mode: CameraType.CT_FIRST_PERSON,
+//         })
+//     }
     
-    Transform.getMutable(firstPersonArea).parent = engine.PlayerEntity
+//     Transform.getMutable(firstPersonArea).parent = engine.PlayerEntity
 
-}
+// }
 
-export function freeCameraMode(){
-    if(!firstPersonArea){
-        firstPersonArea = engine.addEntity()
+// export function freeCameraMode(){
+//     if(!firstPersonArea){
+//         firstPersonArea = engine.addEntity()
 
-        Transform.create(firstPersonArea, {
-            parent: engine.RootEntity
-        })
+//         Transform.create(firstPersonArea, {
+//             parent: engine.RootEntity
+//         })
         
-        CameraModeArea.create(firstPersonArea, {
-            area: Vector3.create(4, 3, 4),
-            mode: CameraType.CT_FIRST_PERSON,
-        })
-    }
+//         CameraModeArea.create(firstPersonArea, {
+//             area: Vector3.create(4, 3, 4),
+//             mode: CameraType.CT_FIRST_PERSON,
+//         })
+//     }
     
-    Transform.getMutable(firstPersonArea).parent = engine.RootEntity
-}
+//     Transform.getMutable(firstPersonArea).parent = engine.RootEntity
+// }
 
-export function freeCamera() {
-    try {
-        MainCamera.getMutable(engine.CameraEntity).virtualCameraEntity = undefined
-
-    } catch (error) {
-        console.error(error);
-    }
-}
 
 export function lockPlayer() {
     InputModifier.createOrReplace(engine.PlayerEntity, {
