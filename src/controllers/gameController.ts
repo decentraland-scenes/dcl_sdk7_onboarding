@@ -1,3 +1,4 @@
+import { cameraManager } from '../cinematic/cameraManager'
 import { initAudioEntities } from '../imports/components/audio/sounds'
 import { MainInstace } from '../instance/mainInstance'
 import { Dialogs } from '../jsonData/npc_dialogs'
@@ -33,5 +34,6 @@ export class GameController {
 
     initAudioEntities()
     initCameraModiers()
+    cameraManager.initCamera()
   }
 }
