@@ -1,6 +1,9 @@
-import { EasingFunction, engine, Entity, InputAction, InputModifier, inputSystem, MainCamera, PBTween, PointerEventType, Schemas, TextAlignMode, Transform, TransformType, Tween, TweenLoop, TweenSequence, tweenSystem, Vector3Type, VirtualCamera } from "@dcl/sdk/ecs"
+import { CameraModeArea, CameraType, EasingFunction, engine, Entity, InputAction, InputModifier, inputSystem, MainCamera, PBTween, PointerEventType, Schemas, TextAlignMode, Transform, TransformType, Tween, TweenLoop, TweenSequence, tweenSystem, Vector3Type, VirtualCamera } from "@dcl/sdk/ecs"
 import { Color4, Quaternion, Vector3 } from "@dcl/sdk/math"
 import { vanityTracks } from "./vanityTracks"
+import * as utils from '@dcl-sdk/utils'
+import { movePlayerTo } from "~system/RestrictedActions"
+import { gameController } from ".."
 
 export let fadeColor: Color4 = Color4.fromHexString("#00000000")
 
@@ -62,51 +65,6 @@ class CameraManager {
         this.currentPosTrack = []
         this.currentRotTrack = []
 
-        // engine.addSystem(() => {
-        //     if (
-        //         inputSystem.isTriggered(InputAction.IA_SECONDARY, PointerEventType.PET_DOWN)
-        //     ) {
-
-        //         stopAnimationTrack()
-        //     }
-        //     if (
-        //         inputSystem.isTriggered(InputAction.IA_PRIMARY, PointerEventType.PET_DOWN)
-        //     ) {
-        //         console.log("MODIFIER ON")
-        //         this.modifierButtonPressed = true
-        //     }
-        //     if (
-        //         inputSystem.isTriggered(InputAction.IA_PRIMARY, PointerEventType.PET_UP)
-        //     ) {
-        //         console.log("MODIFIER OFF")
-        //         this.modifierButtonPressed = false
-
-        //     }
-
-        //     if (
-        //         inputSystem.isTriggered(InputAction.IA_ACTION_3, PointerEventType.PET_DOWN)
-        //     ) {
-
-        //         if (this.modifierButtonPressed) {
-        //             // this.startVanityTrack(vanityTracks.ZoomIn, Transform.get(engine.PlayerEntity).position, false)
-        //         }
-        //     }
-        //     if (
-        //         inputSystem.isTriggered(InputAction.IA_ACTION_4, PointerEventType.PET_DOWN)
-        //     ) {
-        //         if (this.modifierButtonPressed) {
-        //             // this.startVanityTrack(vanityTracks.CircleAvatar, Transform.get(engine.PlayerEntity).position, true)
-        //         }
-        //     }
-        //     if (
-        //         inputSystem.isTriggered(InputAction.IA_ACTION_5, PointerEventType.PET_DOWN)
-        //     ) {
-        //         if (this.modifierButtonPressed) {
-        //             //    this.startVanityTrack(vanityTracks.Action, Transform.get(engine.PlayerEntity).position, false)
-        //         }
-        //     }
-        // })
-
         this.camPositionParent = engine.addEntity()
         Transform.create(this.camPositionParent, { position: Vector3.Zero() })
 
@@ -126,6 +84,7 @@ class CameraManager {
         })
 
     }
+
     initCamera() {
 
         if (this.cameraInitialized) return
@@ -136,14 +95,80 @@ class CameraManager {
         })
         VirtualCamera.create(this.camEntity, {
             defaultTransition: {
-                transitionMode: VirtualCamera.Transition.Time(0)
+                transitionMode: VirtualCamera.Transition.Time(0.5)
             },
         })
+        
+        function cameraAnimationSystem(dt: number) {
+            //POSITION TRACK
+            const pathGroup = engine.getEntitiesWith(Transform, LerpTransformComponent)
+
+            for (let [obj, trans, info] of pathGroup) {
+                if (info.active) {
+                    let transform = Transform.getMutable(obj)
+                    let lerp = LerpTransformComponent.getMutable(obj)
+
+                    lerp.elapsedTime += dt
+
+                    let startIndex = Math.floor(lerp.elapsedTime / lerp.stepTime)
+                    let fractionTime = (lerp.elapsedTime / lerp.stepTime) % 1
+
+                    if (startIndex >= lerp.pathPos.length) {
+                        startIndex = 0
+                        lerp.elapsedTime += dt
+                    }
+
+                    if (!lerp.loop) {
+                        if (!lerp.startedFade) {
+                            if (startIndex + 4 > lerp.pathPos.length) {
+                                // startFade()
+                                lerp.startedFade = true
+                            }
+                        }
+                    }
+                    
+                    let endIndex = startIndex + 1
+                    if (endIndex >= lerp.pathPos.length) {
+                        endIndex = 0
+                        lerp.elapsedTime = 0
+                        if (!lerp.loop) {
+                            stopAnimationTrack()
+                            lerp.startedFade = false
+                        }
+
+                    }
+
+                    lerp.startPos = lerp.pathPos[startIndex]
+                    lerp.endPos = lerp.pathPos[endIndex]
+                    lerp.fraction = fractionTime
+                    transform.position = Vector3.lerp(lerp.startPos, lerp.endPos, lerp.fraction)
+
+                    lerp.startRot = lerp.pathRot[startIndex]
+                    lerp.endRot = lerp.pathRot[endIndex]
+                    transform.rotation = Quaternion.slerp(lerp.startRot, lerp.endRot, lerp.fraction)
+                }
+            }
+        }
+
         engine.addSystem(cameraAnimationSystem)
 
     }
-    blockCamera() {
+
+    blockCamera(position?: Vector3, target?: Vector3, transitionSpeed = 0.5) {
         try {
+            // let camEntityTf = Transform.getMutable(this.camEntity)
+            VirtualCamera.getMutable(this.camEntity).defaultTransition = { transitionMode: VirtualCamera.Transition.Time(transitionSpeed) }
+            let camPositionParentTransform = Transform.getMutable(this.camPositionParent)
+            let camRotationParentTransform = Transform.getMutable(this.camRotationParent)
+
+            camPositionParentTransform.parent = engine.RootEntity
+            camPositionParentTransform.rotation = Quaternion.Identity()
+
+            if(position) camPositionParentTransform.position = position
+            if(position && target) {
+                // camPositionParentTransform.rotation = Quaternion.fromLookAt(position, target)
+                camRotationParentTransform.rotation = Quaternion.fromLookAt(position, target)
+            }
             console.log("Block camera: ", JSON.stringify(Transform.get(engine.CameraEntity)))
             MainCamera.createOrReplace(engine.CameraEntity, {
                 virtualCameraEntity: this.camEntity,
@@ -153,7 +178,6 @@ class CameraManager {
             console.error(error);
         }
     }
-
 
     loadCameraTrack(track: any) {
 
@@ -177,15 +201,21 @@ class CameraManager {
         }
     }
 
-    startPathTrack(track: any, loop: boolean) {
+    async startPathTrack(track: any, loop: boolean, finalPos: Vector3, finalCamTarget: Vector3) {
         this.initCamera()
+
+        this.blockCamera(undefined, undefined, 0)
 
         Transform.getMutable(this.camPositionParent).parent = engine.RootEntity
 
         const sampleRate = 5
         const frameTime = 30 / sampleRate
         this.loadCameraTrack(track)
-        this.blockCamera()
+        
+        lockPlayer()
+        forceFirstPerson()
+
+        await wait_ms(100)
 
         LerpTransformComponent.createOrReplace(this.camPositionParent, {
             pathPos: this.currentPosTrack,
@@ -203,12 +233,27 @@ class CameraManager {
             startedFade: false,
             loop: loop
         })
+        
+        await this.checkIfLerpTransformComplete(this.camPositionParent)
+
+        await wait_ms(50)
+        this.blockCamera(finalPos, finalCamTarget, 0.5)
+
+        await wait_ms(50)
+        unlockPlayer()
+        freeCamera()
+
+        await wait_ms(50)
+        freeCameraMode()
+
+        return
     }
 
-    startVanityTrack(track: any, targetEntity: Entity, loop: boolean) {
+    async startVanityTrack(track: any, targetEntity: Entity, loop: boolean, finalPos: Vector3, finalCamTarget: Vector3) {
         this.initCamera()
 
         // let playerPos = Transform.get(engine.PlayerEntity).position
+        this.blockCamera(undefined, undefined, 0)
 
         const pos = Transform.get(targetEntity).position
         Transform.getMutable(this.vanityRoot).position = Vector3.create(pos.x, pos.y, pos.z)
@@ -217,9 +262,11 @@ class CameraManager {
         const sampleRate = 7
         const frameTime = 30 / sampleRate
         this.loadCameraTrack(track)
-        this.blockCamera()
-        blockPlayer()
+        
+        lockPlayer()
+        forceFirstPerson()
 
+        await wait_ms(100)
 
         LerpTransformComponent.createOrReplace(this.camPositionParent, {
             pathPos: this.currentPosTrack,
@@ -237,65 +284,150 @@ class CameraManager {
             startedFade: false,
             loop: loop
         })
+
+        await this.checkIfLerpTransformComplete(this.camPositionParent)
+
+        await wait_ms(50)
+        this.blockCamera(finalPos, finalCamTarget, 0.5)
+
+        await wait_ms(50)
+        unlockPlayer()
+        freeCamera()
+
+        await wait_ms(50)
+        freeCameraMode()
+
+        return
     }
 
-    orbitEntity(targetEntity: Entity) {
+    async orbitEntity(targetEntity: Entity, camOffset: Vector3, angleStart: number, angleStop: number, duration_ms: number, finalPos: Vector3, finalCamTarget: Vector3) {
+        this.initCamera()
+        console.log('orbitEntity. start', JSON.stringify(Tween.getOrNull(targetEntity)))
+        
+        // await wait_ms(5000)
+        console.log('orbitEntity. lockPlayer')
+        // this.blockCamera(Vector3.add(finalPos, Vector3.create(0, 1.75, 0)), Vector3.add(getWorldPosition(gameController.spawnIsland.tobor.entity), Vector3.create(0, 0, 0)))
 
-        const targetPosition = getWorldPosition(targetEntity)
+        lockPlayer()
 
-        const camPositionParent = engine.addEntity()
-        Transform.createOrReplace(camPositionParent, {
-            position: targetPosition,
-            rotation: Quaternion.fromEulerDegrees(0, 180, 0)
-        })
+        // await wait_ms(500)
+        console.log('orbitEntity. forceFirstPerson')
+        forceFirstPerson()
 
-        const camRotationParent = engine.addEntity()
-        Transform.createOrReplace(camRotationParent, {
-            parent: camPositionParent
-        })
+        await wait_ms(100)
+        console.log('orbitEntity. blockCamera')
 
-        const camEntity = engine.addEntity()
-        Transform.createOrReplace(camEntity, {
-            parent: camRotationParent,
-            position: Vector3.create(0, 2, -6)
-        })
+        this.blockCamera(finalPos, finalCamTarget, 0)
 
-        VirtualCamera.createOrReplace(camEntity, {
-            defaultTransition: {
-                transitionMode: VirtualCamera.Transition.Time(0)
-            },
-        })
+        // await wait_ms(5000)
+        console.log('orbitEntity. start camera tween.')
+        const pos = getWorldPosition(targetEntity)
+        Transform.getMutable(this.vanityRoot).position = Vector3.create(pos.x, pos.y, pos.z)
+        Transform.getMutable(this.camRotationParent).rotation = Quaternion.fromLookAt(camOffset, Vector3.Zero())
 
-        // this.blockCamera()
-        MainCamera.createOrReplace(engine.CameraEntity, {
-            virtualCameraEntity: camEntity,
-        })
+        let camPosParentTf = Transform.getMutable(this.camPositionParent)
+        camPosParentTf.parent = this.vanityRoot
+        camPosParentTf.position = camOffset
 
-        blockPlayer()
+        console.log("CREATING TWEEN", JSON.stringify(Transform.get(this.camRotationParent).rotation))
 
-        console.log("CREATING TWEEN")
-        Tween.createOrReplace(camRotationParent, {
+        let angStart = angleStart
+        let direction = Math.sign(angleStop - angleStart)
+        let angEnd = Math.abs(angleStop - angleStart) <= 180 ? angleStop : (direction * 180 + (angleStart))
+        let duration = Math.abs(angleStop - angleStart) <= 180 ? duration_ms : duration_ms * Math.abs(180 / (angleStop - angleStart))
+        // console.log('start:', angStart, 'end:', angEnd, 'duration:', duration)
+
+        let firstTween: PBTween = {
             mode: Tween.Mode.Rotate({
-                start: Quaternion.fromEulerDegrees(0, 0, 0),
-                end: Quaternion.fromEulerDegrees(0, 160, 0)
+                start: Quaternion.fromEulerDegrees(0, angStart, 0),
+                end: Quaternion.fromEulerDegrees(0, angEnd, 0)
             }),
-            duration: 5000,
+            duration: duration,
             easingFunction: EasingFunction.EF_LINEAR
-        })
+        }
 
-        engine.addSystem(() => {
-            const tweenCompleted = tweenSystem.tweenCompleted(camRotationParent)
-            if (tweenCompleted) {
-                console.log("REMOVING TWEEN")
-                // freeCamera()
-                MainCamera.getMutable(engine.CameraEntity).virtualCameraEntity = undefined
-                freePlayer()
-                engine.removeEntity(camPositionParent)
-                engine.removeEntity(camRotationParent)
-                engine.removeEntity(camEntity)
-                engine.removeSystem("camera-tween")
+        let nextSequenceDuration = 0
+        let isSequenceTween = false
+        let secondTween: PBTween
+
+        if(Math.abs(angleStop - angleStart) > 180){
+            isSequenceTween = true
+            angStart = angEnd
+            angEnd = angleStop
+            nextSequenceDuration = duration_ms * Math.abs(((angleStop - angleStart) - direction * 180) / (angleStop - angleStart))
+            // console.log('sequence start:', angStart, 'sequence end:', angEnd, 'sequence duration:', nextSequenceDuration)
+            
+            secondTween = {
+                mode: Tween.Mode.Rotate({
+                    start: Quaternion.fromEulerDegrees(0, angStart, 0),
+                    end: Quaternion.fromEulerDegrees(0, angEnd, 0)
+                }),
+                duration: nextSequenceDuration,
+                easingFunction: EasingFunction.EF_LINEAR
             }
-        }, undefined, "camera-tween")
+        }
+
+        Tween.createOrReplace(this.vanityRoot, firstTween)
+        if(isSequenceTween){
+            
+            TweenSequence.create(this.vanityRoot, {
+                sequence: [
+                    secondTween!
+                ]
+            })
+        }
+
+        await this.checkIfTweenComplete(this.vanityRoot)
+        console.log("first tween complete")
+
+        await wait_ms(nextSequenceDuration + 100)
+        console.log("tweenSequence complete")
+
+        // await wait_ms(100)
+        // console.log('blockCamera')
+        this.blockCamera(finalPos, finalCamTarget, 0.5)
+        // console.log("movePlayerTo. pos:", JSON.stringify(finalPos), 'target:', JSON.stringify(finalCamTarget))
+        // movePlayerTo({
+        //     // newRelativePosition: Vector3.create(224.127, 68.7368, 124.0051), // spawn island
+        //     // cameraTarget: Vector3.create(219.13, 70.73, 125.91)
+        //     newRelativePosition: Vector3.add(finalPos, Vector3.create(0, 1, 0)),
+        //     cameraTarget: Vector3.add(getWorldPosition(gameController.spawnIsland.tobor.entity), Vector3.create(0, 0, 0))
+        // })
+
+        await wait_ms(50)
+        // console.log("unlockPlayer and freeCamera")
+        unlockPlayer()
+        freeCamera()
+
+        await wait_ms(50)
+        // console.log("freeCameraMode")
+        freeCameraMode()
+
+        return
+    }
+
+    async checkIfTweenComplete(entity: Entity){
+        return new Promise <boolean>((resolve, reject) => {
+            engine.addSystem(() => {
+                const tweenCompleted = tweenSystem.tweenCompleted(entity)
+                if(tweenCompleted){
+                    resolve(true)
+                    engine.removeSystem("check-tween-complete")
+                }
+            }, undefined, "check-tween-complete")
+        })
+    }
+
+    async checkIfLerpTransformComplete(entity: Entity){
+        return new Promise <boolean>((resolve, reject) => {
+            engine.addSystem(() => {
+                const lerpComponent = LerpTransformComponent.get(entity)
+                if(!lerpComponent.active){
+                    resolve(true)
+                    engine.removeSystem("check-lerp-complete")
+                }
+            }, undefined, "check-lerp-complete")
+        })
     }
 }
 
@@ -323,69 +455,43 @@ export function stopAnimationTrack() {
 
 
     }
-    freeCamera()
-    freePlayer()
 }
 
-export function cameraAnimationSystem(dt: number) {
+let firstPersonArea: Entity | null = null
+export function forceFirstPerson(){
+    if(!firstPersonArea){
+        firstPersonArea = engine.addEntity()
 
-    //POSITION TRACK
-    const pathGroup = engine.getEntitiesWith(Transform, LerpTransformComponent)
+        Transform.create(firstPersonArea, {
+            parent: engine.RootEntity
+        })
 
-    for (let [obj, trans, info] of pathGroup) {
-
-        if (info.active) {
-            let transform = Transform.getMutable(obj)
-            let lerp = LerpTransformComponent.getMutable(obj)
-
-            lerp.elapsedTime += dt
-
-            let startIndex = Math.floor(lerp.elapsedTime / lerp.stepTime)
-            let fractionTime = (lerp.elapsedTime / lerp.stepTime) % 1
-
-            if (startIndex >= lerp.pathPos.length) {
-                startIndex = 0
-                lerp.elapsedTime += dt
-            }
-
-
-            if (!lerp.loop) {
-                if (!lerp.startedFade) {
-                    if (startIndex + 4 > lerp.pathPos.length) {
-                        // startFade()
-                        lerp.startedFade = true
-                    }
-                }
-            }
-
-
-
-            let endIndex = startIndex + 1
-            if (endIndex >= lerp.pathPos.length) {
-                endIndex = 0
-                lerp.elapsedTime = 0
-                if (!lerp.loop) {
-                    stopAnimationTrack()
-                    lerp.startedFade = false
-                }
-
-            }
-
-            lerp.startPos = lerp.pathPos[startIndex]
-            lerp.endPos = lerp.pathPos[endIndex]
-            lerp.fraction = fractionTime
-            transform.position = Vector3.lerp(lerp.startPos, lerp.endPos, lerp.fraction)
-
-            lerp.startRot = lerp.pathRot[startIndex]
-            lerp.endRot = lerp.pathRot[endIndex]
-            transform.rotation = Quaternion.slerp(lerp.startRot, lerp.endRot, lerp.fraction)
-
-        }
-
+        CameraModeArea.create(firstPersonArea, {
+            area: Vector3.create(4, 3, 4),
+            mode: CameraType.CT_FIRST_PERSON,
+        })
     }
+    
+    Transform.getMutable(firstPersonArea).parent = engine.PlayerEntity
 
 }
 
+export function freeCameraMode(){
+    if(!firstPersonArea){
+        firstPersonArea = engine.addEntity()
+
+        Transform.create(firstPersonArea, {
+            parent: engine.RootEntity
+        })
+        
+        CameraModeArea.create(firstPersonArea, {
+            area: Vector3.create(4, 3, 4),
+            mode: CameraType.CT_FIRST_PERSON,
+        })
+    }
+    
+    Transform.getMutable(firstPersonArea).parent = engine.RootEntity
+}
 
 export function freeCamera() {
     try {
@@ -396,7 +502,7 @@ export function freeCamera() {
     }
 }
 
-export function blockPlayer() {
+export function lockPlayer() {
     InputModifier.createOrReplace(engine.PlayerEntity, {
         mode: {
             $case: 'standard',
@@ -407,7 +513,7 @@ export function blockPlayer() {
     })
 }
 
-export function freePlayer() {
+export function unlockPlayer() {
     InputModifier.createOrReplace(engine.PlayerEntity, {
         mode: {
             $case: 'standard',
@@ -419,31 +525,27 @@ export function freePlayer() {
 }
 
 export function getWorldPosition(entity: Entity, position = Vector3.Zero()): Vector3 {
-
-    const transform = Transform.get(entity)
-    //No transform
-    if (!transform) return Vector3.Zero()
-
-    let scaledPosition = { ...transform.position }
-    //Scale relative position by parent scale
-    if (transform.parent) {
-        const parentTransform = Transform.get(transform.parent)
-        if (parentTransform) {
-            scaledPosition.x = scaledPosition.x * parentTransform.scale.x
-            scaledPosition.y = scaledPosition.y * parentTransform.scale.y
-            scaledPosition.z = scaledPosition.z * parentTransform.scale.z
-        }
+    let worldPosition: Vector3
+    let targetTransform = Transform.getOrNull(entity)
+    if(!targetTransform) return Vector3.Zero()
+    
+    worldPosition = targetTransform.position
+  
+    while(targetTransform.parent){
+      let parentTransform = Transform.getOrNull(targetTransform.parent)
+      if(!parentTransform) return worldPosition
+  
+      let scaledPosition = {
+        x: worldPosition.x * parentTransform.scale.x,
+        y: worldPosition.y * parentTransform.scale.y,
+        z: worldPosition.z * parentTransform.scale.z
+      }
+  
+      worldPosition = Vector3.add(Vector3.rotate(scaledPosition, getWorldRotation(targetTransform.parent)), parentTransform.position)
+  
+      targetTransform = parentTransform
     }
-    //Update position
-    position.x = position.x + scaledPosition.x
-    position.y = position.y + scaledPosition.y
-    position.z = position.z + scaledPosition.z
-
-    //No more parents
-    if (!transform.parent) return position;
-
-    //Get world position of the parent
-    return Vector3.add(getWorldPosition(transform.parent, position), Vector3.rotate(transform.position, getWorldRotation(transform.parent)))
+    return worldPosition
 }
 
 export function getWorldRotation(entity: Entity): Quaternion {
@@ -460,4 +562,17 @@ export function getWorldRotation(entity: Entity): Quaternion {
     } else {
         return Quaternion.multiply(transform.rotation, getWorldRotation(parent))
     }
+}
+
+export async function wait_ms(ms: number){
+    return new Promise <boolean>((resolve, reject) => {
+        try{
+            utils.timers.setTimeout(() => {
+                resolve(true)
+            }, ms)
+        }
+        catch{
+            resolve(false)
+        }
+    })
 }

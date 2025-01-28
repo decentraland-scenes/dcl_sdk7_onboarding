@@ -1,6 +1,8 @@
-import { cameraManager } from "../cinematic/cameraManager"
+import { cameraManager, getWorldPosition } from "../cinematic/cameraManager"
 import { vanityTracks } from "../cinematic/vanityTracks"
 import { gameController } from ".."
+import { Vector3 } from "@dcl/sdk/math"
+import { engine, Transform } from "@dcl/sdk/ecs"
 
 export type Objectives = {
   text: { en: string }
@@ -29,8 +31,45 @@ export const textQuests: Tasks[] = [
         vAlign: '0%',
         completed: false,
         action: () => {
+
           // cameraManager.startVanityTrack(vanityTracks.SemiCircle, gameController.spawnIsland.tobor.entity, false)
-          cameraManager.orbitEntity(gameController.spawnIsland.tobor.entity)
+          // cameraManager.orbitEntity(gameController.spawnIsland.tobor.entity, Vector3.create(0, 6, -12), 160 - 60, -60, 5000)
+
+          // orbit tobor
+          cameraManager.orbitEntity(
+            gameController.spawnIsland.tobor.entity, 
+            Vector3.create(0, 6, -12), 
+            190 - 45, 
+            -10 - 45, 
+            5000, 
+            Vector3.create(224.127, 68.7 + 1.75, 124.0051), 
+            getWorldPosition(gameController.spawnIsland.tobor.entity)
+          )
+          
+          // // shoot to a player and move camera back to tobor
+          // cameraManager.orbitEntity(
+          //   engine.PlayerEntity, 
+          //   Vector3.create(0, 2, -6), 
+          //   90, 
+          //   95, 
+          //   4000, 
+          //   Vector3.create(224.127, 68.7 + 1.75, 124.0051), 
+          //   getWorldPosition(gameController.spawnIsland.tobor.entity)
+          // )
+
+          // cameraManager.startVanityTrack(
+          //   vanityTracks.SemiCircle, 
+          //   gameController.spawnIsland.tobor.entity, 
+          //   false, 
+          //   Vector3.create(224.127, 68.7 + 1.75, 124.0051), 
+          //   getWorldPosition(gameController.spawnIsland.tobor.entity)
+          // )
+          // cameraManager.startPathTrack(
+          //   vanityTracks.SemiCircle, 
+          //   false, 
+          //   Vector3.create(224.127, 68.7 + 1.75, 124.0051), 
+          //   getWorldPosition(gameController.spawnIsland.tobor.entity)
+          // )
         }
       }
     ]
@@ -119,7 +158,7 @@ export const textQuests: Tasks[] = [
         completed: false,
         action: () => {
           // cameraManager.startVanityTrack(vanityTracks.SemiCircle, gameController.questMaterial.mat.entity, false)
-          cameraManager.orbitEntity(gameController.questMaterial.mat.entity)
+        //   cameraManager.orbitEntity(gameController.questMaterial.mat.entity, Vector3.create(0, 4, -10), 0, 360, 5000)
         }
       }
     ]
