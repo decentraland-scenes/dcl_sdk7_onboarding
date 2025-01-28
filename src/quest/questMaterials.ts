@@ -286,6 +286,8 @@ export class QuestMaterials {
   }
   pickPiece() {
     this.materialsCollected++
+    this.gameController.uiController.widgetTasks.setStepCount(this.materialsCollected)
+
     if (this.materialsCollected == 2) {
       this.pickedAllPieces()
       this.bubbleTalk.closeBubbleInTime()

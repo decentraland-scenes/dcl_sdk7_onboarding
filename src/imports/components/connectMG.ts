@@ -149,6 +149,7 @@ export class ConnectMiniGame {
     let correct = 0
     for (let i = 0; i < this.pieces.length; i++) {
       if (this.pieces[i].correctState == this.pieces[i].currentState) {
+        correct += 1
         if (!this.firstConection) {
           this.firstConection = true
           delay(() => {
@@ -168,7 +169,8 @@ export class ConnectMiniGame {
         }
       }
     }
-
+    this.gameController.uiController.widgetTasks.setStepCount(correct)
+    
     if (this.boardCompleted) {
       console.log('board completed')
       this.completeEvent2PuzzleCallback()

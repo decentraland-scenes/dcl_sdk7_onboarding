@@ -78,7 +78,12 @@ export class WidgetTasks {
   setText(taskId: number, dialogId: number) {
     this.currentTask = getTaskTexts(taskId, dialogId)
     this.textUI = this.currentTask?.text?.en
-    this.infoUI = this.currentTask?.missionInfo?.en
+    
+    let isStep = this.currentTask.missionInfo.steps ? true : false
+    this.infoUI = this.currentTask?.missionInfo?.en + (isStep ? ` (0/${this.currentTask.missionInfo.steps?.toString()})` : '')
+  }
+  setStepCount(stepCount: number){
+    this.infoUI = this.currentTask?.missionInfo?.en + ` (${stepCount}/${this.currentTask.missionInfo.steps?.toString()})`
   }
   showTasks(visible: boolean, type: TaskType) {
     this.isVisible = true
