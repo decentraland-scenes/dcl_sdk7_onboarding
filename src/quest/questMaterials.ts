@@ -191,7 +191,7 @@ export class QuestMaterials {
     this.gameController.uiController.widgetTasks.showTick(true, 0)
     utils.timers.setTimeout(() => {
       this.gameController.uiController.widgetTasks.showTick(false, 0)
-      this.gameController.uiController.widgetTasks.setText(6, 0)
+      this.gameController.uiController.widgetTasks.setText(7, 0)
       this.gameController.uiController.widgetTasks.showTasks(true, TaskType.Simple)
     }, 1500)
     openDialogWindow(this.mat.entity, this.gameController.dialogs.matDialog, 0)
@@ -304,7 +304,7 @@ export class QuestMaterials {
     this.gameController.uiController.widgetTasks.showTick(true, 0)
     utils.timers.setTimeout(() => {
       this.gameController.uiController.widgetTasks.showTick(false, 0)
-      this.gameController.uiController.widgetTasks.setText(7, 0)
+      this.gameController.uiController.widgetTasks.setText(8, 0)
       this.gameController.uiController.widgetTasks.showTasks(true, TaskType.Simple)
     }, 1500)
     openDialogWindow(this.mat.entity, this.gameController.dialogs.matDialog, 5)
@@ -353,7 +353,7 @@ export class QuestMaterials {
     this.gameController.uiController.widgetTasks.showTick(true, 2)
     utils.timers.setTimeout(() => {
       this.gameController.uiController.widgetTasks.showTick(false, 0)
-      this.gameController.uiController.widgetTasks.setText(8, 0)
+      this.gameController.uiController.widgetTasks.setText(9, 0)
       this.gameController.uiController.widgetTasks.showTasks(true, TaskType.Simple)
     }, 1500)
     this.spawnparticles()

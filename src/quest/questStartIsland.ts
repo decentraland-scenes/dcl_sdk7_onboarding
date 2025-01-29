@@ -193,7 +193,6 @@ export class SpawnIsland {
   startSpawnIsland() {
     lockPlayer()
     forceThirdPerson()
-
     this.gameController.uiController.widgetTasks.showTasks(false, TaskType.Simple)
 
     // -- Camera --
@@ -278,6 +277,8 @@ export class SpawnIsland {
     this.bubbleTalk.openBubble(CAMERA_QUEST_0, true)
     this.gameController.uiController.popUpControls.showLookControlsUI()
     //Camera task UI
+    this.gameController.uiController.widgetTasks.showTick(false, 0)
+    this.gameController.uiController.widgetTasks.setText(1, 0)
     //Spawn gloing orb
     this.spawnGlowingOrb()
   }
@@ -288,6 +289,7 @@ export class SpawnIsland {
 
   cameraQuestCompleted() {
 
+    this.gameController.uiController.widgetTasks.showTick(true, 0)
     lockPlayer()
     movePlayerTo({
       newRelativePosition: this.SPAWN_POINT,
@@ -315,7 +317,7 @@ export class SpawnIsland {
     unlockPlayer()
 
     this.gameController.uiController.popUpControls.showJumpControlsUI()
-    //Jump task UI
+    
     
     this.startMoveForwardJumpQuest()
   }
@@ -331,7 +333,7 @@ export class SpawnIsland {
         'assets/scene/models/unity_assets/s0_Cable_01_OFF_01.glb'
     }
   }
-  startInteractQuest() {
+  /*startInteractQuest() {
     AudioManager.instance().playOnce('tobor_talk', { volume: 0.6, parent: this.tobor.entity })
     openDialogWindow(this.tobor.entity, this.gameController.dialogs.toborDialog, 0)
     Animator.stopAllAnimations(this.tobor.entity)
@@ -341,7 +343,7 @@ export class SpawnIsland {
     this.gameController.uiController.widgetTasks.showTick(true, 0)
     this.gameController.uiController.popUpControls.hideLookControlsUI()
     this.gameController.uiController.popUpControls.hideCursorLockControlsUI()
-  }
+  }*/
   startMoveForwardJumpQuest() {
     //this.gameController.uiController.popUpControls.showMoveControlsUI()
     this.tobor.activateBillBoard(false)
@@ -411,7 +413,7 @@ export class SpawnIsland {
               sendTrak('z0_quest0_02', this.gameController.timeStamp)
               openDialogWindow(this.gameController.spawnIsland.tobor.entity, this.gameController.dialogs.toborDialog, 3)
               utils.timers.setTimeout(() => {
-                this.gameController.uiController.widgetTasks.setText(3, 0)
+                this.gameController.uiController.widgetTasks.setText(4, 0)
                 this.gameController.uiController.widgetTasks.showTick(false, 0)
               }, 2000)
             }
@@ -424,7 +426,7 @@ export class SpawnIsland {
   jumpquest() {
     //this.gameController.uiController.popUpControls.spaceContainerVisible = true
     this.gameController.uiController.popUpControls.showJumpControlsUI()
-    this.gameController.uiController.widgetTasks.setText(1, 0)
+    this.gameController.uiController.widgetTasks.setText(2, 0)
     this.gameController.uiController.widgetTasks.showTasks(true, TaskType.Simple)
     Transform.getMutable(this.gameController.mainInstance.s0_Fence_Art_02).scale = Vector3.create(0, 0, 0)
     Transform.getMutable(this.gameController.mainInstance.s0_Fence_Art_02).position = Vector3.create(0, 0, 0)
@@ -449,7 +451,7 @@ export class SpawnIsland {
     this.gameController.uiController.popUpControls.spaceContainerVisible = false
     this.gameController.uiController.widgetTasks.showTick(true, 0)
     utils.timers.setTimeout(() => {
-      this.gameController.uiController.widgetTasks.setText(2, 0)
+      this.gameController.uiController.widgetTasks.setText(3, 0)
       this.gameController.uiController.widgetTasks.showTasks(true, TaskType.Simple)
       this.dialogAtPilar()
     }, 1500)

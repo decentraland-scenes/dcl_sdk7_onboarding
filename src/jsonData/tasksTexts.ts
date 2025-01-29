@@ -19,7 +19,8 @@ export const textQuests: Tasks[] = [
           en: 'Learn how to move'
         },
         missionInfo: {
-          en: 'Move in every direction'
+          en: 'Move your avatar in \nevery direction.',
+          steps: 4
         },
         fontSize: 14,
         vAlign: '0%',
@@ -29,14 +30,31 @@ export const textQuests: Tasks[] = [
   },
   {
     texts: [
-      //1 Quest 1 room
+      //1 Quest 0 room
+      {
+        text: {
+          //Task 0
+          en: 'Learn how to turn the camera'
+        },
+        missionInfo: {
+          en: 'Look around to find \nthe glowing orb'
+        },
+        fontSize: 14,
+        vAlign: '0%',
+        completed: false
+      }
+    ]
+  },
+  {
+    texts: [
+      //2 Quest 1 room
       {
         text: {
           //Task 0
           en: 'Follow Tobor'
         },
         missionInfo: {
-          en: ' Jump over the branch.'
+          en: 'Jump the log and follow Tobor.'
         },
         fontSize: 14,
         vAlign: '0%',
@@ -46,7 +64,7 @@ export const textQuests: Tasks[] = [
   },
   {
     texts: [
-      //Quest 2 room
+      //3 Quest 2 room
       {
         text: {
           //Task 0
@@ -63,7 +81,7 @@ export const textQuests: Tasks[] = [
   },
   {
     texts: [
-      //Quest 3 room
+      //4 Quest 3 room
       {
         text: {
           //Task 0
@@ -80,7 +98,7 @@ export const textQuests: Tasks[] = [
   },
   {
     texts: [
-      //Quest 4 room
+      //5 Quest 4 room
       {
         text: {
           //Task 0
@@ -98,7 +116,7 @@ export const textQuests: Tasks[] = [
   },
   {
     texts: [
-      //Quest 5 room
+      //6 Quest 5 room
       {
         text: {
           //Task 0
@@ -115,7 +133,7 @@ export const textQuests: Tasks[] = [
   },
   {
     texts: [
-      //Quest 6 room
+      //7 Quest 6 room
       {
         text: {
           //Task 0
@@ -133,7 +151,7 @@ export const textQuests: Tasks[] = [
   },
   {
     texts: [
-      //Quest 7 room
+      //8 Quest 7 room
       {
         text: {
           //Task 0
@@ -150,7 +168,7 @@ export const textQuests: Tasks[] = [
   },
   {
     texts: [
-      //Quest 8 room
+      //9 Quest 8 room
       {
         text: {
           //Task 0
@@ -167,7 +185,7 @@ export const textQuests: Tasks[] = [
   },
   {
     texts: [
-      //Quest 9 room
+      //10 Quest 9 room
       {
         text: {
           //Task 0
@@ -185,7 +203,7 @@ export const textQuests: Tasks[] = [
   },
   {
     texts: [
-      //Quest 10 room
+      //11 Quest 10 room
       {
         text: {
           //Task 0
@@ -202,7 +220,7 @@ export const textQuests: Tasks[] = [
   },
   {
     texts: [
-      //Quest 11 room
+      //12 Quest 11 room
       {
         text: {
           en: 'Go to the portal'
@@ -218,7 +236,7 @@ export const textQuests: Tasks[] = [
   },
   {
     texts: [
-      //Quest 12 room
+      //13 Quest 12 room
       {
         //Task 2
         text: {
@@ -235,12 +253,12 @@ export const textQuests: Tasks[] = [
   },
   {
     texts: [
-      //Quest 13
+      //14 Quest 13
     ]
   },
   {
     texts: [
-      //Quest 14
+      //15 Quest 14
       {
         text: {
           //Task 0
@@ -257,7 +275,7 @@ export const textQuests: Tasks[] = [
   },
   {
     texts: [
-      //Quest 15
+      //16 Quest 15
       {
         text: {
           //Task 0
@@ -274,7 +292,7 @@ export const textQuests: Tasks[] = [
   },
   {
     texts: [
-      //Quest 16
+      //17 Quest 16
       {
         text: {
           //Task 0
@@ -291,7 +309,7 @@ export const textQuests: Tasks[] = [
   },
   {
     texts: [
-      // Quest 17
+      //18 Quest 17
       {
         text: {
           //Task 0
@@ -308,7 +326,7 @@ export const textQuests: Tasks[] = [
   },
   {
     texts: [
-      // Quest 18
+      //19 Quest 18
       {
         text: {
           //Task 0
@@ -325,7 +343,7 @@ export const textQuests: Tasks[] = [
   },
   {
     texts: [
-      // Quest 19
+      //20 Quest 19
       {
         text: {
           //Task 0
@@ -342,7 +360,7 @@ export const textQuests: Tasks[] = [
   },
   {
     texts: [
-      // Quest 20
+      //21 Quest 20
       {
         text: {
           //Task 0

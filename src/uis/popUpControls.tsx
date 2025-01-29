@@ -48,6 +48,7 @@ export class PopUpControls {
   private runControlsUI: RunControlsUI
   private cameraControlsUI: CameraControlsUI
   private bEnableAutoSwapLookControls = true
+  private moveQuestSteps = 0
 
   constructor(uiController: UIController) {
     this.uiController = uiController
@@ -115,6 +116,8 @@ export class PopUpControls {
         this.moveControlsUI.moveContainerVisible = false
     }
     checkMoveQuestCompleted() {
+      this.moveQuestSteps++
+      this.uiController.widgetTasks.setStepCount(this.moveQuestSteps)
         if(
             this.moveControlsUI.keyW.bIsProgressCompleted && this.moveControlsUI.keyS.bIsProgressCompleted && 
             this.moveControlsUI.keyA.bIsProgressCompleted && this.moveControlsUI.keyD.bIsProgressCompleted

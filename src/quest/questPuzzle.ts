@@ -124,7 +124,7 @@ export class QuestPuzzle {
     this.gameController.uiController.widgetTasks.showTick(true, 0)
     utils.timers.setTimeout(() => {
       this.gameController.uiController.widgetTasks.showTick(false, 0)
-      this.gameController.uiController.widgetTasks.setText(9, 0)
+      this.gameController.uiController.widgetTasks.setText(10, 0)
       this.gameController.uiController.widgetTasks.showTasks(true, TaskType.Simple)
     }, 1500)
     this.questIndicator.hide()
@@ -170,7 +170,7 @@ export class QuestPuzzle {
     this.gameController.uiController.widgetTasks.showTick(true, 0)
     utils.timers.setTimeout(() => {
       this.gameController.uiController.widgetTasks.showTick(false, 0)
-      this.gameController.uiController.widgetTasks.setText(10, 0)
+      this.gameController.uiController.widgetTasks.setText(11, 0)
       this.gameController.uiController.widgetTasks.showTasks(true, TaskType.Simple)
     }, 1500)
   }
@@ -189,7 +189,7 @@ export class QuestPuzzle {
         this.gameController.uiController.widgetTasks.showTick(true, 3)
         utils.timers.setTimeout(() => {
           this.gameController.uiController.widgetTasks.showTick(false, 0)
-          this.gameController.uiController.widgetTasks.setText(11, 0)
+          this.gameController.uiController.widgetTasks.setText(12, 0)
           this.gameController.uiController.widgetTasks.showTasks(false, TaskType.Multiple)
           this.gameController.uiController.widgetTasks.showTasks(true, TaskType.Simple)
         }, 2000)

@@ -78,7 +78,7 @@ export class KeyControlWidget {
                 if(this.bInstantProgress) {
                     this.pressedProgress = 1
                 }
-                else this.pressedProgress += dt
+                else this.pressedProgress += dt*2
                 
                 if(this.pressedProgress >= 1) {
                     this.pressedProgress = 1

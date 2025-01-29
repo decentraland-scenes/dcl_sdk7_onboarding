@@ -201,7 +201,7 @@ export class QuestEmote {
       sendTrak('z1_quest1_00', this.gameController.timeStamp)
       this.gameController.uiController.widgetTasks.showTick(true, 0)
       utils.timers.setTimeout(() => {
-        this.gameController.uiController.widgetTasks.setText(4, 0)
+        this.gameController.uiController.widgetTasks.setText(5, 0)
         this.gameController.uiController.widgetTasks.showTasks(true, TaskType.Simple)
       }, 1500)
       AudioManager.instance().playOnce('npc_1_salute', { volume: 0.6, parent: this.bezier.entity })
@@ -312,7 +312,7 @@ export class QuestEmote {
       this.gameController.uiController.widgetTasks.showTick(true, 1)
       utils.timers.setTimeout(() => {
         this.gameController.uiController.widgetTasks.showTick(false, 0)
-        this.gameController.uiController.widgetTasks.setText(5, 0)
+        this.gameController.uiController.widgetTasks.setText(6, 0)
         this.gameController.uiController.widgetTasks.showTasks(true, TaskType.Simple)
       }, 1500)
       this.bubbleTalk.closeBubbleInTime()
