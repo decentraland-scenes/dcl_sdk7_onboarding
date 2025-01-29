@@ -56,7 +56,7 @@ export function blockCamera(position: Vector3, rotation: Quaternion, bForceFirst
 
         //Force 1st person some frames before blocking the camera to avoid 3rd person camera bug with block camera
         forceFirstPerson()
-        hideAvatar()
+        //hideAvatar()
         utils.timers.setTimeout(()=>{
             MainCamera.createOrReplace(engine.CameraEntity, {
                 virtualCameraEntity: customCameraEnt,
@@ -72,13 +72,13 @@ export function freeCamera() {
 
         MainCamera.getMutable(engine.CameraEntity).virtualCameraEntity = undefined
 
-        if(forcedFirstPersonInCameraBlock) {     
-            //After a couple of frames, stop forcing 1st person camera mode, the transition is smooth with the release of the virtual camera and the change of mode won't be noticed
-            utils.timers.setTimeout(() => {
-                freeCameraMode()
-                showAvatar()
-            }, 100)
-        }
+            
+        //After a couple of frames, stop forcing 1st person camera mode, the transition is smooth with the release of the virtual camera and the change of mode won't be noticed
+        utils.timers.setTimeout(() => {
+            if(forcedFirstPersonInCameraBlock) freeCameraMode()
+            //if(AvatarModifierArea.has(hideAvatarArea)) showAvatar();
+        }, 100)
+        
     } catch (error) {
         console.error(error); 
     }

@@ -36,6 +36,7 @@ import { NPC } from '../imports/components/npc.class'
 import { blockCamera, forceFirstPerson, forceThirdPerson, freeCamera, freeCameraMode } from '../utils/camera'
 import { lockPlayer, unlockPlayer } from '../utils/blockPlayer'
 import { GlowingOrb } from '../imports/glowingOrb'
+import { wait_ms } from '../cinematic/cameraManager'
 
 export class SpawnIsland {
   tobor: NPC
@@ -246,18 +247,19 @@ export class SpawnIsland {
     this.gameController.uiController.widgetTasks.showTick(false, 0)
     this.gameController.uiController.widgetTasks.setText(0, 0)
   }
-  moveQuestCompleted() {
+  async moveQuestCompleted() {
     if(this.isMoveQuestCompleted) return;
     this.isMoveQuestCompleted = true;
+
+    await wait_ms(500)
 
     // -- Camera --
     //Camera transitions to Tobor
 
-    
     lockPlayer()
     movePlayerTo({
       newRelativePosition: this.SPAWN_POINT,
-      cameraTarget: Quaternion.fromLookAt(this.SPAWN_POINT, Vector3.add(Transform.get(this.tobor.entity).position, {x: 0, y: 1, z: 0}))
+      cameraTarget: Transform.get(this.tobor.entity).position
     })
     this.bubbleTalk.closeBubbleInTime()
     this.gameController.uiController.popUpControls.hideAllControlsUI()
@@ -287,13 +289,14 @@ export class SpawnIsland {
     this.orb.activate()
   }
 
-  cameraQuestCompleted() {
+  async cameraQuestCompleted() {
 
     this.gameController.uiController.widgetTasks.showTick(true, 0)
+    await wait_ms(500)
     lockPlayer()
     movePlayerTo({
       newRelativePosition: this.SPAWN_POINT,
-      cameraTarget: Quaternion.fromLookAt(this.SPAWN_POINT, Vector3.add(Transform.get(this.tobor.entity).position, {x: 0, y: 1, z: 0}))
+      cameraTarget: Transform.get(this.tobor.entity).position
     })
     this.bubbleTalk.closeBubbleInTime()
     this.gameController.uiController.popUpControls.hideAllControlsUI()
