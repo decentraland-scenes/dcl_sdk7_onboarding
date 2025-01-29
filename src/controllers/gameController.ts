@@ -22,18 +22,18 @@ export class GameController {
   timeStamp: number
   questPuzzle: QuestPuzzle
   constructor() {
+    initCameraModiers()
     this.mainInstance = new MainInstace(this)
-    this.uiController = new UIController(this)
-    this.spawnIsland = new SpawnIsland(this)
     this.dialogs = new Dialogs(this)
+    this.spawnIsland = new SpawnIsland(this)
     this.questEmote = new QuestEmote(this)
     this.questPuzzle = new QuestPuzzle(this)
     this.questMaterial = new QuestMaterials(this)
     this.questPortal = new QuestPortal(this)
     this.timeStamp = setPlayerTime()
+    this.uiController = new UIController(this)
 
     initAudioEntities()
-    initCameraModiers()
     cameraManager.initCamera()
   }
 }

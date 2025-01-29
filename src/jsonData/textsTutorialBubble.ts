@@ -2,11 +2,17 @@
 //mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
 
 //Tobor Dialogs
+export const MOVE_QUEST_0 = 'I would show you how… but I don’t have legs'
+export const MOVE_QUEST_1 = 'Press AWSD to move in every direction!'
+export const MOVE_QUEST_2 = 'Cmon! Im sure you can do it!'
+export const CAMERA_QUEST_0 = 'Look at the orb!'
+
 export const CLICKME = '<b>Over here!</b>'
 export const OVERHERE = 'Hey!'
 export const JUMP = 'Press the <b>SPACE BAR</b> to jump.'
 export const HELP_BEIZER = 'Talk to Bezier at the next island.'
 export const CHOOSE_PORTAL = 'Choose your next experience!'
+
 
 //Bezier Dialogs
 export const ZONE_1_EMOTE_0 = 'Press <b>B</b> to open the Emote menu and select a move'

@@ -16,10 +16,10 @@ export const textQuests: Tasks[] = [
       {
         text: {
           //Task 0
-          en: 'Talk with the robot'
+          en: 'Learn how to move'
         },
         missionInfo: {
-          en: 'Get close to the robot. Click to <br>interact with it'
+          en: 'Move in every direction'
         },
         fontSize: 14,
         vAlign: '0%',

@@ -60,12 +60,27 @@ import {
   THIRD_ISLAND_9,
   SECOND_ISLAND_9,
   SECOND_ISLAND_11,
-  SECOND_ISLAND_10
+  SECOND_ISLAND_10,
+  START_ISLAND_CINEMATIC_0,
+  START_ISLAND_CINEMATIC_1,
+  START_ISLAND_CINEMATIC_2,
+  START_ISLAND_CINEMATIC_3,
+  START_ISLAND_MOVEMENT_0,
+  START_ISLAND_CAMERA_0,
+  START_ISLAND_CAMERA_1,
+  START_ISLAND_CAMERA_2,
+  START_ISLAND_JUMP_0,
+  START_ISLAND_JUMP_1,
+  START_ISLAND_JUMP_2
 } from './textsTutorialPopups'
 import { POPUP_STATE } from '../uis/popupUI'
 
 export class Dialogs {
   public toborDialog: Dialog[]
+  public toborCinematicDialog: Dialog[]
+  public toborMovementDialog: Dialog[]
+  public toborCameraDialog: Dialog[]
+  public toborJumpDialog: Dialog[]
   public bezierDialog: Dialog[]
   public matDialog: Dialog[]
   public toborBubbles: Dialog[]
@@ -75,6 +90,100 @@ export class Dialogs {
   gameController: GameController
   constructor(gameController: GameController) {
     this.gameController = gameController
+    this.toborCinematicDialog = [
+      {
+        text: START_ISLAND_CINEMATIC_0,
+        fontSize: 18,
+        portrait: IdleTrebor,
+        typeSpeed: this.typeSpeed
+      },
+      {
+        text: START_ISLAND_CINEMATIC_1,
+        fontSize: 18,
+        portrait: IdleTrebor,
+        typeSpeed: this.typeSpeed,
+        triggeredByNext: () => {
+          //Camera change
+          this.gameController.spawnIsland.introductionMiddleChangeCamera()
+        }
+      },
+      {
+        text: START_ISLAND_CINEMATIC_2,
+        fontSize: 18,
+        portrait: IdleTrebor,
+        typeSpeed: this.typeSpeed
+      },
+      {
+        text: START_ISLAND_CINEMATIC_3,
+        fontSize: 18,
+        portrait: IdleTrebor,
+        typeSpeed: this.typeSpeed,
+        isEndOfDialog: true,
+        triggeredByNext: () => {
+          this.gameController.spawnIsland.finishedIntroDialog()
+        }
+      },
+    ]
+    this.toborMovementDialog = [
+      {
+        text: START_ISLAND_MOVEMENT_0,
+        fontSize: 18,
+        portrait: IdleTrebor,
+        typeSpeed: this.typeSpeed,
+        isEndOfDialog: true,
+        triggeredByNext: () => {
+          this.gameController.spawnIsland.startMovementQuest()
+        }
+      },
+    ]
+    this.toborCameraDialog = [
+      {
+        text: START_ISLAND_CAMERA_0,
+        fontSize: 18,
+        portrait: IdleTrebor,
+        typeSpeed: this.typeSpeed,
+      },
+      {
+        text: START_ISLAND_CAMERA_1,
+        fontSize: 18,
+        portrait: IdleTrebor,
+        typeSpeed: this.typeSpeed,
+      },
+      {
+        text: START_ISLAND_CAMERA_2,
+        fontSize: 18,
+        portrait: IdleTrebor,
+        typeSpeed: this.typeSpeed,
+        isEndOfDialog: true,
+        triggeredByNext: () => {
+          this.gameController.spawnIsland.startCameraQuest()
+        }
+      },
+    ]
+    this.toborJumpDialog = [
+      {
+        text: START_ISLAND_JUMP_0,
+        fontSize: 18,
+        portrait: IdleTrebor,
+        typeSpeed: this.typeSpeed,
+      },
+      {
+        text: START_ISLAND_JUMP_1,
+        fontSize: 18,
+        portrait: IdleTrebor,
+        typeSpeed: this.typeSpeed,
+      },
+      {
+        text: START_ISLAND_JUMP_2,
+        fontSize: 18,
+        portrait: IdleTrebor,
+        typeSpeed: this.typeSpeed,
+        isEndOfDialog: true,
+        triggeredByNext: () => {
+          this.gameController.spawnIsland.startJumpQuest()
+        }
+      },
+    ]
     this.toborDialog = [
       {
         text: START_ISLAND_0,
@@ -93,7 +202,7 @@ export class Dialogs {
         typeSpeed: this.typeSpeed,
         isEndOfDialog: true,
         triggeredByNext: () => {
-          this.gameController.spawnIsland.startMoveQuest()
+          this.gameController.spawnIsland.startMoveForwardJumpQuest()
         }
       },
 

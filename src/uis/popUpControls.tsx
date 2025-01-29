@@ -120,6 +120,7 @@ export class PopUpControls {
             this.moveControlsUI.keyA.bIsProgressCompleted && this.moveControlsUI.keyD.bIsProgressCompleted
         ) {
             //TODO MOVE QUEST COMPLETED
+            this.uiController.gameController.spawnIsland.moveQuestCompleted()
         }
     }
     showJumpControlsUI() {

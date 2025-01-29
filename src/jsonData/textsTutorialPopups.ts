@@ -1,5 +1,31 @@
 // Dialogs  Start island
 
+export const START_ISLAND_CINEMATIC_0 =
+  'Ah, a new explorer! I’m Tobor, your floating, infinitely cool guide to Decentraland!'
+export const START_ISLAND_CINEMATIC_1 =
+  'Here, you can create, discover, and connect in ways you’ve never dreamed of. But hey, enough about the big picture—let’s get YOU started!'
+export const START_ISLAND_CINEMATIC_2 =
+  'See that stylish individual right there? That’s YOU! Looking sharp already'
+export const START_ISLAND_CINEMATIC_3 =
+  'This is your avatar—your digital self in this vast metaverse. Trust me, you’ll be turning heads in no time.'
+
+export const START_ISLAND_MOVEMENT_0 =
+  'Now, let’s get those feet moving. Use the W, A, S, and D keys to walk around. Go on, give it a shot! Don’t be shy; I’ll be right here, floating fabulously.'
+
+export const START_ISLAND_CAMERA_0 =
+  'Now that you’re moving like a pro, let’s put your camera skills to the test.'
+export const START_ISLAND_CAMERA_1 =
+  'Somewhere nearby, I’ve hidden a glowing orb! Use your camera to look around and spot it.'
+export const START_ISLAND_CAMERA_2 =
+  'Hold the left mouse button and drag to rotate your view, or right-click to lock the cursor and really fine-tune your perspective. Good luck!'
+
+export const START_ISLAND_JUMP_0 =
+  'Good job! Ok. Lets get out of here. I will show you how to Jump.'
+export const START_ISLAND_JUMP_1 =
+  'Try to jump this log to access the next stage.'
+export const START_ISLAND_JUMP_2 =
+  'To Jump, you must press <b>Space</b> and Forward with <b>W</b> key.'
+
 export const START_ISLAND_0 =
   'Welcome to Decentraland! The metaverse <b>owned and created</b> by people like you. My name is Tobor.'
 export const START_ISLAND_1 =

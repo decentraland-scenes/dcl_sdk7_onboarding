@@ -48,7 +48,7 @@ export class UIController {
       this.gameController.questPortal.claim.onTheWay.render(),
     ]
     ReactEcsRenderer.setUiRenderer(this.uiComponent)
-    //this.keyBoardUI.isVisible = true
+    this.keyBoardUI.isVisible = true
 
     this.listenToPointerLockChange()
   }

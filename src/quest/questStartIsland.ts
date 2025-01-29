@@ -14,7 +14,8 @@ import {
   Transform,
   Tween,
   TweenSequence,
-  tweenSystem
+  tweenSystem,
+  VisibilityComponent
 } from '@dcl/sdk/ecs'
 import { Vector3, Quaternion, Color4 } from '@dcl/sdk/math'
 import { GameController } from '../controllers/gameController'
@@ -28,12 +29,13 @@ import { IndicatorState, QuestIndicator } from '../imports/components/questIndic
 import { AudioManager } from '../imports/components/audio/audio.manager'
 import { activateSoundPillar1 } from '../imports/components/audio/sounds'
 import { TaskType } from '../uis/widgetTask'
-import { CLICKME, HELP_BEIZER, JUMP, OVERHERE } from '../jsonData/textsTutorialBubble'
+import { CAMERA_QUEST_0, CLICKME, HELP_BEIZER, JUMP, MOVE_QUEST_1, OVERHERE } from '../jsonData/textsTutorialBubble'
 import { point1, point2, point3 } from '../jsonData/npcData'
 import { sendTrak } from '../utils/segment'
 import { NPC } from '../imports/components/npc.class'
-import { blockCamera, forceFirstPerson, freeCamera, freeCameraMode } from '../utils/camera'
+import { blockCamera, forceFirstPerson, forceThirdPerson, freeCamera, freeCameraMode } from '../utils/camera'
 import { lockPlayer, unlockPlayer } from '../utils/blockPlayer'
+import { GlowingOrb } from '../imports/glowingOrb'
 
 export class SpawnIsland {
   tobor: NPC
@@ -42,6 +44,9 @@ export class SpawnIsland {
   questIndicator: QuestIndicator
   bubbleTalk: BubbleTalk
   arrows: Entity[]
+  private isMoveQuestCompleted = false
+  private readonly SPAWN_POINT = Vector3.create(224.127, 69.7368, 124.0051)
+  private orb: GlowingOrb
   constructor(gameController: GameController) {
     this.gameController = gameController
     this.tobor = new NPC(
@@ -53,12 +58,13 @@ export class SpawnIsland {
       () => {
         Animator.getClip(this.tobor.entity, 'Robot_Idle').playing = true
       },
-      () => {
-        pointerEventsSystem.removeOnPointerDown(this.tobor.npcChild)
-        this.bubbleTalk.closeBubbleInTime()
-        this.startInteractQuest()
-      }
+      
     )
+    //() => {
+      //  pointerEventsSystem.removeOnPointerDown(this.tobor.npcChild)
+      //  this.bubbleTalk.closeBubbleInTime()
+      //  this.startInteractQuest()
+      //}
     Animator.createOrReplace(this.tobor.entity, {
       states: [
         {
@@ -101,7 +107,8 @@ export class SpawnIsland {
     this.tobor.activateBillBoard(true)
     this.bubbleTalk = new BubbleTalk(this.tobor.bubbleAttach)
     this.tobor.setChildScaleYAxis(3.1)
-    this.bubbleTalk.openBubble(CLICKME, true)
+    this.bubbleTalk.closeBubbleInTime()
+    //this.bubbleTalk.openBubble(CLICKME, true)
 
     this.targeterCircle = new FloorCircleTargeter(
       Vector3.create(0, 0, 0),
@@ -111,9 +118,12 @@ export class SpawnIsland {
     )
     this.questIndicator = new QuestIndicator(this.tobor.entity)
     this.questIndicator.hide()
-    this.targeterCircle.showCircle(true)
+    this.targeterCircle.showCircle(false)
     this.targeterCircle.setCircleScale(0.4)
     this.arrows = []
+
+    this.orb = new GlowingOrb(this)
+
     this.loadTagData()
   }
   loadTagData() {
@@ -161,7 +171,7 @@ export class SpawnIsland {
     })
     this.respawnTrigger()
     this.activeCables(false)
-    this.startSpawnIsland()
+    //this.startSpawnIsland()
   }
   respawnTrigger() {
     const triggerPos = Vector3.create(160, 10, 160)
@@ -181,12 +191,133 @@ export class SpawnIsland {
     })
   }
   startSpawnIsland() {
+    lockPlayer()
+    forceThirdPerson()
+
+    this.gameController.uiController.widgetTasks.showTasks(false, TaskType.Simple)
+
+    // -- Camera --
+    //The tutorial begins with a cinematic that shows detailed views and traveling shots of the scenario. Then, it focuses on where the avatar has appeared along with Tobor.
+
     //Start ambiental sound
     sendTrak('z0_quest0_00', this.gameController.timeStamp)
     AudioManager.instance().playMainAmbience(true)
     AudioManager.instance().play('waterfall', { volume: 1, loop: true, position: Vector3.create(226.94, 70, 130.37) })
 
+    utils.timers.setTimeout(()=>{
+      Animator.stopAllAnimations(this.tobor.entity)
+      Animator.getClip(this.tobor.entity, 'Talk').playing = true
+      openDialogWindow(this.tobor.entity, this.gameController.dialogs.toborCinematicDialog, 0)
+    }, 500)
+
+  }
+
+  introductionMiddleChangeCamera() {
+    // -- Camera --
+    //Camera pans to the player’s character
+  }
+
+  finishedIntroDialog() {
+    // -- Camera --
+    //Camera turns back to Tobor
+    
+    //Wait for camera animation
+    utils.timers.setTimeout(()=>{
+
+      AudioManager.instance().playOnce('tobor_talk', { volume: 0.6, parent: this.tobor.entity })
+      Animator.stopAllAnimations(this.tobor.entity)
+      Animator.getClip(this.tobor.entity, 'Talk').playing = true
+      openDialogWindow(this.tobor.entity, this.gameController.dialogs.toborMovementDialog, 0)
+    }, 500)
+  }
+  // ---- Movement Quest ----
+  startMovementQuest() {
+    // -- Camera --
+    //Camera goes back to normal
+
+    unlockPlayer()
+    freeCameraMode()
+    Animator.stopAllAnimations(this.tobor.entity)
+    Animator.getClip(this.tobor.entity, 'Robot_Idle').playing = true
+
+    this.gameController.uiController.popUpControls.showMoveControlsUI()
+    this.bubbleTalk.openBubble(MOVE_QUEST_1, true)
+    //Movement task UI
+    this.gameController.uiController.widgetTasks.showTasks(true, TaskType.Simple)
+    this.gameController.uiController.widgetTasks.showTick(false, 0)
+    this.gameController.uiController.widgetTasks.setText(0, 0)
+  }
+  moveQuestCompleted() {
+    if(this.isMoveQuestCompleted) return;
+    this.isMoveQuestCompleted = true;
+
+    // -- Camera --
+    //Camera transitions to Tobor
+
+    
+    lockPlayer()
+    movePlayerTo({
+      newRelativePosition: this.SPAWN_POINT,
+      cameraTarget: Quaternion.fromLookAt(this.SPAWN_POINT, Vector3.add(Transform.get(this.tobor.entity).position, {x: 0, y: 1, z: 0}))
+    })
+    this.bubbleTalk.closeBubbleInTime()
+    this.gameController.uiController.popUpControls.hideAllControlsUI()
+
+
+    AudioManager.instance().playOnce('tobor_talk', { volume: 0.6, parent: this.tobor.entity })
+    Animator.stopAllAnimations(this.tobor.entity)
+    Animator.getClip(this.tobor.entity, 'Talk').playing = true
+    openDialogWindow(this.tobor.entity, this.gameController.dialogs.toborCameraDialog, 0)
+  }
+  // ---- Camera Quest ----
+  startCameraQuest() {
+    Animator.stopAllAnimations(this.tobor.entity)
+    Animator.getClip(this.tobor.entity, 'Robot_Idle').playing = true
+
+    unlockPlayer()
+    this.bubbleTalk.openBubble(CAMERA_QUEST_0, true)
     this.gameController.uiController.popUpControls.showLookControlsUI()
+    //Camera task UI
+    //Spawn gloing orb
+    this.spawnGlowingOrb()
+  }
+
+  private spawnGlowingOrb() {
+    this.orb.activate()
+  }
+
+  cameraQuestCompleted() {
+
+    lockPlayer()
+    movePlayerTo({
+      newRelativePosition: this.SPAWN_POINT,
+      cameraTarget: Quaternion.fromLookAt(this.SPAWN_POINT, Vector3.add(Transform.get(this.tobor.entity).position, {x: 0, y: 1, z: 0}))
+    })
+    this.bubbleTalk.closeBubbleInTime()
+    this.gameController.uiController.popUpControls.hideAllControlsUI()
+
+
+    AudioManager.instance().playOnce('tobor_talk', { volume: 0.6, parent: this.tobor.entity })
+    Animator.stopAllAnimations(this.tobor.entity)
+    Animator.getClip(this.tobor.entity, 'Talk').playing = true
+    openDialogWindow(this.tobor.entity, this.gameController.dialogs.toborJumpDialog, 0)
+
+    utils.timers.setTimeout(()=>{
+      this.orb.deactivateWithAnim()
+    }, 1000)
+  }
+
+  //Jump quest
+  startJumpQuest() {
+    Animator.stopAllAnimations(this.tobor.entity)
+    Animator.getClip(this.tobor.entity, 'Robot_Idle').playing = true
+
+    unlockPlayer()
+
+    this.gameController.uiController.popUpControls.showJumpControlsUI()
+    //Jump task UI
+    
+    this.startMoveForwardJumpQuest()
   }
 
   activeCables(bActive: boolean) {
@@ -211,8 +342,8 @@ export class SpawnIsland {
     this.gameController.uiController.popUpControls.hideLookControlsUI()
     this.gameController.uiController.popUpControls.hideCursorLockControlsUI()
   }
-  startMoveQuest() {
-    this.gameController.uiController.popUpControls.showMoveControlsUI()
+  startMoveForwardJumpQuest() {
+    //this.gameController.uiController.popUpControls.showMoveControlsUI()
     this.tobor.activateBillBoard(false)
 
     Tween.createOrReplace(this.tobor.entity, {
@@ -223,7 +354,7 @@ export class SpawnIsland {
       duration: 400,
       easingFunction: EasingFunction.EF_LINEAR
     })
-    utils.timers.setTimeout(() => {}, 500)
+    //utils.timers.setTimeout(() => {}, 500)
 
     TweenSequence.create(this.tobor.entity, {
       sequence: [

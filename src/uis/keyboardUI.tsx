@@ -14,6 +14,7 @@ export class KeyBoardUI {
   pressanykey: string = 'Press left click to Continue...'
   currentBackgroundColor: Color4 = Color4.create(0, 0, 0, 1)
   isFadingOut: boolean = false
+  private isStarted = false
   uiController: UIController
   constructor(uiController: UIController) {
     this.uiController = uiController
@@ -23,7 +24,7 @@ export class KeyBoardUI {
     if (this.isFadingOut) return
 
     this.isFadingOut = true
-    let fadeInterval = 62
+    let fadeInterval = 62/2
     let stepValue = 0.05
     let alpha = 1
 
@@ -42,7 +43,9 @@ export class KeyBoardUI {
       }
     }, fadeInterval)
     
-
+    if(this.isStarted) return;
+    this.isStarted = true
+    this.uiController.gameController.spawnIsland.startSpawnIsland()
     //this.uiController.gameController.questEmote.giveReward()
   }
 
