@@ -335,7 +335,7 @@ export class Dialogs {
         portrait: happyMat,
         isEndOfDialog: true,
         triggeredByNext: () => {
-          this.gameController.questMaterial.startQuestCollectMaterials()
+          this.gameController.questMaterial.cameraTargetsMaterialsObjectives()
         },
         typeSpeed: this.typeSpeed
       },
