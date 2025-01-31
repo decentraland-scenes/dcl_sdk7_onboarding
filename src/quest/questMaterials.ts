@@ -186,6 +186,10 @@ export class QuestMaterials {
   cameraTargetsMaterialsObjectives() {
     // -- Camera --
     // Camera shots at both boxes on each side for a couple of seconds. Then goes back to mat
+    
+    utils.timers.setTimeout(()=>{
+      this.startQuestCollectMaterials()
+    }, 1000)
   }
   deleteBlocker() {
     engine.removeEntity(this.blocker)
