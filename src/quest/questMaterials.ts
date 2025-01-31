@@ -27,6 +27,8 @@ import { POPUP_STATE } from '../uis/popupUI'
 import { TaskType } from '../uis/widgetTask'
 import { sendTrak } from '../utils/segment'
 import { NPC } from '../imports/components/npc.class'
+import { lockPlayer, unlockPlayer } from '../utils/blockPlayer'
+import { movePlayerTo } from '~system/RestrictedActions'
 export class QuestMaterials {
   gameController: GameController
   mat: NPC
@@ -43,6 +45,8 @@ export class QuestMaterials {
   arrow1: ArrowTargeter
   arrow2: ArrowTargeter
   pilarActivate: boolean = false
+  private readonly talkMatPoint: Vector3 = Vector3.create(169.26,68.78,154.41)
+  private readonly lookNextQuestPoint: Vector3 = Vector3.create(169.26,68.78,154.41)
   constructor(gameController: GameController) {
     this.gameController = gameController
     this.blocker = engine.addEntity()
@@ -132,6 +136,17 @@ export class QuestMaterials {
     this.activeCables(false)
   }
   startQuest() {
+
+    lockPlayer()
+    movePlayerTo({
+      newRelativePosition: this.talkMatPoint,
+      cameraTarget: Transform.get(this.gameController.mainInstance.s0_En_Npc2_01).position
+    })
+
+    // -- Camera --
+    //Camera talk with Mat
+
+
     this.setQuestStartDialog()
     sendTrak('z2_quest2_00', this.gameController.timeStamp)
     this.gameController.uiController.popUpControls.hideAllControlsUI()
@@ -153,6 +168,24 @@ export class QuestMaterials {
       },
       () => {}
     )
+  }
+  setQuestStartDialog() {
+    AudioManager.instance().playOnce('npc_2_salute', { volume: 0.6, parent: this.mat.entity })
+    this.gameController.uiController.widgetTasks.showTick(true, 0)
+    utils.timers.setTimeout(() => {
+      this.gameController.uiController.widgetTasks.showTick(false, 0)
+      this.gameController.uiController.widgetTasks.setText(7, 0)
+      this.gameController.uiController.widgetTasks.showTasks(true, TaskType.Simple)
+    }, 1500)
+    openDialogWindow(this.mat.entity, this.gameController.dialogs.matDialog, 0)
+    Animator.stopAllAnimations(this.mat.entity)
+    Animator.getClip(this.mat.entity, 'Talk').playing = true
+    this.targeterCircle.showCircle(false)
+    this.questIndicator.hide()
+  }
+  cameraTargetsMaterialsObjectives() {
+    // -- Camera --
+    // Camera shots at both boxes on each side for a couple of seconds. Then goes back to mat
   }
   deleteBlocker() {
     engine.removeEntity(this.blocker)
@@ -186,33 +219,24 @@ export class QuestMaterials {
       }
     )
   }
-  setQuestStartDialog() {
-    AudioManager.instance().playOnce('npc_2_salute', { volume: 0.6, parent: this.mat.entity })
-    this.gameController.uiController.widgetTasks.showTick(true, 0)
-    utils.timers.setTimeout(() => {
-      this.gameController.uiController.widgetTasks.showTick(false, 0)
-      this.gameController.uiController.widgetTasks.setText(7, 0)
-      this.gameController.uiController.widgetTasks.showTasks(true, TaskType.Simple)
-    }, 1500)
-    openDialogWindow(this.mat.entity, this.gameController.dialogs.matDialog, 0)
-    Animator.stopAllAnimations(this.mat.entity)
-    Animator.getClip(this.mat.entity, 'Talk').playing = true
-    this.targeterCircle.showCircle(false)
-    this.questIndicator.hide()
-  }
-  accetpQuest() {
+  showQuestBubbleAndTargeters() {
     this.bubbleTalk.openBubble(ZONE_3_COLLECT_0, true)
     Animator.stopAllAnimations(this.mat.entity)
     Animator.getClip(this.mat.entity, 'Idle').playing = true
-    this.startQuestCollectMaterials()
     this.arrow1.showArrow(true)
     this.arrow2.showArrow(true)
   }
-  startQuestCollectMaterials() {
+  startQuestCollectMaterials() { 
+    this.showQuestBubbleAndTargeters()
+    unlockPlayer()
     if (this.quest3Started == false) {
       this.quest3Started = true
+
       this.onclickMaterial()
       this.onclickTriangles()
+
+      // -- Camera --
+      //Restore camera to player
     }
   }
   onclickMaterial() {
@@ -229,8 +253,9 @@ export class QuestMaterials {
       {
         entity: collider,
         opts: {
-          button: InputAction.IA_PRIMARY,
-          hoverText: 'Grab'
+          button: InputAction.IA_POINTER,
+          hoverText: 'Grab',
+          showFeedback: true
         }
       },
       () => {
@@ -265,8 +290,9 @@ export class QuestMaterials {
       {
         entity: collider,
         opts: {
-          button: InputAction.IA_PRIMARY,
-          hoverText: 'Grab'
+          button: InputAction.IA_POINTER,
+          hoverText: 'Grab',
+          showFeedback: true
         }
       },
       () => {
@@ -349,6 +375,16 @@ export class QuestMaterials {
     )
   }
   talkNpcCompleteQuest() {
+
+    lockPlayer()
+    movePlayerTo({
+      newRelativePosition: this.talkMatPoint,
+      cameraTarget: Transform.get(this.gameController.mainInstance.s0_En_Npc2_01).position
+    })
+
+    // -- Camera --
+    //Camera talk with Mat
+
     this.gameController.uiController.widgetTasks.showTick(true, 0)
     this.gameController.uiController.widgetTasks.showTick(true, 2)
     utils.timers.setTimeout(() => {
@@ -374,7 +410,7 @@ export class QuestMaterials {
   }
 
   setWalletConnection() {
-    console.log('wallet connected:' + this.walletConected)
+    /*console.log('wallet connected:' + this.walletConected)
     if (this.walletConected === false) {
       utils.timers.setTimeout(() => {
         openDialogWindow(this.mat.entity, this.gameController.dialogs.matDialog, 8)
@@ -384,6 +420,14 @@ export class QuestMaterials {
       utils.timers.setTimeout(() => {
         openDialogWindow(this.mat.entity, this.gameController.dialogs.matDialog, 9)
       }, 200)
+    }*/
+
+    this.walletConected = this.claim.setUserData()
+    console.log('wallet connected' + this.walletConected)
+    if (this.walletConected === false) {
+      this.gameController.uiController.popUpUI.show(POPUP_STATE.TwoButtons)
+    } else {
+      this.giveReward()
     }
   }
 
@@ -391,16 +435,35 @@ export class QuestMaterials {
     this.hasReward = true
     this.afterEndQuestClick()
   }
-  showWearableUI() {
-    //this.gameController.uiController.popUpUI.show(POPUP_STATE.Vest)
-    this.giveReward()
-  }
+
   giveReward() {
     this.claim.claimToken()
+  }
+  onCloseRewardUI() {
     if (this.firstTimeClosingRewardUI) {
-      this.activatePilar()
+      openDialogWindow(this.mat.entity, this.gameController.dialogs.matDialog, 8)
       this.firstTimeClosingRewardUI = false
     }
+    else this.afterEndQuestClick()
+  }
+  lookAtNextQuest() {
+    // -- Camera --
+    //Camera pans to show the stair case traveling until it reaches Kit, waving at the camera
+
+    movePlayerTo({
+      newRelativePosition: this.lookNextQuestPoint,
+      cameraTarget: Transform.get(this.gameController.mainInstance.s0_En_Npc3_01).position
+    })
+
+    this.gameController.questPuzzle.questIndicator.updateStatus(IndicatorState.ARROW)
+    this.gameController.questPuzzle.questIndicator.showWithAnim()
+    utils.timers.setTimeout(()=>{
+      //Pilar Turn ON
+      this.activatePilar()
+      utils.timers.setTimeout(()=>{
+        openDialogWindow(this.mat.entity, this.gameController.dialogs.matDialog, 9)
+      }, 1000)
+    }, 500)
   }
   activatePilar() {
     if (this.pilarActivate === true){
@@ -428,6 +491,13 @@ export class QuestMaterials {
       GltfContainer.getMutable(this.gameController.mainInstance.s0_Cable_03_OFF_01).src =
         'assets/scene/models/unity_assets/s0_Cable_03_OFF_01.glb'
     }
+  }
+  questFinished() {
+    // -- Camera --
+    //Restore camera to player
+
+    unlockPlayer()
+    this.afterEndQuestClick()
   }
   afterEndQuestClick() {
     console.log('QuestEnd')

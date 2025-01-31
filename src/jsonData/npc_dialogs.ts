@@ -335,7 +335,7 @@ export class Dialogs {
         portrait: happyMat,
         isEndOfDialog: true,
         triggeredByNext: () => {
-          this.gameController.questMaterial.accetpQuest()
+          this.gameController.questMaterial.startQuestCollectMaterials()
         },
         typeSpeed: this.typeSpeed
       },
@@ -343,7 +343,7 @@ export class Dialogs {
         text: THIRD_ISLAND_4,
         portrait: idleMat,
         triggeredByNext: () => {
-          this.gameController.questMaterial.accetpQuest()
+          this.gameController.questMaterial.showQuestBubbleAndTargeters()
         },
         isEndOfDialog: true,
         typeSpeed: this.typeSpeed
@@ -360,11 +360,20 @@ export class Dialogs {
         typeSpeed: this.typeSpeed
       },
       {
+        text: THIRD_ISLAND_9,
+        portrait: idleMat,
+        triggeredByNext: () => {
+          this.gameController.questMaterial.setWalletConnection()
+        },
+        isEndOfDialog: true,
+        typeSpeed: this.typeSpeed
+      },
+      {
         text: THIRD_ISLAND_7,
         portrait: idleMat,
         isEndOfDialog: true,
         triggeredByNext: () => {
-          this.gameController.questMaterial.setWalletConnection()
+          this.gameController.questMaterial.lookAtNextQuest()
         },
         typeSpeed: this.typeSpeed
       },
@@ -372,20 +381,12 @@ export class Dialogs {
         text: THIRD_ISLAND_8,
         portrait: idleMat,
         triggeredByNext: () => {
-          this.gameController.questMaterial.afterEndQuestClick()
+          this.gameController.questMaterial.questFinished()
         },
         isEndOfDialog: true,
         typeSpeed: this.typeSpeed
       },
-      {
-        text: THIRD_ISLAND_9,
-        portrait: idleMat,
-        triggeredByNext: () => {
-          this.gameController.questMaterial.showWearableUI()
-        },
-        isEndOfDialog: true,
-        typeSpeed: this.typeSpeed
-      },
+      
       {
         text: THIRD_ISLAND_10,
         portrait: idleMat,

@@ -129,16 +129,16 @@ export class PopUpControls {
     showJumpControlsUI() {
         this.jumpControlsUI.jumpContainerVisible = true
         this.jumpControlsUI.keySpace.resetPressProgress()
-        this.jumpControlsUI.keySpace.setFinishProgressCB(()=>{this.checkJumpQuestCompleted()})
+        //this.jumpControlsUI.keySpace.setFinishProgressCB(()=>{this.checkJumpQuestCompleted()})
     }
     hideJumpControlsUI() {
         this.jumpControlsUI.jumpContainerVisible = false
     }
-    checkJumpQuestCompleted() {
+    /*checkJumpQuestCompleted() {
         if(this.jumpControlsUI.keySpace.bIsProgressCompleted) {
             //TODO MOVE QUEST COMPLETED
         }
-    }
+    }*/
     showLookControlsUI() {
         this.lookControlsUI.lookContainerVisible = true
         this.bEnableAutoSwapLookControls = true

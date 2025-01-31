@@ -62,7 +62,8 @@ export class NPC {
         entity: this.npcChild,
         opts: {
           button: InputAction.IA_POINTER,
-          hoverText: 'Talk'
+          hoverText: 'Talk',
+          showFeedback: true
         }
       },
       () => {

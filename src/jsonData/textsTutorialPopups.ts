@@ -53,7 +53,7 @@ export const SECOND_ISLAND_11 = 'And by the way you forgot your NFT emote.'
 
 // Dialogs  Mat island
 export const THIRD_ISLAND_0 = "Hey, I'm Mat. I have a business in the metaverse selling NFT wearables."
-export const THIRD_ISLAND_1 = 'There are thousands of community created wearables for sale in Decentraland.'
+export const THIRD_ISLAND_1 = 'There are thousands of community created wearables for sale.'
 export const THIRD_ISLAND_2 =
   'I’m running low on materials and meshes. If you find them for me I can make it worth your while.'
 export const THIRD_ISLAND_3 =
@@ -66,7 +66,7 @@ export const THIRD_ISLAND_6 = 'Thanks for collecting the materials and meshes, n
 export const THIRD_ISLAND_7 = 'Your next task is to talk to Kit, find him on the last island.'
 export const THIRD_ISLAND_8 = 'Thanks for your help.'
 
-export const THIRD_ISLAND_9 = 'Before you go, take this wearable as thanks for your help.'
+export const THIRD_ISLAND_9 = 'Take this one as thanks for your help.'
 export const THIRD_ISLAND_10 = 'Kit should be in the next island.'
 export const THIRD_ISLAND_11 = 'With the materials that you gave me, I can create awesome wearables. Thanks!'
 export const THIRD_ISLAND_12 = 'Oh! You forgot your wearable.'

@@ -7,10 +7,11 @@ import { ClaimTokenRequestArgs, USE_CAPTCHA } from './config'
 import * as ui from 'dcl-ui-toolkit'
 import { Color4 } from '@dcl/sdk/math'
 import { openExternalUrl } from '~system/RestrictedActions'
-import { PromptButton } from 'dcl-ui-toolkit/dist/ui-entities/prompts/Prompt/components/Button'
+import { PromptText } from 'dcl-ui-toolkit/dist/ui-entities/prompts/Prompt/components/Text'
 import { PromptIcon } from 'dcl-ui-toolkit/dist/ui-entities/prompts/Prompt/components/Icon'
 import { PromptInput } from 'dcl-ui-toolkit/dist/ui-entities/prompts/Prompt/components/Input'
-import { PromptText } from 'dcl-ui-toolkit/dist/ui-entities/prompts/Prompt/components/Text'
+import { PromptButton } from 'dcl-ui-toolkit/dist/ui-entities/prompts/Prompt/components/Button'
+import { ButtonStyles } from 'dcl-npc-toolkit/dist/types'
 
 export class ClaimWearableRequest {
   inTimeOut: boolean = false
@@ -92,6 +93,7 @@ export class ClaimWearableRequest {
       yPosition: 0,
       onMouseDown: () => {}
     })
+
     this.captchaButtonF = this.captchaUI.addButton({
       style: ui.ButtonStyles.DARK,
       buttonSize: 200,
@@ -143,7 +145,7 @@ export class ClaimWearableRequest {
         this.isRetryInCD = true
         promptButtonE.grayOut()
         promptButtonE.text = 'Wait'
-        this.gameController.questEmote.giveReward()
+        this.gameController.questMaterial.giveReward()
 
         utils.timers.setTimeout(()=>{
           this.retryCD += 2
@@ -162,6 +164,7 @@ export class ClaimWearableRequest {
       yPosition: -120,
       onMouseDown: () => {
         this.retryUI.hide()
+        this.gameController.questMaterial.onCloseRewardUI()
       }
     })
   }
@@ -172,7 +175,7 @@ export class ClaimWearableRequest {
       xPosition: -120,
       yPosition: 150
     })
-    let emoteImage = this.onTheWay.addIcon({
+    const wearableImage = this.onTheWay.addIcon({
       image: image,
       xPosition: 0,
       yPosition: 25,
@@ -228,6 +231,7 @@ export class ClaimWearableRequest {
     const isClaimed = this.alreadyClaimed.find((item) => item === this.campaign_key)
 
     if (isClaimed) {
+      console.log('Already Claim UI')
       return
     }
 
@@ -245,7 +249,7 @@ export class ClaimWearableRequest {
   }
   async requestToken(campaign_key: string) {
     await this.setUserData()
-    console.log('Requesting Emote')
+    console.log('Requesting Wearable')
     let METHOD_NAME = 'claimToken'
     const url = this.claimServer + '/api/campaigns/' + this.campaign.campaign + '/rewards'
     console.log(METHOD_NAME, 'sending req to: ', url)
@@ -277,6 +281,9 @@ export class ClaimWearableRequest {
     } catch (error) {
       console.log(METHOD_NAME, 'error fetching from token server ', url)
       console.log(METHOD_NAME, 'error', error)
+      this.claimInProgress.hide()
+      if(this.msgRetryUi) this.msgRetryUi.value = 'An unexpected error occurred'
+      this.retryUI.show()
     }
   }
   async processResponse(response: any, campaign_key: string) {
@@ -343,6 +350,7 @@ export class ClaimWearableRequest {
       console.log('dataaa' + json)
       this.createOnTheWayUI(json.data[0].image, json.data[0].id)
       this.onTheWay.show()
+      this.gameController.questMaterial.setRewardTrue()
       this.alreadyClaimed.push(campaign_key)
     }
   }
@@ -416,9 +424,6 @@ export class ClaimWearableRequest {
     this.captchaButtonF.yPosition = -155
     this.captchaButtonF.onMouseDown = () => {
       this.captchaUI.hide()
-      this.gameController.questMaterial.afterEndQuestClick()
     }
   }
 }
-
-
