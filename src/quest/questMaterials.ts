@@ -429,7 +429,9 @@ export class QuestMaterials {
     this.walletConected = this.claim.setUserData()
     console.log('wallet connected' + this.walletConected)
     if (this.walletConected === false) {
-      this.gameController.uiController.popUpUI.show(POPUP_STATE.TwoButtons)
+      utils.timers.setTimeout(() => {
+        this.onCloseRewardUI()
+      }, 200)
     } else {
       this.giveReward()
     }

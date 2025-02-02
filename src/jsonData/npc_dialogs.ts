@@ -315,90 +315,106 @@ export class Dialogs {
       }
     ]
     this.matDialog = [
-      {
+      { //0
         text: THIRD_ISLAND_0,
         portrait: idleMat,
         typeSpeed: this.typeSpeed
       },
-      {
+      { //1
         text: THIRD_ISLAND_1,
         portrait: happyMat,
         typeSpeed: this.typeSpeed
       },
-      {
+
+      { //2
         text: THIRD_ISLAND_2,
         portrait: surprisedMat,
         typeSpeed: this.typeSpeed
       },
-      {
+
+      { //3
         text: THIRD_ISLAND_3,
         portrait: happyMat,
         isEndOfDialog: true,
         triggeredByNext: () => {
+
           this.gameController.questMaterial.cameraTargetsMaterialsObjectives()
         },
         typeSpeed: this.typeSpeed
       },
-      {
+      { //4
         text: THIRD_ISLAND_4,
         portrait: idleMat,
         triggeredByNext: () => {
+
           this.gameController.questMaterial.showQuestBubbleAndTargeters()
         },
         isEndOfDialog: true,
         typeSpeed: this.typeSpeed
       },
-      {
+      { //5
         text: THIRD_ISLAND_5,
         portrait: idleMat,
         isEndOfDialog: true,
         typeSpeed: this.typeSpeed
       },
-      {
+
+      { //6
         text: THIRD_ISLAND_6,
         portrait: idleMat,
         typeSpeed: this.typeSpeed
       },
-      {
+
+      { //7
         text: THIRD_ISLAND_9,
         portrait: idleMat,
         triggeredByNext: () => {
+
           this.gameController.questMaterial.setWalletConnection()
         },
         isEndOfDialog: true,
         typeSpeed: this.typeSpeed
       },
-      {
+      { //8
         text: THIRD_ISLAND_7,
         portrait: idleMat,
         isEndOfDialog: true,
         triggeredByNext: () => {
+
           this.gameController.questMaterial.lookAtNextQuest()
         },
         typeSpeed: this.typeSpeed
       },
-      {
+      { //9
         text: THIRD_ISLAND_8,
         portrait: idleMat,
         triggeredByNext: () => {
+
           this.gameController.questMaterial.questFinished()
         },
         isEndOfDialog: true,
         typeSpeed: this.typeSpeed
       },
       
-      {
+      { //10
         text: THIRD_ISLAND_10,
         portrait: idleMat,
         typeSpeed: this.typeSpeed
       },
-      { text: THIRD_ISLAND_11, portrait: idleMat, isEndOfDialog: true, typeSpeed: this.typeSpeed },
-      {
+
+      { //11
+        text: THIRD_ISLAND_11,
+        portrait: idleMat,
+        isEndOfDialog: true,
+        typeSpeed: this.typeSpeed
+      },
+      { //12
         text: THIRD_ISLAND_12,
         portrait: idleMat,
         isEndOfDialog: true,
         typeSpeed: this.typeSpeed,
         triggeredByNext: () => {
+
           this.gameController.questMaterial.giveReward()
         }
       }
