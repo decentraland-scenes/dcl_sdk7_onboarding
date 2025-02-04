@@ -77,14 +77,16 @@ export const FOURTH_ISLAND_0 =
 export const FOURTH_ISLAND_1 =
   'Genesis City is a huge open world, and every part of it is <b>owned</b> by someone in the community.'
 export const FOURTH_ISLAND_2 =
-  'You can get there through these <b>portals.</b> Looks like they aren’t working right now. Maybe if you restore the power they will start working again.'
+  'You can get there through these <b>portals.</b>'
+export const FOURTH_ISLAND_3 =
+  'Looks like they aren’t working right now. Maybe if you restore the power they will start working again.'
+export const FOURTH_ISLAND_4 = 'By the way, pressing <b>V</b> will alternate between different cameras. First person view is ideal for close actions like this!'
+export const FOURTH_ISLAND_5 = 'It’s working! Now fix the other connections.'
+export const FOURTH_ISLAND_6 = 'Cool the power is online, come back to talk to me.'
 
-export const FOURTH_ISLAND_3 = 'It’s working! Now fix the other connections.'
-export const FOURTH_ISLAND_4 = 'Cool the power is online, come back to talk to me.'
-
-export const FOURTH_ISLAND_5 = 'Thanks to you the portals are ready to use. Tobor is waiting you, go talk with him.'
-
-export const FOURTH_ISLAND_6 = 'Tobor wants to talk to you, he’s next to the portals.'
+export const FOURTH_ISLAND_7 = 'Thanks to you the portals are ready to use.'
+export const FOURTH_ISLAND_8 = 'Tobor is waiting you, go talk with him.'
+//export const FOURTH_ISLAND_9 = 'Tobor wants to talk to you, he’s next to the portals.'
 
 // Dialogs  Tobor portal
 export const PORTAL_ISLAND_0 = 'Awesome, the portals are online!'

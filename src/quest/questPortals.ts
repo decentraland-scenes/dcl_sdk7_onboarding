@@ -15,6 +15,7 @@ import { delay } from '../imports/components/delay'
 import { randomNumbers } from '../utils/globalLibrary'
 import { sendTrak } from '../utils/segment'
 import { NPC } from '../imports/components/npc.class'
+import { lockPlayer, unlockPlayer } from '../utils/blockPlayer'
 
 export class QuestPortal {
   tobor: NPC
@@ -124,15 +125,25 @@ export class QuestPortal {
     engine.removeSystem(this.bubbleDynamic.respSystem)
     AudioManager.instance().playOnce('tobor_talk', { volume: 0.6, parent: this.tobor.entity })
     openDialogWindow(this.tobor.entity, this.gameController.dialogs.toborEndDialog, 0)
+
+    lockPlayer()
+    // -- Camera --
+    //Camera talk with Tobor
   }
   robotToPortalCallBack() {
     Animator.stopAllAnimations(this.gameController.mainInstance.s0_Z3_Quest_Portal_Art_01)
+
     Animator.playSingleAnimation(this.gameController.mainInstance.s0_Z3_Quest_Portal_Art_01, 'Portal_Activate')
     AudioManager.instance().playMainAmbience(false)
     activateLoopSoundPortal()
     this.displayEvents()
     AudioManager.instance().audio.portal_ambiental.setVolumeSmooth(0, 2000)
+
+    unlockPlayer()
+    // -- Camera --
+    //Restore camera to player
   }
+
 
   setRewardTrue() {
     this.hasReward = true
@@ -146,7 +157,6 @@ export class QuestPortal {
       this.robotToPortalCallBack()
     } else {
       utils.timers.setTimeout(() => {
-        this.robotToPortalCallBack()
         openDialogWindow(this.tobor.entity, this.gameController.dialogs.toborEndDialog, 4)
       }, 200)
     }
@@ -156,6 +166,7 @@ export class QuestPortal {
   }
   onCloseRewardUI() {
     this.setupFinalDialog()
+    this.robotToPortalCallBack()
   }
   async displayEvents() {
     const event: any = await getEvents('https://events.decentraland.org/api/events/?limit=10')

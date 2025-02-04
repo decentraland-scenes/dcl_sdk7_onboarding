@@ -3,14 +3,15 @@ import { signedFetch } from '~system/SignedFetch'
 import * as utils from '@dcl-sdk/utils'
 import { getPlayer } from '@dcl/sdk/src/players'
 import { GameController } from '../controllers/gameController'
-import { ClaimTokenRequestArgs, USE_CAPTCHA, configEmote } from './config'
+import { ClaimTokenRequestArgs, USE_CAPTCHA } from './config'
 import * as ui from 'dcl-ui-toolkit'
 import { Color4 } from '@dcl/sdk/math'
 import { openExternalUrl } from '~system/RestrictedActions'
+import { PromptText } from 'dcl-ui-toolkit/dist/ui-entities/prompts/Prompt/components/Text'
+import { PromptIcon } from 'dcl-ui-toolkit/dist/ui-entities/prompts/Prompt/components/Icon'
 import { PromptInput } from 'dcl-ui-toolkit/dist/ui-entities/prompts/Prompt/components/Input'
 import { PromptButton } from 'dcl-ui-toolkit/dist/ui-entities/prompts/Prompt/components/Button'
-import { PromptIcon } from 'dcl-ui-toolkit/dist/ui-entities/prompts/Prompt/components/Icon'
-import { PromptText } from 'dcl-ui-toolkit/dist/ui-entities/prompts/Prompt/components/Text'
+import { ButtonStyles } from 'dcl-npc-toolkit/dist/types'
 
 export class ClaimCapRequest {
   inTimeOut: boolean = false
@@ -92,6 +93,7 @@ export class ClaimCapRequest {
       yPosition: 0,
       onMouseDown: () => {}
     })
+
     this.captchaButtonF = this.captchaUI.addButton({
       style: ui.ButtonStyles.DARK,
       buttonSize: 200,
@@ -142,7 +144,7 @@ export class ClaimCapRequest {
         this.isRetryInCD = true
         promptButtonE.grayOut()
         promptButtonE.text = 'Wait'
-        this.gameController.questEmote.giveReward()
+        this.gameController.questPortal.giveReward()
 
         utils.timers.setTimeout(()=>{
           this.retryCD += 2
@@ -161,6 +163,7 @@ export class ClaimCapRequest {
       yPosition: -120,
       onMouseDown: () => {
         this.retryUI.hide()
+        this.gameController.questPortal.onCloseRewardUI()
       }
     })
   }
@@ -171,7 +174,7 @@ export class ClaimCapRequest {
       xPosition: -120,
       yPosition: 150
     })
-    let emoteImage = this.onTheWay.addIcon({
+    const capImage = this.onTheWay.addIcon({
       image: image,
       xPosition: 0,
       yPosition: 25,
@@ -245,7 +248,7 @@ export class ClaimCapRequest {
   }
   async requestToken(campaign_key: string) {
     await this.setUserData()
-    console.log('Requesting Emote')
+    console.log('Requesting Cap')
     let METHOD_NAME = 'claimToken'
     const url = this.claimServer + '/api/campaigns/' + this.campaign.campaign + '/rewards'
     console.log(METHOD_NAME, 'sending req to: ', url)
@@ -277,6 +280,9 @@ export class ClaimCapRequest {
     } catch (error) {
       console.log(METHOD_NAME, 'error fetching from token server ', url)
       console.log(METHOD_NAME, 'error', error)
+      this.claimInProgress.hide()
+      if(this.msgRetryUi) this.msgRetryUi.value = 'An unexpected error occurred'
+      this.retryUI.show()
     }
   }
   async processResponse(response: any, campaign_key: string) {
@@ -343,6 +349,7 @@ export class ClaimCapRequest {
       console.log('dataaa' + json)
       this.createOnTheWayUI(json.data[0].image, json.data[0].id)
       this.onTheWay.show()
+      this.gameController.questPortal.setRewardTrue()
       this.alreadyClaimed.push(campaign_key)
     }
   }
@@ -375,7 +382,6 @@ export class ClaimCapRequest {
       console.log('textbox changed:', value)
       captchaInput = value
     }
-
     this.captchaButtonE.imageElement.uiBackground = {
       textureMode: 'center',
       texture: { src: 'assets/ui/UI_button_red_version_2.png'}

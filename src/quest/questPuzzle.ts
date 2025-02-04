@@ -13,6 +13,9 @@ import { TaskType } from '../uis/widgetTask'
 import { sendTrak } from '../utils/segment'
 import { ConnectMiniGame } from '../imports/components/connectMG'
 import { NPC } from '../imports/components/npc.class'
+import { movePlayerTo } from '~system/RestrictedActions'
+import { lockPlayer, wait_ms } from '../cinematic/cameraManager'
+import { unlockPlayer } from '../utils/blockPlayer'
 
 export class QuestPuzzle {
   gameController: GameController
@@ -21,6 +24,7 @@ export class QuestPuzzle {
   questIndicator: QuestIndicator
   connect_game: ConnectMiniGame
   bubbleTalk: sideBubbleTalk
+  private readonly talkKitPlayerPoint: Vector3 = Vector3.create(114.51,77.59,141.38)
   constructor(gameController: GameController) {
     this.gameController = gameController
     this.kit = new NPC(
@@ -83,6 +87,16 @@ export class QuestPuzzle {
     this.activeCables(false)
   }
   public startQuestPuzzle() {
+
+    lockPlayer()
+    movePlayerTo({
+      newRelativePosition: this.talkKitPlayerPoint,
+      cameraTarget: Transform.get(this.gameController.mainInstance.s0_En_Npc3_01).position
+    })
+
+    // -- Camera --
+    //Camera talk with Kit
+
     this.setBubbleNpc2()
     this.setUpInitQuest()
   }
@@ -132,17 +146,42 @@ export class QuestPuzzle {
     openDialogWindow(this.kit.entity, this.gameController.dialogs.kitDialog, 0)
     Animator.getClip(this.kit.entity, 'Talk').playing = true
   }
+  async cameraLooksAtPortals() {
+    // -- Camera --
+    //Camera travels to the portals and pan. https://www.notion.so/decentraland/Tutorial-Improvements-14c5f41146a58044b29cfb1b33dcf027?pvs=4#1535f41146a5803ab4eacb2b3335436a
+    //Wait for camera to look at portals
+    await wait_ms(1000)
+
+    openDialogWindow(this.kit.entity, this.gameController.dialogs.kitDialog, 3)
+    
+  }
+  async cameraLooksAtPuzzle() {
+    // -- Camera --
+    //Camera shot of the connector.
+    await wait_ms(1000)
+
+    // -- Camera --
+    //Camera goes back to kit
+
+    openDialogWindow(this.kit.entity, this.gameController.dialogs.kitDialog, 4)
+    
+  }
   accetpQuest() {
     Animator.getClip(this.kit.entity, 'Talk').playing = false
     Animator.getClip(this.kit.entity, 'Idle').playing = true
     this.connect_game.activatePieces()
     this.bubbleTalk.openBubble(ZONE_2_PUZZLE_0, true)
     this.puzzleQuest()
+
     this.gameController.uiController.popUpControls.showCameraControlsUI()
+
+    unlockPlayer()
+    // -- Camera --
+    //Restore camera to player
   }
   cameraModeAngleCheck() {
     // engine.addSystem( this.gameController.uiController.popUpControls.checkCameraMode)
-    this.gameController.uiController.popUpControls.showPuzzlesUis()
+    //this.gameController.uiController.popUpControls.showPuzzlesUis()
     this.gameController.uiController.popUpControls.hideAllControlsUI()
     this.gameController.uiController.popUpControls.showCameraControlsUI()
     // this.gameController.uiController.popUpControls.checkCameraMode()
@@ -158,7 +197,7 @@ export class QuestPuzzle {
       changeGeneratosSound()
       this.bubbleTalk.closeBubbleInTime()
       utils.timers.setTimeout(() => {
-        openDialogWindow(this.kit.entity, this.gameController.dialogs.kitDialog, 4)
+        openDialogWindow(this.kit.entity, this.gameController.dialogs.kitDialog, 6)
         this.taskTalkSwap()
         this.clicOnNPC2PuzzleCompleted()
         this.questIndicator.updateStatus(IndicatorState.ARROW)
@@ -181,32 +220,46 @@ export class QuestPuzzle {
         entity: this.kit.npcChild,
         opts: {
           button: InputAction.IA_POINTER,
-          hoverText: 'Talk'
+          hoverText: 'Talk',
+          showFeedback: true
         }
       },
       () => {
-        this.gameController.uiController.widgetTasks.showTick(true, 0)
-        this.gameController.uiController.widgetTasks.showTick(true, 3)
-        utils.timers.setTimeout(() => {
-          this.gameController.uiController.widgetTasks.showTick(false, 0)
-          this.gameController.uiController.widgetTasks.setText(12, 0)
-          this.gameController.uiController.widgetTasks.showTasks(false, TaskType.Multiple)
-          this.gameController.uiController.widgetTasks.showTasks(true, TaskType.Simple)
-        }, 2000)
         pointerEventsSystem.removeOnPointerDown(this.kit.npcChild)
-        this.spawnparticles()
-        this.questIndicator.hide()
-        Animator.stopAllAnimations(this.kit.entity)
-        Animator.playSingleAnimation(this.kit.entity, 'Celebrate')
-        utils.timers.setTimeout(() => {
-          Animator.getClip(this.kit.entity, 'Celebrate').playing = false
-          Animator.getClip(this.kit.entity, 'Idle').playing = true
-        }, 2200)
-        Animator.getClip(this.kit.entity, 'Idle').playing = false
-        Animator.getClip(this.kit.entity, 'Talk').playing = true
-        openDialogWindow(this.kit.entity, this.gameController.dialogs.kitDialog, 5)
+        this.talkToKitEndQuest()
       }
     )
+  }
+
+  private talkToKitEndQuest() {
+    this.gameController.uiController.widgetTasks.showTick(true, 0)
+    this.gameController.uiController.widgetTasks.showTick(true, 3)
+    utils.timers.setTimeout(() => {
+      this.gameController.uiController.widgetTasks.showTick(false, 0)
+      this.gameController.uiController.widgetTasks.setText(12, 0)
+      this.gameController.uiController.widgetTasks.showTasks(false, TaskType.Multiple)
+      this.gameController.uiController.widgetTasks.showTasks(true, TaskType.Simple)
+    }, 2000)
+    this.spawnparticles()
+    this.questIndicator.hide()
+    Animator.stopAllAnimations(this.kit.entity)
+    Animator.playSingleAnimation(this.kit.entity, 'Celebrate')
+    utils.timers.setTimeout(() => {
+      Animator.getClip(this.kit.entity, 'Celebrate').playing = false
+      Animator.getClip(this.kit.entity, 'Idle').playing = true
+    }, 2200)
+    Animator.getClip(this.kit.entity, 'Idle').playing = false
+    Animator.getClip(this.kit.entity, 'Talk').playing = true
+    openDialogWindow(this.kit.entity, this.gameController.dialogs.kitDialog, 7)
+
+    lockPlayer()
+    movePlayerTo({
+      newRelativePosition: this.talkKitPlayerPoint,
+      cameraTarget: Transform.get(this.gameController.mainInstance.s0_En_Npc3_01).position
+    })
+
+    // -- Camera --
+    //Camera talk with Kit
   }
 
   private spawnparticles() {
@@ -232,6 +285,11 @@ export class QuestPuzzle {
     this.activatePilar()
     this.gameController.questPortal.initQuestPortal()
     this.gameController.uiController.popUpControls.hideCameraControlsUI()
+
+    unlockPlayer()
+
+    // -- Camera --
+    //Restore camera to player
   }
   activatePilar() {
     AudioManager.instance().playTowerCharge(this.gameController.mainInstance.s0_Z3_Quest_Pillar_Art_2__01)

@@ -132,7 +132,8 @@ export class ConnectMiniGame {
             entity: piece,
             opts: {
               button: InputAction.IA_POINTER,
-              hoverText: 'Interact'
+              hoverText: 'Interact',
+              showFeedback: true
             }
           },
           () => {
@@ -153,7 +154,7 @@ export class ConnectMiniGame {
         if (!this.firstConection) {
           this.firstConection = true
           delay(() => {
-            openDialogWindow(this.gameController.questPuzzle.kit.entity, this.gameController.dialogs.kitDialog, 3)
+            openDialogWindow(this.gameController.questPuzzle.kit.entity, this.gameController.dialogs.kitDialog, 5)
             // getHUD().wgPopUpControls.showCameraModeImage(false)
             // getHUD().wgPopUpControls.showCablesImage(true)
           }, 500)
