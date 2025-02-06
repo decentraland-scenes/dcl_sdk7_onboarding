@@ -479,7 +479,7 @@ export class Popup {
             onMouseDown={() => {
               if (this.currentButton === POPUP_STATE.TwoButtons) {
                 this.hide(POPUP_STATE.TwoButtons)
-                this.uiController.gameController.questEmote.onCloseRewardUI()
+                this.uiController.gameController.questEmote.onCloseRewardUI_deprecated()
                 openExternalUrl({ url: 'https://docs.decentraland.org/player/blockchain-integration/get-a-wallet/' })
               } else if (this.currentButton === POPUP_STATE.OneButton) {
                 this.hide(POPUP_STATE.OneButton)
@@ -518,10 +518,10 @@ export class Popup {
             onMouseDown={() => {
               if (POPUP_STATE.TwoButtons) {
                 this.hide(POPUP_STATE.TwoButtons)
-                this.uiController.gameController.questEmote.onCloseRewardUI()
+                this.uiController.gameController.questEmote.onCloseRewardUI_deprecated()
               } else if (POPUP_STATE.OneButton) {
                 this.hide(POPUP_STATE.OneButton)
-                this.uiController.gameController.questEmote.onCloseRewardUI()
+                this.uiController.gameController.questEmote.onCloseRewardUI_deprecated()
               }
             }}
           >

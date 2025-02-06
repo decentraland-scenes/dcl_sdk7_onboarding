@@ -478,7 +478,7 @@ export class QuestEmote {
       this.activeCables(true)
     }, 3000)
   }
-  onCloseRewardUI() {
+  onCloseRewardUI_deprecated() {
     if (this.firstTimeClosingRewardUI) {
       openDialogWindow(this.bezier.entity, this.gameController.dialogs.bezierDialog, 6)
       this.firstTimeClosingRewardUI = false

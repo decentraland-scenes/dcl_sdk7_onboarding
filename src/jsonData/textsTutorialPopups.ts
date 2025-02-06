@@ -94,5 +94,5 @@ export const PORTAL_ISLAND_1 = "From here on out it's up to you... <b>what do yo
 export const PORTAL_ISLAND_2 =
   "Don't like these choices? Press <b>tab</b> to open the menu and choose from loads of different experiences."
 export const PORTAL_ISLAND_3 = 'Well, what are you waiting for, choose your next experience!'
-export const PORTAL_ISLAND_4 = "Before you go, don't forget your reward for activating the portals"
+export const PORTAL_ISLAND_4 = "Before you go, I'm sending you a reward for activating the portals"
 export const PORTAL_ISLAND_5 = 'Thanks again for activating the portals!'

@@ -238,84 +238,91 @@ export class Dialogs {
       }
     ]
     this.bezierDialog = [
-      {
+      { //0
         text: SECOND_ISLAND_0,
         portrait: idleBezier,
         typeSpeed: this.typeSpeed
+
       },
-      {
+      { //1
         text: SECOND_ISLAND_1,
         portrait: talkingBezier,
         typeSpeed: this.typeSpeed
       },
-      {
+      { //2
         text: SECOND_ISLAND_2,
         typeSpeed: this.typeSpeed,
         portrait: surprisedBezier
       },
-      {
+      { //3
         text: SECOND_ISLAND_3,
         typeSpeed: this.typeSpeed,
         portrait: surprisedBezier,
         isEndOfDialog: true,
         triggeredByNext: () => {
+
           this.gameController.questEmote.startEmoteQuest()
         }
       },
-      {
+      { //4
         text: SECOND_ISLAND_4,
         portrait: surprisedBezier,
         typeSpeed: this.typeSpeed
       },
-      {
+      { //5
         text: SECOND_ISLAND_5,
         portrait: happyBezier,
         typeSpeed: this.typeSpeed,
-        isEndOfDialog: true,
+        //isEndOfDialog: true,
         triggeredByNext: () => {
+
           this.gameController.questEmote.setWalletConnection()
         },
       },
-      {
+      { //6
         text: SECOND_ISLAND_6,
         portrait: happyBezier,
         typeSpeed: this.typeSpeed
       },
-      {
+      { //7
         text: SECOND_ISLAND_7,
         portrait: happyBezier,
         typeSpeed: this.typeSpeed,
         isEndOfDialog: true,
         triggeredByNext: () => {
+
           this.gameController.questEmote.cameraAndBridgeAnim()
         },
       },
-      {
+      { //8
         text: SECOND_ISLAND_8,
         portrait: talkingBezier,
         isEndOfDialog: true,
         triggeredByNext: () => {
+
           // this.gameController.questEmote.finishAfterRewardDialog()
           this.gameController.questEmote.dialogQuestFinished()
         },
         typeSpeed: this.typeSpeed
       },
-      {
+      { //9
         text: SECOND_ISLAND_9,
         portrait: talkingBezier,
         isEndOfDialog: true,
         typeSpeed: this.typeSpeed
       },
-      {
+
+      { //10
         text: SECOND_ISLAND_10,
         portrait: talkingBezier,
         typeSpeed: this.typeSpeed
       },
-      {
+      { //11
         text: SECOND_ISLAND_11,
         portrait: talkingBezier,
         isEndOfDialog: true,
         triggeredByNext: () => {
+
           this.gameController.questEmote.setWalletConnection()
         },
         typeSpeed: this.typeSpeed
@@ -379,7 +386,7 @@ export class Dialogs {
 
           this.gameController.questMaterial.setWalletConnection()
         },
-        isEndOfDialog: true,
+        //isEndOfDialog: true,
         typeSpeed: this.typeSpeed
       },
       { //8
@@ -470,14 +477,18 @@ export class Dialogs {
 
           this.gameController.questPortal.giveReward()
         },
-        isEndOfDialog: true
+        //isEndOfDialog: true
       },
 
       { //5
         text: PORTAL_ISLAND_5,
         portrait: happyTrebor,
         isEndOfDialog: true,
-        typeSpeed: 30
+        typeSpeed: 30,
+        triggeredByNext: () => {
+
+          this.gameController.questPortal.finishedToborPortalEndDialog()
+        },
       }
 
     ]

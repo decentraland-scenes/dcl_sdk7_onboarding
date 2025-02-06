@@ -164,7 +164,7 @@ export class ClaimEmoteTokenRequest {
       yPosition: -120,
       onMouseDown: () => {
         this.retryUI.hide()
-        this.gameController.questEmote.onCloseRewardUI()
+        this.gameController.questEmote.onCloseRewardUI_deprecated()
       }
     })
   }
@@ -190,11 +190,11 @@ export class ClaimEmoteTokenRequest {
       yPosition: -120,
       onMouseDown: () => {
         this.onTheWay.hide()
-        this.gameController.questEmote.onCloseRewardUI()
+        this.gameController.questEmote.onCloseRewardUI_deprecated()
       }
     })
     this.onTheWay.onClose = () => {
-      this.gameController.questEmote.onCloseRewardUI()
+      this.gameController.questEmote.onCloseRewardUI_deprecated()
     }
 
     const promptButtonF = this.onTheWay.addButton({
@@ -221,7 +221,7 @@ export class ClaimEmoteTokenRequest {
   }
   async claimToken() {
     console.log('Claiming Token')
-    this.claimInProgress.show()
+    //this.claimInProgress.show()
     // prevent more than 1 request per second
     if (this.inTimeOut) return
 
@@ -305,8 +305,8 @@ export class ClaimEmoteTokenRequest {
     }
 
     this.claimInProgress.hide()
-    this.createOnTheWayUI(json.data[0].image, json.data[0].id)
-    this.onTheWay.show()
+    //this.createOnTheWayUI(json.data[0].image, json.data[0].id)
+    //this.onTheWay.show()
     this.gameController.questEmote.setRewardTrue()
     this.alreadyClaimed.push(campaign_key)
   }

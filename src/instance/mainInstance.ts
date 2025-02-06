@@ -2580,18 +2580,7 @@ export class MainInstace {
       scale: Vector3.create(0.91, 0.9100001, 0.91)
     })
     Transform.getMutable(this.s0_tree_fall_art_01).parent = this.s0_Z3_COG_01
-    PointerEvents.createOrReplace(this.s0_tree_fall_art_01, {
-      pointerEvents: [
-        {
-          eventType: PointerEventType.PET_DOWN,
-          eventInfo: {
-            button: InputAction.IA_POINTER,
-            showFeedback: true,
-            hoverText: 'Jump pressing SPACE and W'
-          }
-        }
-      ]
-    })
+    
     //DEFER_LOADING.push( ()=>{
     //keep this one as player can get to it fast, before download done
     //log("onSceneReadyObservable called. loading non critical values","Main_Island_art2")

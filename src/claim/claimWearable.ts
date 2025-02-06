@@ -164,7 +164,7 @@ export class ClaimWearableRequest {
       yPosition: -120,
       onMouseDown: () => {
         this.retryUI.hide()
-        this.gameController.questMaterial.onCloseRewardUI()
+        this.gameController.questMaterial.onCloseRewardUI_deprecated()
       }
     })
   }
@@ -191,11 +191,11 @@ export class ClaimWearableRequest {
       onMouseDown: () => {
         this.onTheWay.hide()
         // this.gameController.questMaterial.setRewardTrue()
-        this.gameController.questMaterial.onCloseRewardUI()
+        this.gameController.questMaterial.onCloseRewardUI_deprecated()
       }
     })
     this.onTheWay.onClose = () => {
-      this.gameController.questMaterial.onCloseRewardUI()
+      this.gameController.questMaterial.onCloseRewardUI_deprecated()
     }
 
     const promptButtonF = this.onTheWay.addButton({
@@ -222,7 +222,7 @@ export class ClaimWearableRequest {
   }
   async claimToken() {
     console.log('Claiming Token')
-    this.claimInProgress.show()
+    //this.claimInProgress.show()
     // prevent more than 1 request per second
     if (this.inTimeOut) return
 
@@ -306,10 +306,11 @@ export class ClaimWearableRequest {
     }
 
     this.claimInProgress.hide()
-    this.createOnTheWayUI(json.data[0].image, json.data[0].id)
-    this.onTheWay.show()
+    //this.createOnTheWayUI(json.data[0].image, json.data[0].id)
+    //this.onTheWay.show()
     this.gameController.questMaterial.setRewardTrue()
     this.alreadyClaimed.push(campaign_key)
+
   }
   async validateCaptcha(captcha: string, captcha_id: string, campaign: string, campaign_key: string) {
     this.claimInProgress.show()

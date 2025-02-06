@@ -538,7 +538,7 @@ export class QuestMaterials {
     console.log('wallet connected' + this.walletConected)
     if (this.walletConected === false) {
       utils.timers.setTimeout(() => {
-        this.onCloseRewardUI()
+        this.onCloseRewardUI_deprecated()
       }, 200)
     } else {
       this.giveReward()
@@ -554,7 +554,7 @@ export class QuestMaterials {
   giveReward() {
     this.claim.claimToken()
   }
-  onCloseRewardUI() {
+  onCloseRewardUI_deprecated() {
     if (this.firstTimeClosingRewardUI) {
       openDialogWindow(this.mat.entity, this.gameController.dialogs.matDialog, 8)
       this.firstTimeClosingRewardUI = false

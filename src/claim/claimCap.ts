@@ -163,7 +163,7 @@ export class ClaimCapRequest {
       yPosition: -120,
       onMouseDown: () => {
         this.retryUI.hide()
-        this.gameController.questPortal.onCloseRewardUI()
+        this.gameController.questPortal.onCloseRewardUI_deprecated()
       }
     })
   }
@@ -217,7 +217,7 @@ export class ClaimCapRequest {
   }
   async claimToken() {
     console.log('Claiming Token')
-    this.claimInProgress.show()
+    //this.claimInProgress.show()
     // prevent more than 1 request per second
     if (this.inTimeOut) return
 
@@ -301,10 +301,11 @@ export class ClaimCapRequest {
     }
 
     this.claimInProgress.hide()
-    this.createOnTheWayUI(json.data[0].image, json.data[0].id)
-    this.onTheWay.show()
+    //this.createOnTheWayUI(json.data[0].image, json.data[0].id)
+    //this.onTheWay.show()
     this.gameController.questPortal.setRewardTrue()
     this.alreadyClaimed.push(campaign_key)
+
   }
   async validateCaptcha(captcha: string, captcha_id: string, campaign: string, campaign_key: string) {
     this.claimInProgress.show()
@@ -423,7 +424,7 @@ export class ClaimCapRequest {
     this.captchaButtonF.yPosition = -155
     this.captchaButtonF.onMouseDown = () => {
       this.captchaUI.hide()
-      this.gameController.questPortal.onCloseRewardUI()
+      this.gameController.questPortal.onCloseRewardUI_deprecated()
     }
   }
 }

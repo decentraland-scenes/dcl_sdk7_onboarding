@@ -147,7 +147,7 @@ export class QuestPortal {
 
   setRewardTrue() {
     this.hasReward = true
-    this.onCloseRewardUI()
+    this.onCloseRewardUI_deprecated()
   }
   setWalletConnection() {
     this.walletConected = this.claim.setUserData()
@@ -164,7 +164,10 @@ export class QuestPortal {
   giveReward() {
     this.claim.claimToken()
   }
-  onCloseRewardUI() {
+  onCloseRewardUI_deprecated() {
+    this.finishedToborPortalEndDialog()
+  }
+  finishedToborPortalEndDialog() {
     this.setupFinalDialog()
     this.robotToPortalCallBack()
   }
