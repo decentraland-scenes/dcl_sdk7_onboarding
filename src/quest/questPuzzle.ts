@@ -14,7 +14,7 @@ import { sendTrak } from '../utils/segment'
 import { ConnectMiniGame } from '../imports/components/connectMG'
 import { NPC } from '../imports/components/npc.class'
 import { movePlayerTo } from '~system/RestrictedActions'
-import { lockPlayer, wait_ms } from '../cinematic/cameraManager'
+import { cameraManager, getWorldPosition, wait_ms } from '../cinematic/cameraManager'
 import { unlockPlayer } from '../utils/blockPlayer'
 
 export class QuestPuzzle {
@@ -86,16 +86,24 @@ export class QuestPuzzle {
   loadTagData() {
     this.activeCables(false)
   }
-  public startQuestPuzzle() {
+  public async startQuestPuzzle() {
+    // -- Camera --
+    //Camera talk with Kit
+    cameraManager.lockPlayer()
+    
+    const talkPlayerPoint = Vector3.add(this.talkKitPlayerPoint, Vector3.create(0, 0.75, 0))
+    const cameraTarget = Vector3.add(getWorldPosition(this.kit.entity), Vector3.create(0, 0.75, 0))
 
-    lockPlayer()
+    await cameraManager.blockCamera(
+      talkPlayerPoint,
+      Quaternion.fromLookAt(talkPlayerPoint, cameraTarget),
+      true,
+      0.5
+    )
     movePlayerTo({
       newRelativePosition: this.talkKitPlayerPoint,
       cameraTarget: Transform.get(this.gameController.mainInstance.s0_En_Npc3_01).position
     })
-
-    // -- Camera --
-    //Camera talk with Kit
 
     this.setBubbleNpc2()
     this.setUpInitQuest()
@@ -150,23 +158,80 @@ export class QuestPuzzle {
     // -- Camera --
     //Camera travels to the portals and pan. https://www.notion.so/decentraland/Tutorial-Improvements-14c5f41146a58044b29cfb1b33dcf027?pvs=4#1535f41146a5803ab4eacb2b3335436a
     //Wait for camera to look at portals
-    await wait_ms(1000)
 
-    openDialogWindow(this.kit.entity, this.gameController.dialogs.kitDialog, 3)
+    const cameraPosition = Vector3.add(Vector3.create(110.2, 80, 115), Vector3.create(0, 2, 0))
+    const cameraTarget = Vector3.add(Vector3.create(101.9, 80, 98), Vector3.create(0, 5, 0))
+    let track = [
+      {
+        position: cameraPosition,
+        rotation: Quaternion.fromLookAt(cameraPosition, cameraTarget)
+      },
+      {
+        position: Vector3.add(Vector3.create(110.2 - 0.25, 80, 115 - 0.25), Vector3.create(0, 5, 0)),
+        rotation: Quaternion.fromLookAt(Vector3.add(Vector3.create(110.2 - 0.25, 80, 115 - 0.25), Vector3.create(0, 5, 0)), cameraTarget)
+      },
+      {
+        position: Vector3.add(Vector3.create(110.2, 80, 115), Vector3.create(0, 8, 0)),
+        rotation: Quaternion.fromLookAt(Vector3.add(Vector3.create(110.2, 80, 115), Vector3.create(0, 8, 0)), cameraTarget)
+      }
+    ]
+
+    await cameraManager.blockCamera(
+      cameraPosition,
+      Quaternion.fromLookAt(cameraPosition, cameraTarget),
+      true,
+      0.5
+    )
+    await cameraManager.startPathTrack(track, 5000, 8, false, 0, 0)
+
+    const talkPlayerPoint = Vector3.add(this.talkKitPlayerPoint, Vector3.create(0, 0.75, 0))
+    const cameraTargetToKit = Vector3.add(getWorldPosition(this.kit.entity), Vector3.create(0, 0.75, 0))
+    await cameraManager.blockCamera(
+      talkPlayerPoint,
+      Quaternion.fromLookAt(talkPlayerPoint, cameraTargetToKit),
+      true,
+      0.5
+    )
     
+    openDialogWindow(this.kit.entity, this.gameController.dialogs.kitDialog, 3)
   }
   async cameraLooksAtPuzzle() {
     // -- Camera --
     //Camera shot of the connector.
-    await wait_ms(1000)
 
+    const talkPlayerPoint = Vector3.add(this.talkKitPlayerPoint, Vector3.create(0, 0.75, 0))
+    const cameraTarget1 = Vector3.add(Vector3.create(104.9, 77, 140.2), Vector3.create(0, 1.75, 0))
+    const cameraTarget2 = Vector3.add(Vector3.create(102.6, 77, 140.8), Vector3.create(0, 1.75, 0))
+    await wait_ms(200)
+
+    await cameraManager.blockCamera(
+      cameraTarget1,
+      Quaternion.fromLookAt(cameraTarget1, cameraTarget2),
+      true,
+      0.25
+    )
+    await cameraManager.blockCamera(
+      cameraTarget2,
+      Quaternion.fromLookAt(cameraTarget1, cameraTarget2),
+      true,
+      3
+    )
+    
     // -- Camera --
     //Camera goes back to kit
+
+    const cameraTargetToKit = Vector3.add(getWorldPosition(this.kit.entity), Vector3.create(0, 0.75, 0))
+    await cameraManager.blockCamera(
+      talkPlayerPoint,
+      Quaternion.fromLookAt(talkPlayerPoint, cameraTargetToKit),
+      true,
+      0.25
+    )
 
     openDialogWindow(this.kit.entity, this.gameController.dialogs.kitDialog, 4)
     
   }
-  accetpQuest() {
+  async accetpQuest() {
     Animator.getClip(this.kit.entity, 'Talk').playing = false
     Animator.getClip(this.kit.entity, 'Idle').playing = true
     this.connect_game.activatePieces()
@@ -175,9 +240,14 @@ export class QuestPuzzle {
 
     this.gameController.uiController.popUpControls.showCameraControlsUI()
 
-    unlockPlayer()
     // -- Camera --
     //Restore camera to player
+    await wait_ms(100)
+    cameraManager.forceThirdPerson()
+    await wait_ms(100)
+    cameraManager.freeCamera()
+
+    cameraManager.unlockPlayer()
   }
   cameraModeAngleCheck() {
     // engine.addSystem( this.gameController.uiController.popUpControls.checkCameraMode)
@@ -231,7 +301,7 @@ export class QuestPuzzle {
     )
   }
 
-  private talkToKitEndQuest() {
+  private async talkToKitEndQuest() {
     this.gameController.uiController.widgetTasks.showTick(true, 0)
     this.gameController.uiController.widgetTasks.showTick(true, 3)
     utils.timers.setTimeout(() => {
@@ -252,14 +322,23 @@ export class QuestPuzzle {
     Animator.getClip(this.kit.entity, 'Talk').playing = true
     openDialogWindow(this.kit.entity, this.gameController.dialogs.kitDialog, 7)
 
-    lockPlayer()
+    cameraManager.lockPlayer()
+
+    // -- Camera --
+    //Camera talk with Kit
+
+    const talkPlayerPoint = Vector3.add(this.talkKitPlayerPoint, Vector3.create(0, 0.75, 0))
+    const cameraTargetToKit = Vector3.add(getWorldPosition(this.kit.entity), Vector3.create(0, 0.75, 0))
+    await cameraManager.blockCamera(
+      talkPlayerPoint,
+      Quaternion.fromLookAt(talkPlayerPoint, cameraTargetToKit),
+      true,
+      0.25
+    )
     movePlayerTo({
       newRelativePosition: this.talkKitPlayerPoint,
       cameraTarget: Transform.get(this.gameController.mainInstance.s0_En_Npc3_01).position
     })
-
-    // -- Camera --
-    //Camera talk with Kit
   }
 
   private spawnparticles() {
@@ -278,7 +357,7 @@ export class QuestPuzzle {
       engine.removeEntity(particle)
     }, 1000)
   }
-  dialogQuestFinished() {
+  async dialogQuestFinished() {
     this.bubbleTalk.openBubble(GO_TO_PORTAL, true)
     Animator.getClip(this.kit.entity, 'Talk').playing = false
     Animator.getClip(this.kit.entity, 'Idle').playing = true
@@ -286,11 +365,16 @@ export class QuestPuzzle {
     this.gameController.questPortal.initQuestPortal()
     this.gameController.uiController.popUpControls.hideCameraControlsUI()
 
-    unlockPlayer()
-
     // -- Camera --
     //Restore camera to player
+    await wait_ms(100)
+    cameraManager.forceThirdPerson()
+    await wait_ms(100)
+    cameraManager.freeCamera()
+
+    cameraManager.unlockPlayer()
   }
+
   activatePilar() {
     AudioManager.instance().playTowerCharge(this.gameController.mainInstance.s0_Z3_Quest_Pillar_Art_2__01)
     Animator.getClip(this.gameController.mainInstance.s0_Z3_Quest_Pillar_Art_2__01, 'Pillar_Anim').speed = 3
