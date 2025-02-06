@@ -190,8 +190,12 @@ export class ClaimEmoteTokenRequest {
       yPosition: -120,
       onMouseDown: () => {
         this.onTheWay.hide()
+        this.gameController.questEmote.onCloseRewardUI()
       }
     })
+    this.onTheWay.onClose = () => {
+      this.gameController.questEmote.onCloseRewardUI()
+    }
 
     const promptButtonF = this.onTheWay.addButton({
       style: ui.ButtonStyles.F,
