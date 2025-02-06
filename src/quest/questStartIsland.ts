@@ -171,6 +171,14 @@ export class SpawnIsland {
         )
       ) {
       }
+      if (
+        inputSystem.isTriggered(
+          InputAction.IA_POINTER,
+          PointerEventType.PET_DOWN,
+          this.gameController.mainInstance.s0_tree_fall_art_01
+        )
+      ) {
+      }
     })
 
     this.activeCables(false)
@@ -423,6 +431,19 @@ export class SpawnIsland {
 
     this.gameController.uiController.popUpControls.showJumpControlsUI()
     
+
+    PointerEvents.createOrReplace(this.gameController.mainInstance.s0_tree_fall_art_01, {
+      pointerEvents: [
+        {
+          eventType: PointerEventType.PET_DOWN,
+          eventInfo: {
+            button: InputAction.IA_POINTER,
+            showFeedback: true,
+            hoverText: 'Jump pressing SPACE and W'
+          }
+        }
+      ]
+    })
     
     this.startMoveForwardJumpQuest()
   }
@@ -555,6 +576,7 @@ export class SpawnIsland {
     this.gameController.uiController.popUpControls.hideJumpControlsUI()
     this.gameController.uiController.popUpControls.spaceContainerVisible = false
     this.gameController.uiController.widgetTasks.showTick(true, 0)
+    PointerEvents.deleteFrom(this.gameController.mainInstance.s0_tree_fall_art_01)
     utils.timers.setTimeout(() => {
       this.gameController.uiController.widgetTasks.setText(3, 0)
       this.gameController.uiController.widgetTasks.showTasks(true, TaskType.Simple)

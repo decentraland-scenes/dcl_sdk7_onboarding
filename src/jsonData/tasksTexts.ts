@@ -54,7 +54,7 @@ export const textQuests: Tasks[] = [
           en: 'Follow Tobor'
         },
         missionInfo: {
-          en: 'Jump the log and follow Tobor.'
+          en: 'Jump the tree and follow Tobor.'
         },
         fontSize: 14,
         vAlign: '0%',

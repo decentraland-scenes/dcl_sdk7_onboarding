@@ -1,5 +1,6 @@
 import {
   Animator,
+  ColliderLayer,
   engine,
   Entity,
   GltfContainer,
@@ -2568,13 +2569,29 @@ export class MainInstace {
     Transform.getMutable(this.s0_Z3_Str_Wereable_Station_Art_01).parent = this.s0_Z3_COG_01
     // Tree_Fall_Art
     this.s0_tree_fall_art_01 = engine.addEntity()
-    GltfContainer.create(this.s0_tree_fall_art_01, { src: 'assets/scene/models/unity_assets/s0_tree_fall_art_01.glb' })
+    GltfContainer.create(this.s0_tree_fall_art_01, { 
+      src: 'assets/scene/models/unity_assets/s0_tree_fall_art_01.glb',
+      visibleMeshesCollisionMask: ColliderLayer.CL_POINTER | ColliderLayer.CL_PHYSICS,
+      invisibleMeshesCollisionMask: ColliderLayer.CL_POINTER | ColliderLayer.CL_PHYSICS
+    })
     Transform.create(this.s0_tree_fall_art_01, {
       position: Vector3.create(216.9, 67.88, 128.27),
       rotation: Quaternion.create(-0.003149729, 0.996719, -0.04851133, -0.06471474),
       scale: Vector3.create(0.91, 0.9100001, 0.91)
     })
     Transform.getMutable(this.s0_tree_fall_art_01).parent = this.s0_Z3_COG_01
+    PointerEvents.createOrReplace(this.s0_tree_fall_art_01, {
+      pointerEvents: [
+        {
+          eventType: PointerEventType.PET_DOWN,
+          eventInfo: {
+            button: InputAction.IA_POINTER,
+            showFeedback: true,
+            hoverText: 'Jump pressing SPACE and W'
+          }
+        }
+      ]
+    })
     //DEFER_LOADING.push( ()=>{
     //keep this one as player can get to it fast, before download done
     //log("onSceneReadyObservable called. loading non critical values","Main_Island_art2")
