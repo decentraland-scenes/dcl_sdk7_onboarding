@@ -190,9 +190,13 @@ export class ClaimWearableRequest {
       yPosition: -120,
       onMouseDown: () => {
         this.onTheWay.hide()
-        this.gameController.questMaterial.setRewardTrue()
+        // this.gameController.questMaterial.setRewardTrue()
+        this.gameController.questMaterial.onCloseRewardUI()
       }
     })
+    this.onTheWay.onClose = () => {
+      this.gameController.questMaterial.onCloseRewardUI()
+    }
 
     const promptButtonF = this.onTheWay.addButton({
       style: ui.ButtonStyles.F,

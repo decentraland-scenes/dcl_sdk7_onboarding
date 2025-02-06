@@ -174,6 +174,9 @@ export class Dialogs {
         fontSize: 18,
         portrait: IdleTrebor,
         typeSpeed: this.typeSpeed,
+        triggeredByNext: () => {
+          this.gameController.spawnIsland.lookAtLog()
+        }
       },
       {
         text: START_ISLAND_JUMP_2,
@@ -291,7 +294,8 @@ export class Dialogs {
         portrait: talkingBezier,
         isEndOfDialog: true,
         triggeredByNext: () => {
-          this.gameController.questEmote.finishAfterRewardDialog()
+          // this.gameController.questEmote.finishAfterRewardDialog()
+          this.gameController.questEmote.dialogQuestFinished()
         },
         typeSpeed: this.typeSpeed
       },
@@ -449,7 +453,7 @@ export class Dialogs {
         },
         isEndOfDialog: true
       },
-      
+
       { //3
         text: PORTAL_ISLAND_3,
         portrait: talkingTrebor,

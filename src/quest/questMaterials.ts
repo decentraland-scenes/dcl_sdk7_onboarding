@@ -1,4 +1,4 @@
-import { Quaternion, Vector3 } from '@dcl/sdk/math'
+import { Color4, Quaternion, Vector3 } from '@dcl/sdk/math'
 import { ClaimEmoteTokenRequest } from '../claim/claimEmote'
 import { configVest } from '../claim/config'
 import { GameController } from '../controllers/gameController'
@@ -7,11 +7,13 @@ import {
   Entity,
   GltfContainer,
   InputAction,
+  Material,
   MeshCollider,
   MeshRenderer,
   PointerEvents,
   Transform,
   engine,
+  executeTask,
   pointerEventsSystem
 } from '@dcl/sdk/ecs'
 import { AudioManager } from '../imports/components/audio/audio.manager'
@@ -29,6 +31,7 @@ import { sendTrak } from '../utils/segment'
 import { NPC } from '../imports/components/npc.class'
 import { lockPlayer, unlockPlayer } from '../utils/blockPlayer'
 import { movePlayerTo } from '~system/RestrictedActions'
+import { cameraManager, getWorldPosition, wait_ms } from '../cinematic/cameraManager'
 export class QuestMaterials {
   gameController: GameController
   mat: NPC
@@ -45,7 +48,8 @@ export class QuestMaterials {
   arrow1: ArrowTargeter
   arrow2: ArrowTargeter
   pilarActivate: boolean = false
-  private readonly talkMatPoint: Vector3 = Vector3.create(169.26,68.78,154.41)
+  // private readonly talkMatPoint: Vector3 = Vector3.create(169.26,68.78,154.41)
+  private readonly talkMatPoint: Vector3 = Vector3.create(169,68.78,155.7)
   private readonly lookNextQuestPoint: Vector3 = Vector3.create(169.26,68.78,154.41)
   constructor(gameController: GameController) {
     this.gameController = gameController
@@ -135,16 +139,24 @@ export class QuestMaterials {
     this.spawnBlockToNextIsalnd()
     this.activeCables(false)
   }
-  startQuest() {
+  async startQuest() {
+    // -- Camera --
+    //Camera talk with Mat
+    cameraManager.lockPlayer()
 
-    lockPlayer()
+    const talkPlayerPoint = Vector3.add(this.talkMatPoint, Vector3.create(0, 0.75, 0))
+    const cameraTarget = Vector3.add(getWorldPosition(this.mat.entity), Vector3.create(0, 0.75, 0))
+    
+    await cameraManager.blockCamera(
+      talkPlayerPoint,
+      Quaternion.fromLookAt(talkPlayerPoint, cameraTarget),
+      true,
+      0.5
+    )
     movePlayerTo({
       newRelativePosition: this.talkMatPoint,
       cameraTarget: Transform.get(this.gameController.mainInstance.s0_En_Npc2_01).position
     })
-
-    // -- Camera --
-    //Camera talk with Mat
 
 
     this.setQuestStartDialog()
@@ -183,10 +195,45 @@ export class QuestMaterials {
     this.targeterCircle.showCircle(false)
     this.questIndicator.hide()
   }
-  cameraTargetsMaterialsObjectives() {
+  async cameraTargetsMaterialsObjectives() {
     // -- Camera --
     // Camera shots at both boxes on each side for a couple of seconds. Then goes back to mat
+
+    await cameraManager.cameraOrbit(
+      this.gameController.mainInstance.s0_Z3_Quest_BoxMat_art_3__01,
+      Vector3.create(0, 1.5, 5),
+      0 - 90,
+      -45 - 90,
+      3000,
+      0,
+      undefined
+    )
     
+    await cameraManager.cameraOrbit(
+      this.gameController.mainInstance.s0_Z3_Quest_BoxTri_art_3__01,
+      Vector3.create(0, 1.5, 5),
+      0 + 135,
+      45 + 135,
+      3000,
+      0,
+      undefined
+    )
+    
+    const talkPlayerPoint = Vector3.add(this.talkMatPoint, Vector3.create(0, 0.75, 0))
+    const cameraTarget = Vector3.add(getWorldPosition(this.mat.entity), Vector3.create(0, 0.75, 0))
+    
+    await cameraManager.blockCamera(
+      talkPlayerPoint,
+      Quaternion.fromLookAt(talkPlayerPoint, cameraTarget),
+      true,
+      0
+    )
+    
+    cameraManager.forceThirdPerson()
+    await wait_ms(100)
+    cameraManager.freeCamera()
+    cameraManager.unlockPlayer()
+
     utils.timers.setTimeout(()=>{
       this.startQuestCollectMaterials()
     }, 1000)
@@ -262,9 +309,9 @@ export class QuestMaterials {
           showFeedback: true
         }
       },
-      () => {
+      async () => {
         console.log('clicked entity')
-        this.pickPiece()
+        // this.pickPiece()
 
         AudioManager.instance().playOnce('pickup_box', {
           volume: 0.8,
@@ -272,9 +319,30 @@ export class QuestMaterials {
         })
         Animator.playSingleAnimation(this.gameController.mainInstance.s0_Z3_Quest_BoxMat_art_3__01, 'Box_02_Anim')
         engine.removeEntity(collider)
-        utils.timers.setTimeout(() => {
-          engine.removeEntity(this.gameController.mainInstance.s0_Z3_Quest_BoxMat_art_3__01)
-        }, 3500)
+
+        cameraManager.lockPlayer()
+        // let cameraPoint = Vector3.add(Transform.get(engine.PlayerEntity).position, Vector3.create(0, 0.75, 0))
+        const cameraPoint = Vector3.create(Transform.get(engine.PlayerEntity).position.x, 70.5, Transform.get(engine.PlayerEntity).position.z)
+        const cameraTarget = Vector3.add(getWorldPosition(this.gameController.mainInstance.s0_Z3_Quest_BoxMat_art_3__01), Vector3.create(0, -0.5, 0))
+        
+        await cameraManager.blockCamera(
+          cameraPoint,
+          Quaternion.fromLookAt(cameraPoint, cameraTarget),
+          true,
+          0.5
+        )
+        
+        await wait_ms(2000)
+        this.pickPiece()
+
+        await wait_ms(500)
+        cameraManager.forceThirdPerson()
+        await wait_ms(100)
+        cameraManager.freeCamera()
+        cameraManager.unlockPlayer()
+
+        await wait_ms(500)
+        engine.removeEntity(this.gameController.mainInstance.s0_Z3_Quest_BoxMat_art_3__01)
       }
     )
   }
@@ -299,18 +367,40 @@ export class QuestMaterials {
           showFeedback: true
         }
       },
-      () => {
+      async () => {
         console.log('clicked entity')
-        this.pickPiece()
+        // this.pickPiece()
         AudioManager.instance().playOnce('pickup_box', {
+
           volume: 0.8,
           parent: this.gameController.mainInstance.s0_Z3_Quest_BoxTri_art_3__01
         })
         Animator.playSingleAnimation(this.gameController.mainInstance.s0_Z3_Quest_BoxTri_art_3__01, 'Box_01_Anim')
         engine.removeEntity(collider)
-        utils.timers.setTimeout(() => {
-          engine.removeEntity(this.gameController.mainInstance.s0_Z3_Quest_BoxTri_art_3__01)
-        }, 3500)
+
+        
+        cameraManager.lockPlayer()
+        // let cameraPoint = Vector3.add(Transform.get(engine.PlayerEntity).position, Vector3.create(0, 0.75, 0))
+        const cameraPoint = Vector3.create(Transform.get(engine.PlayerEntity).position.x, 70.5, Transform.get(engine.PlayerEntity).position.z)
+        const cameraTarget = Vector3.add(getWorldPosition(this.gameController.mainInstance.s0_Z3_Quest_BoxTri_art_3__01), Vector3.create(0, -0.5, 0))
+        
+        await cameraManager.blockCamera(
+          cameraPoint,
+          Quaternion.fromLookAt(cameraPoint, cameraTarget),
+          true,
+          0.5
+        )
+        await wait_ms(2000)
+        this.pickPiece()
+
+        await wait_ms(500)
+        cameraManager.forceThirdPerson()
+        await wait_ms(100)
+        cameraManager.freeCamera()
+        cameraManager.unlockPlayer()
+
+        await wait_ms(500)
+        engine.removeEntity(this.gameController.mainInstance.s0_Z3_Quest_BoxTri_art_3__01)
       }
     )
   }
@@ -372,22 +462,40 @@ export class QuestMaterials {
         }
       },
       () => {
+        console.log('deliverAllPiecesClick')
+
         this.questIndicator.hide()
         this.talkNpcCompleteQuest()
         pointerEventsSystem.removeOnPointerDown(this.mat.npcChild)
       }
     )
   }
-  talkNpcCompleteQuest() {
+  async talkNpcCompleteQuest() {
 
-    lockPlayer()
+    // lockPlayer()
+    // movePlayerTo({
+    //   newRelativePosition: this.talkMatPoint,
+    //   cameraTarget: Transform.get(this.gameController.mainInstance.s0_En_Npc2_01).position
+    // })
+
+    // -- Camera --
+    //Camera talk with Mat
+    
+    cameraManager.lockPlayer()
+
+    const talkPlayerPoint = Vector3.add(this.talkMatPoint, Vector3.create(0, 0.75, 0))
+    const cameraTarget = Vector3.add(getWorldPosition(this.mat.entity), Vector3.create(0, 0.75, 0))
+    
+    await cameraManager.blockCamera(
+      talkPlayerPoint,
+      Quaternion.fromLookAt(talkPlayerPoint, cameraTarget),
+      true,
+      0.5
+    )
     movePlayerTo({
       newRelativePosition: this.talkMatPoint,
       cameraTarget: Transform.get(this.gameController.mainInstance.s0_En_Npc2_01).position
     })
-
-    // -- Camera --
-    //Camera talk with Mat
 
     this.gameController.uiController.widgetTasks.showTick(true, 0)
     this.gameController.uiController.widgetTasks.showTick(true, 2)
@@ -439,7 +547,8 @@ export class QuestMaterials {
 
   setRewardTrue() {
     this.hasReward = true
-    this.afterEndQuestClick()
+    // uncomment this for now, because we go to this.onCloseRewardUI after onTheWayUI reward is closed
+    // this.afterEndQuestClick()
   }
 
   giveReward() {
@@ -452,24 +561,74 @@ export class QuestMaterials {
     }
     else this.afterEndQuestClick()
   }
-  lookAtNextQuest() {
+  async lookAtNextQuest() {
+    executeTask(async () => {
+      this.gameController.questPuzzle.questIndicator.updateStatus(IndicatorState.ARROW)
+      this.gameController.questPuzzle.questIndicator.showWithAnim()
+  
+      await wait_ms(1000)
+      this.activatePilar()
+      await wait_ms(7000)
+      Animator.playSingleAnimation(this.gameController.questPuzzle.kit.entity, 'Hi')
+    })
     // -- Camera --
     //Camera pans to show the stair case traveling until it reaches Kit, waving at the camera
+    
+    cameraManager.lockPlayer()
 
+    let path = [
+      { 
+        position: Vector3.create(163, 68 + 4, 159.6), 
+        rotation: Quaternion.fromLookAt(Vector3.create(163, 68 + 4, 159.6), Vector3.create(144.4, 71.5 + 4, 156.8))
+      },
+      {
+        position: Vector3.create(144.4, 71.5 + 4, 156.8), 
+        rotation: Quaternion.fromLookAt(Vector3.create(144.4, 71.5 + 4, 156.8), Vector3.create(120.3, 73.3 + 4, 143.9))
+      },
+      {
+        position: Vector3.create(120, 73.3 + 8, 144), 
+        rotation: Quaternion.fromLookAt(Vector3.create(120, 73.3 + 8, 144), getWorldPosition(this.gameController.questPuzzle.kit.entity))
+      }
+    ]
+
+    for(let i = 0; i < path.length; i++) {
+      let debugBox = engine.addEntity()
+      Transform.create(debugBox, {
+        position: path[i].position,
+        scale: Vector3.scale(Vector3.One(), 0.4)
+      })
+      MeshCollider.setBox(debugBox)
+      Material.setPbrMaterial(debugBox, {albedoColor: Color4.create(1, 0, 0, 1)})
+    }
+
+    await cameraManager.startPathTrack(path, 9000, 10, false, 0, 0.5)
+    
+    await cameraManager.cameraOrbit(
+      this.gameController.questPuzzle.kit.entity,
+      Vector3.subtract(path[path.length - 1].position, getWorldPosition(this.gameController.questPuzzle.kit.entity)),
+      0,
+      20,
+      3000,
+      0,
+      undefined
+    )
+
+    const talkPlayerPoint = Vector3.add(this.talkMatPoint, Vector3.create(0, 0.75, 0))
+    const cameraTarget = Vector3.add(getWorldPosition(this.mat.entity), Vector3.create(0, 0.75, 0))
+    
     movePlayerTo({
-      newRelativePosition: this.lookNextQuestPoint,
-      cameraTarget: Transform.get(this.gameController.mainInstance.s0_En_Npc3_01).position
+      newRelativePosition: this.talkMatPoint,
+      cameraTarget: Transform.get(this.gameController.mainInstance.s0_En_Npc2_01).position
     })
-
-    this.gameController.questPuzzle.questIndicator.updateStatus(IndicatorState.ARROW)
-    this.gameController.questPuzzle.questIndicator.showWithAnim()
-    utils.timers.setTimeout(()=>{
-      //Pilar Turn ON
-      this.activatePilar()
-      utils.timers.setTimeout(()=>{
-        openDialogWindow(this.mat.entity, this.gameController.dialogs.matDialog, 9)
-      }, 1000)
-    }, 500)
+    
+    await cameraManager.blockCamera(
+      talkPlayerPoint,
+      Quaternion.fromLookAt(talkPlayerPoint, cameraTarget),
+      true,
+      0.5
+    )
+    
+    openDialogWindow(this.mat.entity, this.gameController.dialogs.matDialog, 9)
   }
   activatePilar() {
     if (this.pilarActivate === true){
@@ -498,11 +657,16 @@ export class QuestMaterials {
         'assets/scene/models/unity_assets/s0_Cable_03_OFF_01.glb'
     }
   }
-  questFinished() {
+  async questFinished() {
     // -- Camera --
     //Restore camera to player
 
-    unlockPlayer()
+    cameraManager.unlockPlayer()
+    await wait_ms(100)
+    cameraManager.forceThirdPerson()
+    await wait_ms(100)
+    cameraManager.freeCamera()
+
     this.afterEndQuestClick()
   }
   afterEndQuestClick() {
@@ -541,5 +705,6 @@ export class QuestMaterials {
     Animator.stopAllAnimations(this.mat.entity)
     Animator.getClip(this.mat.entity, 'Idle').playing = true
     openDialogWindow(this.mat.entity, this.gameController.dialogs.matDialog, 11)
+    PointerEvents.deleteFrom(this.mat.npcChild)
   }
 }
