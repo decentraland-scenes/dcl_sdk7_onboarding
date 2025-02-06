@@ -227,7 +227,8 @@ export class Dialogs {
         isEndOfDialog: true,
         typeSpeed: this.typeSpeed,
         triggeredByNext: () => {
-          this.gameController.uiController.popUpUI.show(POPUP_STATE.Tasks)
+          //this.gameController.uiController.popUpUI.show(POPUP_STATE.Tasks)
+          this.gameController.spawnIsland.onFinishCompleteQuestDialog()
         }
       }
     ]

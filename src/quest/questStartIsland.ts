@@ -587,7 +587,7 @@ export class SpawnIsland {
     this.questIndicator.updateStatus(IndicatorState.ARROW)
     this.questIndicator.showWithAnim()
   }
-  async onCloseRewardUI() {
+  async onFinishCompleteQuestDialog() {
     this.targeterCircle.showCircle(false)
     this.questIndicator.hide()
 
@@ -656,6 +656,9 @@ export class SpawnIsland {
     await cameraManager.freeCamera()
 
     Animator.playSingleAnimation(this.gameController.questEmote.bezier.entity, 'Idle')
+  }
+  onCloseRewardUI() {
+    //this.onFinishCompleteQuestDialog()
   }
   onCloseRewardUI_BU() {
     this.targeterCircle.showCircle(false)
