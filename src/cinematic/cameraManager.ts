@@ -340,12 +340,9 @@ class CameraManager {
         console.log('startPathTrack. start', this.activeOperationId)
         this.setCurrentCamEntity()
 
-        Transform.getMutable(this.currentCam.camEntity).parent = engine.RootEntity
-
         // create catmullRomSpline with rotation
         const catmullRomSpline = createCatmullRomSplineWithRotation(track, nbPoints, rotationBlend, loop)
-
-        console.log('startPathTrack. catmullRomSpline:', JSON.stringify(catmullRomSpline), 'length:', catmullRomSpline.length)
+        // console.log('startPathTrack. catmullRomSpline:', JSON.stringify(catmullRomSpline), 'length:', catmullRomSpline.length)
 
         let sumLength = 0
         const segmentLengths = []
@@ -368,9 +365,13 @@ class CameraManager {
     
         // Calculate normalized segment times
         const cumulativeSegmentTimes = segmentLengths.map(v => v / sumLength)
-        
-        console.log('startPathTrack. cumulativeSegmentTimes:', JSON.stringify(cumulativeSegmentTimes), 'length:', cumulativeSegmentTimes.length)
+        // console.log('startPathTrack. cumulativeSegmentTimes:', JSON.stringify(cumulativeSegmentTimes), 'length:', cumulativeSegmentTimes.length)
         const speed = 1 / duration_ms * 1000
+
+        const camTransform = Transform.getMutable(this.currentCam.camEntity)
+        camTransform.parent = engine.RootEntity
+        camTransform.position = catmullRomSpline[0].position
+        camTransform.rotation = catmullRomSpline[0].rotation
 
         // assisgn current camera to virtual camera
         console.log('cameraOrbit. change main camera to orbit camera. Transition speed:', transitionSpeed)
@@ -378,6 +379,12 @@ class CameraManager {
         MainCamera.createOrReplace(engine.CameraEntity, {
             virtualCameraEntity: this.currentCam.camEntity,
         })
+
+        await wait_ms(transitionSpeed * 1000)
+        if(!this.isOperationValid(operationId)) {
+            console.log('terminate operation. operation invalid:', operationId, '. New operation:', this.activeOperationId)
+            return
+        }
 
         LerpTransformComponent.createOrReplace(this.currentCam.camEntity, {
             track: catmullRomSpline,
