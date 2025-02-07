@@ -43,8 +43,11 @@ export class QuestIndicator {
   }
 
   hide() {
-    Transform.getMutable(this.icon).scale = Vector3.Zero()
-    this.stopAnimation()
+    Tween.deleteFrom(this.icon)
+    utils.timers.setTimeout(()=>{
+      Transform.getMutable(this.icon).scale = Vector3.Zero()
+      this.stopAnimation()
+    }, 100)
   }
   show() {
     Transform.getMutable(this.icon).position = this.startPos
