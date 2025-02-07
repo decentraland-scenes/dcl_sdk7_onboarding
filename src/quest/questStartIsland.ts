@@ -9,6 +9,7 @@ import {
   inputSystem,
   LoadingState,
   Material,
+  MaterialTransparencyMode,
   MeshRenderer,
   PointerEvents,
   pointerEventsSystem,
@@ -717,19 +718,20 @@ export class SpawnIsland {
     let scale = 0.3
     const xOffsets = [-2.3, -0.6, 0.7, 2.3, -2.3, -0.6, 0.7, 2.3]
     for (let i = 0; i < 9; i++) {
+      const texture = Material.Texture.Common({
+        src: 'assets/textures/arrow2.png'
+      })
       const arrow = engine.addEntity()
       MeshRenderer.setPlane(arrow)
       Transform.create(arrow, { parent: this.gameController.mainInstance.s0_Z3_Str_Bridge_Art_01 })
       Material.setPbrMaterial(arrow, {
-        texture: Material.Texture.Common({
-          src: 'assets/textures/arrow2.png'
-        }),
+        texture: texture,
         albedoColor: Color4.Yellow(),
         emissiveColor: Color4.Yellow(),
         emissiveIntensity: 5,
-        alphaTexture: Material.Texture.Common({
-          src: 'assets/textures/arrow2.png'
-        })
+        emissiveTexture: texture,
+        alphaTexture: texture,
+        transparencyMode: MaterialTransparencyMode.MTM_ALPHA_TEST
       })
       if (i == 4) zOffset = -1.85
 

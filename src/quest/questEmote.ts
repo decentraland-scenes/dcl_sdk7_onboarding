@@ -5,6 +5,7 @@ import {
   GltfContainer,
   InputAction,
   Material,
+  MaterialTransparencyMode,
   MeshRenderer,
   PointerEventType,
   PointerEvents,
@@ -558,16 +559,17 @@ export class QuestEmote {
       const arrow = engine.addEntity()
       MeshRenderer.setPlane(arrow)
       Transform.create(arrow, { parent: this.gameController.mainInstance.s0_Z3_Str_Bridge_Art_1__01 })
+      const texture = Material.Texture.Common({
+        src: 'assets/textures/arrow2.png'
+      })
       Material.setPbrMaterial(arrow, {
-        texture: Material.Texture.Common({
-          src: 'assets/textures/arrow2.png'
-        }),
+        texture: texture,
         albedoColor: Color4.Yellow(),
         emissiveColor: Color4.Yellow(),
         emissiveIntensity: 5,
-        alphaTexture: Material.Texture.Common({
-          src: 'assets/textures/arrow2.png'
-        })
+        emissiveTexture: texture,
+        alphaTexture: texture,
+        transparencyMode: MaterialTransparencyMode.MTM_ALPHA_TEST
       })
       if (i == 4) zOffset = -1.85
 
