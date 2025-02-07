@@ -228,6 +228,15 @@ export class SpawnIsland {
     this.gameController.uiController.keyBoardUI.canClick = true
   }
   async startSpawnIsland() {
+    if(Vector3.distance(Transform.get(engine.PlayerEntity).position, this.SPAWN_POINT) > 10) {
+      cameraManager.unlockPlayer()
+      cameraManager.forceThirdPerson()
+      await wait_ms(100)
+      await cameraManager.freeCamera()
+      return
+    }
+
+
     this.gameController.uiController.widgetTasks.showTasks(false, TaskType.Simple)
 
     //Start ambiental sound
@@ -243,8 +252,7 @@ export class SpawnIsland {
       -10 - 40, 
       190 - 40, 
       15000,
-      0,
-      undefined
+      0
     )
     
     await wait_ms(500)
@@ -262,8 +270,7 @@ export class SpawnIsland {
       90 + 40, 
       105 + 40, 
       10000,
-      1,
-      undefined
+      1
     )
   }
 
@@ -274,9 +281,14 @@ export class SpawnIsland {
     let camPosition = Vector3.add(Transform.get(engine.PlayerEntity).position, Vector3.create(0, 2, 0))
     let cameraRotation = Quaternion.fromLookAt(camPosition, Vector3.add(Transform.get(this.tobor.entity).position, Vector3.create(0, 1.25, 0)))
     
-    await cameraManager.blockCamera(camPosition, cameraRotation, true, 0.25)
-    
-    await wait_ms(100)
+    await cameraManager.blockCamera(
+      camPosition, 
+      cameraRotation, 
+      true, 
+      0
+    )
+
+    await wait_ms(500)
     cameraManager.forceThirdPerson()
     await wait_ms(100)
     await cameraManager.freeCamera()
@@ -322,9 +334,13 @@ export class SpawnIsland {
     
     let cameraPosition = Vector3.create(225.5, 71, 123.7)
     let cameraRotation = Quaternion.fromLookAt(cameraPosition, Vector3.add(Transform.get(this.tobor.entity).position, Vector3.create(0, 1.25, 0)))
-    await cameraManager.blockCamera(cameraPosition, cameraRotation, true, 0)
+    await cameraManager.blockCamera(
+      cameraPosition, 
+      cameraRotation, 
+      true, 
+      0.4
+    )
     
-    await wait_ms(100)
     movePlayerTo({
       newRelativePosition: Vector3.create(225.5, 69.7368, 123.7),
       cameraTarget: Transform.get(this.tobor.entity).position
@@ -349,9 +365,6 @@ export class SpawnIsland {
     let cameraPosition = Vector3.create(225.5, 71, 123.7)
     let cameraRotation = Quaternion.fromLookAt(cameraPosition, Vector3.add(Transform.get(this.tobor.entity).position, Vector3.create(0, 1.25, 0)))
     
-    await cameraManager.blockCamera(cameraPosition, cameraRotation, true, 0.25)
-    
-    await wait_ms(100)
     cameraManager.forceThirdPerson()
     await wait_ms(100)
     await cameraManager.freeCamera()
@@ -376,9 +389,13 @@ export class SpawnIsland {
     await wait_ms(500)
     let cameraPosition = Vector3.create(225.5, 71, 123.7)
     let cameraRotation = Quaternion.fromLookAt(cameraPosition, Vector3.add(Transform.get(this.tobor.entity).position, Vector3.create(0, 1.25, 0)))
-    await cameraManager.blockCamera(cameraPosition, cameraRotation, true, 0.25)
+    await cameraManager.blockCamera(
+      cameraPosition, 
+      cameraRotation, 
+      true, 
+      0.4
+    )
     
-
     this.bubbleTalk.closeBubbleInTime()
     this.gameController.uiController.popUpControls.hideAllControlsUI()
 
@@ -398,7 +415,12 @@ export class SpawnIsland {
     let cameraPosition = Vector3.create(222.7, 71, 131.11)
     let logPosition = Vector3.create(217.4, 69.5, 131.4)
     let cameraRotation = Quaternion.fromLookAt(cameraPosition, logPosition)
-    cameraManager.blockCamera(cameraPosition, cameraRotation, true, 1.5)
+    cameraManager.blockCamera(
+      cameraPosition, 
+      cameraRotation, 
+      true, 
+      1.25
+    )
     
     await wait_ms(100)
     movePlayerTo({
@@ -417,7 +439,12 @@ export class SpawnIsland {
     let cameraPosition = Vector3.create(225.5, 71, 123.7)
     let logPosition = Vector3.create(217.4, 69.5, 131.4)
     let cameraRotation = Quaternion.fromLookAt(cameraPosition, logPosition)
-    await cameraManager.blockCamera(cameraPosition, cameraRotation, true, 0.25)
+    await cameraManager.blockCamera(
+      cameraPosition, 
+      cameraRotation, 
+      true, 
+      0.4
+    )
 
     await wait_ms(100)
     cameraManager.forceThirdPerson()
@@ -596,10 +623,10 @@ export class SpawnIsland {
     const afterCameraTarget = getWorldPosition(this.gameController.questEmote.bezier.entity)
     const cameraPoint = Vector3.create(198.4, 65.5, 126.6)
     await cameraManager.blockCamera(
-        cameraPoint, 
-        Quaternion.fromLookAt(cameraPoint, afterCameraTarget), 
-        true, 
-        0.25
+      cameraPoint, 
+      Quaternion.fromLookAt(cameraPoint, afterCameraTarget), 
+      true, 
+      1.25
     )
     
     this.gameController.questEmote.npcSayHi()
@@ -611,7 +638,12 @@ export class SpawnIsland {
     this.gameController.spawnIsland.bubbleTalk.openBubble(HELP_BEIZER, false)
     this.gameController.questEmote.questIndicator.updateStatus(IndicatorState.ARROW)
     this.gameController.questEmote.questIndicator.showWithAnim()
-    
+
+    // move player back to start position (near tobor)
+    movePlayerTo({
+      newRelativePosition: moveToPosition,
+      cameraTarget: afterCameraTarget
+    })
 
     // camera move to end position
     const cameraPoint2 = Vector3.create(173.4,71,110.5)
@@ -632,25 +664,18 @@ export class SpawnIsland {
         0,
         -20,
         3000,
-        0,
-        undefined
+        0
     )
 
-    // camera movemement finished,move player back to start position (near tobor)
-    movePlayerTo({
-      newRelativePosition: moveToPosition,
-      cameraTarget: afterCameraTarget
-    })
+    await wait_ms(200)
+    await cameraManager.blockCamera(
+      Vector3.add(moveToPosition, Vector3.create(0, 1.75, 0)),
+      Quaternion.fromLookAt(Vector3.add(moveToPosition, Vector3.create(0, 1.75, 0)), getWorldPosition(this.gameController.questEmote.bezier.entity)), 
+      true, 
+      0
+    )
 
-    // should we block camera?
-    // await cameraManager.blockCamera(
-    //     Vector3.add(moveToPosition, Vector3.create(0, 1.75, 0)),
-    //     Quaternion.fromLookAt(cameraPoint, afterCameraTarget), 
-    //     true, 
-    //     0.5
-    // )
-
-    await wait_ms(100)
+    await wait_ms(500)
     cameraManager.forceThirdPerson()
     await wait_ms(100)
     await cameraManager.freeCamera()
@@ -659,62 +684,6 @@ export class SpawnIsland {
   }
   onCloseRewardUI() {
     //this.onFinishCompleteQuestDialog()
-  }
-  onCloseRewardUI_BU() {
-    this.targeterCircle.showCircle(false)
-    this.questIndicator.hide()
-    //Camera animations
-
-    //Blocks camera after force a 1st person, the transition is smooth and the change of camera won't be noticed
-    const moveToPosition = Vector3.create(203.60,64.89,129.5)
-    const afterCameraTarget = Vector3.add(Transform.get(this.gameController.questEmote.bezier.entity).position, Vector3.create(0,40,0))
-    const cameraPoint = Vector3.create(199,66,127)
-    blockCamera(
-      cameraPoint, 
-      Quaternion.fromLookAt(cameraPoint, Vector3.add(Transform.get(this.gameController.questEmote.bezier.entity).position, Vector3.create(0,40,0))),
-      true
-    )
-    //If player is in front of the camera, move it inmidetlly
-    //if(
-    //  Vector3.distance(cameraPoint, Transform.get(this.gameController.questEmote.bezier.entity).position) 
-    //  > Vector3.distance(Transform.get(engine.PlayerEntity).position, Transform.get(this.gameController.questEmote.bezier.entity).position)
-    //) {
-    //  movePlayerTo({
-    //    newRelativePosition: moveToPosition,
-    //    cameraTarget: afterCameraTarget
-    //  })
-    //}
-    //Lock player controls
-    lockPlayer()
-    //500ms to wait for block camera traveling
-    utils.timers.setTimeout(() => {
-      //Bridge & indicator animations
-      this.gameController.questEmote.npcSayHi()
-      this.activateBridge()
-      this.activatePilar()
-      Animator.stopAllAnimations(this.tobor.entity)
-      Animator.getClip(this.tobor.entity, 'Robot_Idle').playing = true
-      this.gameController.uiController.widgetTasks.showTasks(true, TaskType.Simple)
-      this.gameController.spawnIsland.bubbleTalk.openBubble(HELP_BEIZER, false)
-      this.gameController.questEmote.questIndicator.updateStatus(IndicatorState.ARROW)
-      this.gameController.questEmote.questIndicator.showWithAnim()
-      //Release camera after animations (1000ms)
-      utils.timers.setTimeout(() => {
-        //While the camera is still blocked, move the player & camera look to the desired target
-        
-        movePlayerTo({
-          newRelativePosition: moveToPosition,
-          cameraTarget: afterCameraTarget
-        })
-        //Wait some frames until move player is finished (500ms here because of desired anim time)
-        utils.timers.setTimeout(() => {
-          //Free the camera and unlock plaver controls, the 1st person camera is still being forced to avoid 3rd person camera rotation bug on release camera
-          freeCamera()
-          unlockPlayer()
-  
-        }, 500)
-      }, 1000)
-    }, 500)
   }
   activatePilar() {
     AudioManager.instance().playTowerCharge(this.gameController.mainInstance.s0_Z3_Quest_Pillar_Art_4__01)

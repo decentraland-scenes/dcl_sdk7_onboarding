@@ -159,7 +159,8 @@ export class QuestPuzzle {
     //Camera travels to the portals and pan. https://www.notion.so/decentraland/Tutorial-Improvements-14c5f41146a58044b29cfb1b33dcf027?pvs=4#1535f41146a5803ab4eacb2b3335436a
     //Wait for camera to look at portals
 
-    const cameraPosition = Vector3.add(Vector3.create(110.2, 80, 115), Vector3.create(0, 2, 0))
+    // const cameraPosition = Vector3.add(Vector3.create(110.2, 80, 115), Vector3.create(0, 2, 0))
+    const cameraPosition = Vector3.add(Vector3.create(118.4, 76, 127.5), Vector3.create(0, 4, 0))
     const cameraTarget = Vector3.add(Vector3.create(101.9, 80, 98), Vector3.create(0, 5, 0))
     let track = [
       {
@@ -167,30 +168,36 @@ export class QuestPuzzle {
         rotation: Quaternion.fromLookAt(cameraPosition, cameraTarget)
       },
       {
-        position: Vector3.add(Vector3.create(110.2 - 0.25, 80, 115 - 0.25), Vector3.create(0, 5, 0)),
-        rotation: Quaternion.fromLookAt(Vector3.add(Vector3.create(110.2 - 0.25, 80, 115 - 0.25), Vector3.create(0, 5, 0)), cameraTarget)
+        position: Vector3.add(Vector3.create(110.2, 80, 115), Vector3.create(0, 2, 0)),
+        rotation: Quaternion.fromLookAt( Vector3.add(Vector3.create(110.2, 80, 115), Vector3.create(0, 2, 0)), cameraTarget)
       },
+    //   {
+    //     position: Vector3.add(Vector3.create(110.2 - 0, 80, 115 - 0), Vector3.create(0, 5, 0)),
+    //     rotation: Quaternion.fromLookAt(Vector3.add(Vector3.create(110.2 - 0.25, 80, 115 - 0.25), Vector3.create(0, 5, 0)), cameraTarget)
+    //   },
       {
-        position: Vector3.add(Vector3.create(110.2, 80, 115), Vector3.create(0, 8, 0)),
-        rotation: Quaternion.fromLookAt(Vector3.add(Vector3.create(110.2, 80, 115), Vector3.create(0, 8, 0)), cameraTarget)
+        position: Vector3.add(Vector3.create(110.2 - 0.3, 80, 115 - 0.3), Vector3.create(0, 8, 0)),
+        rotation: Quaternion.fromLookAt(Vector3.add(Vector3.create(110.2 - 0.3, 80, 115 - 0.3), Vector3.create(0, 8, 0)), cameraTarget)
       }
     ]
 
-    await cameraManager.blockCamera(
-      cameraPosition,
-      Quaternion.fromLookAt(cameraPosition, cameraTarget),
-      true,
-      0.5
+    await cameraManager.startPathTrack(
+        track, 
+        7500, 
+        10, 
+        false, 
+        0, 
+        3
     )
-    await cameraManager.startPathTrack(track, 5000, 8, false, 0, 0)
 
     const talkPlayerPoint = Vector3.add(this.talkKitPlayerPoint, Vector3.create(0, 0.75, 0))
     const cameraTargetToKit = Vector3.add(getWorldPosition(this.kit.entity), Vector3.create(0, 0.75, 0))
+    await wait_ms(500)
     await cameraManager.blockCamera(
       talkPlayerPoint,
       Quaternion.fromLookAt(talkPlayerPoint, cameraTargetToKit),
       true,
-      0.5
+      0
     )
     
     openDialogWindow(this.kit.entity, this.gameController.dialogs.kitDialog, 3)
@@ -200,33 +207,39 @@ export class QuestPuzzle {
     //Camera shot of the connector.
 
     const talkPlayerPoint = Vector3.add(this.talkKitPlayerPoint, Vector3.create(0, 0.75, 0))
-    const cameraTarget1 = Vector3.add(Vector3.create(104.9, 77, 140.2), Vector3.create(0, 1.75, 0))
-    const cameraTarget2 = Vector3.add(Vector3.create(102.6, 77, 140.8), Vector3.create(0, 1.75, 0))
+    const cameraTarget1 = Vector3.add(Vector3.create(104.3, 77, 140.4), Vector3.create(0, 1.75, 0))
+    const cameraTarget2 = Vector3.add(Vector3.create(103.5, 77, 140.6), Vector3.create(0, 1.75, 0))
     await wait_ms(200)
 
     await cameraManager.blockCamera(
       cameraTarget1,
       Quaternion.fromLookAt(cameraTarget1, cameraTarget2),
       true,
-      0.25
+      2
     )
     await cameraManager.blockCamera(
       cameraTarget2,
       Quaternion.fromLookAt(cameraTarget1, cameraTarget2),
       true,
-      3
+      2
     )
     
     // -- Camera --
     //Camera goes back to kit
 
+    await wait_ms(500)
     const cameraTargetToKit = Vector3.add(getWorldPosition(this.kit.entity), Vector3.create(0, 0.75, 0))
     await cameraManager.blockCamera(
       talkPlayerPoint,
       Quaternion.fromLookAt(talkPlayerPoint, cameraTargetToKit),
       true,
-      0.25
+      0
     )
+
+    await wait_ms(100)
+    cameraManager.forceThirdPerson()
+    await wait_ms(100)
+    cameraManager.freeCamera()
 
     openDialogWindow(this.kit.entity, this.gameController.dialogs.kitDialog, 4)
     
@@ -240,12 +253,12 @@ export class QuestPuzzle {
 
     this.gameController.uiController.popUpControls.showCameraControlsUI()
 
-    // -- Camera --
-    //Restore camera to player
-    await wait_ms(100)
-    cameraManager.forceThirdPerson()
-    await wait_ms(100)
-    cameraManager.freeCamera()
+    // // -- Camera --
+    // //Restore camera to player
+    // await wait_ms(100)
+    // cameraManager.forceThirdPerson()
+    // await wait_ms(100)
+    // cameraManager.freeCamera()
 
     cameraManager.unlockPlayer()
   }

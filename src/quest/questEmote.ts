@@ -251,19 +251,17 @@ export class QuestEmote {
         position: Vector3.create(0, 1.25, 0)
       })
       await cameraManager.cameraOrbit(
-          orbitPivotEntity, 
-          Vector3.create(0, 0.5, -3.5), 
-          30, 
-          40, 
-          5000,
-          undefined
+        orbitPivotEntity, 
+        Vector3.create(0, 0.5, -3.5), 
+        30, 
+        40, 
+        5000
       )
-      
       await cameraManager.blockCamera(
         this.talkCameraPoint,
         Quaternion.fromLookAt(this.talkCameraPoint, Vector3.add(getWorldPosition(this.bezier.entity), Vector3.create(0, 1.75, 0))),
         true,
-        0.25
+        0
       )
       movePlayerTo({
         newRelativePosition: this.talkPlayerPoint,
@@ -291,19 +289,18 @@ export class QuestEmote {
         position: Vector3.create(0, 1.25, 0)
       })
       await cameraManager.cameraOrbit(
-          orbitPivotEntity, 
-          Vector3.create(0, 0.5, -3.5), 
-          40, 
-          50, 
-          5000, 
-          undefined
+        orbitPivotEntity, 
+        Vector3.create(0, 0.5, -3.5), 
+        50, 
+        60, 
+        5000
       )
       
       await cameraManager.blockCamera(
         this.talkCameraPoint,
         Quaternion.fromLookAt(this.talkCameraPoint, Vector3.add(getWorldPosition(this.bezier.entity), Vector3.create(0, 1.75, 0))),
         true,
-        0.5
+        0
       )
       movePlayerTo({
         newRelativePosition: this.talkPlayerPoint,
@@ -332,19 +329,18 @@ export class QuestEmote {
         position: Vector3.create(0, 1.25, 0)
       })
       await cameraManager.cameraOrbit(
-          orbitPivotEntity, 
-          Vector3.create(0, 0.5, -3.5), 
-          60, 
-          70, 
-          5000,
-          undefined
+        orbitPivotEntity, 
+        Vector3.create(0, 0.5, -3.5), 
+        70, 
+        80, 
+        5000
       )
       
       await cameraManager.blockCamera(
         this.talkCameraPoint,
         Quaternion.fromLookAt(this.talkCameraPoint, Vector3.add(getWorldPosition(this.bezier.entity), Vector3.create(0, 1.75, 0))),
         true,
-        0.5
+        0
       )
       movePlayerTo({
         newRelativePosition: this.talkPlayerPoint,
@@ -390,20 +386,20 @@ export class QuestEmote {
   }
   async completeQuestDialog() {
     console.log('completeQuestDialog.')
-    //Block player & setup camera
-    cameraManager.lockPlayer()
-    await cameraManager.blockCamera(
-      this.talkCameraPoint,
-      Quaternion.fromLookAt(this.talkCameraPoint, Vector3.add(getWorldPosition(this.bezier.entity), Vector3.create(0, 1.75, 0))),
-      true,
-      0.5
-    )
+    // //Block player & setup camera
+    // cameraManager.lockPlayer()
+    // await cameraManager.blockCamera(
+    //   this.talkCameraPoint,
+    //   Quaternion.fromLookAt(this.talkCameraPoint, Vector3.add(getWorldPosition(this.bezier.entity), Vector3.create(0, 1.75, 0))),
+    //   true,
+    //   0.5
+    // )
     
-    await wait_ms(500)
-    movePlayerTo({
-      newRelativePosition: this.talkPlayerPoint,
-      cameraTarget: Vector3.add(Transform.get(this.gameController.mainInstance.s0_En_Npc2_01).position, Vector3.create(0,1,0))
-    })
+    // await wait_ms(500)
+    // movePlayerTo({
+    //   newRelativePosition: this.talkPlayerPoint,
+    //   cameraTarget: Vector3.add(Transform.get(this.gameController.mainInstance.s0_En_Npc2_01).position, Vector3.create(0,1,0))
+    // })
     openDialogWindow(this.bezier.entity, this.gameController.dialogs.bezierDialog, 4)
     this.gameController.uiController.widgetTasks.showTick(true, 0)
     this.gameController.uiController.widgetTasks.showTick(true, 1)
@@ -497,7 +493,7 @@ export class QuestEmote {
       cameraPoint,
       Quaternion.fromLookAt(cameraPoint, afterCameraTarget),
       true,
-      0.25
+      1.75
     )
 
     this.activatePilar()
@@ -522,8 +518,7 @@ export class QuestEmote {
         0,
         20,
         3000,
-        0,
-        undefined
+        0
     )
 
     movePlayerTo({
@@ -531,15 +526,23 @@ export class QuestEmote {
       cameraTarget: Vector3.create(Transform.get(this.bezier.entity).position.x, this.talkCameraPoint.y, Transform.get(this.bezier.entity).position.z)
     })
 
+    await wait_ms(500)
+
+    await cameraManager.blockCamera(
+      this.talkCameraPoint,
+      Quaternion.fromLookAt(this.talkCameraPoint, Vector3.add(getWorldPosition(this.bezier.entity), Vector3.create(0, 1.75, 0))),
+      true,
+      0
+    )
+
     await wait_ms(100)
     cameraManager.forceThirdPerson()
-
     await wait_ms(100)
     await cameraManager.freeCamera()
     
     openDialogWindow(this.bezier.entity, this.gameController.dialogs.bezierDialog, 8)
 
-    cameraManager.unlockPlayer()
+    // cameraManager.unlockPlayer()
   }
   // uncomment this for now, directly call dialogQuestFinished()
   // finishAfterRewardDialog() {
@@ -589,8 +592,10 @@ export class QuestEmote {
     // uncomment this for now, because we go to this.onCloseRewardUI after onTheWayUI reward is closed
     // this.dialogQuestFinished()
   }
-  dialogQuestFinished() {
+  async dialogQuestFinished() {
     this.bubbleTalk.openBubble(ZONE_1_EMOTE_4, true)
+    cameraManager.unlockPlayer()
+
     pointerEventsSystem.onPointerDown(
       {
         entity: this.bezier.npcChild,

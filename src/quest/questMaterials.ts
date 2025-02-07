@@ -578,8 +578,8 @@ export class QuestMaterials {
 
     let path = [
       { 
-        position: Vector3.create(163, 68 + 4, 159.6), 
-        rotation: Quaternion.fromLookAt(Vector3.create(163, 68 + 4, 159.6), Vector3.create(144.4, 71.5 + 4, 156.8))
+        position: Vector3.create(163, 68 + 1, 159.6), 
+        rotation: Quaternion.fromLookAt(Vector3.create(163, 68 + 1, 159.6), Vector3.create(144.4, 71.5 + 4, 156.8))
       },
       {
         position: Vector3.create(144.4, 71.5 + 4, 156.8), 
@@ -601,14 +601,21 @@ export class QuestMaterials {
       Material.setPbrMaterial(debugBox, {albedoColor: Color4.create(1, 0, 0, 1)})
     }
 
-    await cameraManager.startPathTrack(path, 9000, 10, false, 0, 0.5)
+    await cameraManager.startPathTrack(
+      path, 
+      11000, 
+      5, 
+      false, 
+      0, 
+      1.5
+    )
     
     await cameraManager.cameraOrbit(
       this.gameController.questPuzzle.kit.entity,
       Vector3.subtract(path[path.length - 1].position, getWorldPosition(this.gameController.questPuzzle.kit.entity)),
       0,
-      20,
-      3000,
+      40,
+      4000,
       0,
       undefined
     )
@@ -620,14 +627,20 @@ export class QuestMaterials {
       newRelativePosition: this.talkMatPoint,
       cameraTarget: Transform.get(this.gameController.mainInstance.s0_En_Npc2_01).position
     })
-    
+
+    await wait_ms(500)
     await cameraManager.blockCamera(
       talkPlayerPoint,
       Quaternion.fromLookAt(talkPlayerPoint, cameraTarget),
       true,
-      0.5
+      0
     )
-    
+
+    await wait_ms(500)
+    cameraManager.forceThirdPerson()
+    await wait_ms(100)
+    cameraManager.freeCamera()
+
     openDialogWindow(this.mat.entity, this.gameController.dialogs.matDialog, 9)
   }
   activatePilar() {
@@ -662,10 +675,10 @@ export class QuestMaterials {
     //Restore camera to player
 
     cameraManager.unlockPlayer()
-    await wait_ms(100)
-    cameraManager.forceThirdPerson()
-    await wait_ms(100)
-    cameraManager.freeCamera()
+    // await wait_ms(100)
+    // cameraManager.forceThirdPerson()
+    // await wait_ms(100)
+    // cameraManager.freeCamera()
 
     this.afterEndQuestClick()
   }
