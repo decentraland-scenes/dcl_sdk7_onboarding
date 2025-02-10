@@ -91,7 +91,8 @@ export class QuestPuzzle {
     //Camera talk with Kit
     cameraManager.lockPlayer()
     
-    const talkPlayerPoint = Vector3.add(this.talkKitPlayerPoint, Vector3.create(0, 0.75, 0))
+    // const talkPlayerPoint = Vector3.add(this.talkKitPlayerPoint, Vector3.create(0, 0.75, 0))
+    const talkPlayerPoint = Vector3.add(Transform.get(engine.PlayerEntity).position, Vector3.create(0, 1.5, 0))
     const cameraTarget = Vector3.add(getWorldPosition(this.kit.entity), Vector3.create(0, 0.75, 0))
 
     await cameraManager.blockCamera(
@@ -100,10 +101,11 @@ export class QuestPuzzle {
       true,
       0.5
     )
-    movePlayerTo({
-      newRelativePosition: this.talkKitPlayerPoint,
-      cameraTarget: Transform.get(this.gameController.mainInstance.s0_En_Npc3_01).position
-    })
+    cameraManager.hideAvatar()
+    // movePlayerTo({
+    //   newRelativePosition: this.talkKitPlayerPoint,
+    //   cameraTarget: Transform.get(this.gameController.mainInstance.s0_En_Npc3_01).position
+    // })
 
     this.setBubbleNpc2()
     this.setUpInitQuest()
@@ -192,6 +194,11 @@ export class QuestPuzzle {
 
     const talkPlayerPoint = Vector3.add(this.talkKitPlayerPoint, Vector3.create(0, 0.75, 0))
     const cameraTargetToKit = Vector3.add(getWorldPosition(this.kit.entity), Vector3.create(0, 0.75, 0))
+    
+    movePlayerTo({
+      newRelativePosition: this.talkKitPlayerPoint,
+      cameraTarget: Transform.get(this.gameController.mainInstance.s0_En_Npc3_01).position
+    })
     await wait_ms(500)
     await cameraManager.blockCamera(
       talkPlayerPoint,
@@ -236,6 +243,7 @@ export class QuestPuzzle {
       0
     )
 
+    cameraManager.showAvatar()
     await wait_ms(100)
     cameraManager.forceThirdPerson()
     await wait_ms(100)
@@ -340,18 +348,20 @@ export class QuestPuzzle {
     // -- Camera --
     //Camera talk with Kit
 
-    const talkPlayerPoint = Vector3.add(this.talkKitPlayerPoint, Vector3.create(0, 0.75, 0))
+    // const talkPlayerPoint = Vector3.add(this.talkKitPlayerPoint, Vector3.create(0, 0.75, 0))
+    const talkPlayerPoint = Vector3.add(Transform.get(engine.PlayerEntity).position, Vector3.create(0, 1.5, 0))
     const cameraTargetToKit = Vector3.add(getWorldPosition(this.kit.entity), Vector3.create(0, 0.75, 0))
     await cameraManager.blockCamera(
       talkPlayerPoint,
       Quaternion.fromLookAt(talkPlayerPoint, cameraTargetToKit),
       true,
-      0.25
+      0.5
     )
-    movePlayerTo({
-      newRelativePosition: this.talkKitPlayerPoint,
-      cameraTarget: Transform.get(this.gameController.mainInstance.s0_En_Npc3_01).position
-    })
+    cameraManager.hideAvatar()
+    // movePlayerTo({
+    //   newRelativePosition: this.talkKitPlayerPoint,
+    //   cameraTarget: Transform.get(this.gameController.mainInstance.s0_En_Npc3_01).position
+    // })
   }
 
   private spawnparticles() {
@@ -380,6 +390,7 @@ export class QuestPuzzle {
 
     // -- Camera --
     //Restore camera to player
+    cameraManager.showAvatar()
     await wait_ms(100)
     cameraManager.forceThirdPerson()
     await wait_ms(100)
