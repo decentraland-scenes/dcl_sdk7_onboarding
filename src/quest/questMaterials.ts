@@ -144,7 +144,8 @@ export class QuestMaterials {
     //Camera talk with Mat
     cameraManager.lockPlayer()
 
-    const talkPlayerPoint = Vector3.add(this.talkMatPoint, Vector3.create(0, 0.75, 0))
+    // const talkPlayerPoint = Vector3.add(this.talkMatPoint, Vector3.create(0, 0.75, 0))
+    const talkPlayerPoint = Vector3.add(Transform.get(engine.PlayerEntity).position, Vector3.create(0, 1.5, 0))
     const cameraTarget = Vector3.add(getWorldPosition(this.mat.entity), Vector3.create(0, 0.75, 0))
     
     await cameraManager.blockCamera(
@@ -153,10 +154,11 @@ export class QuestMaterials {
       true,
       0.5
     )
-    movePlayerTo({
-      newRelativePosition: this.talkMatPoint,
-      cameraTarget: Transform.get(this.gameController.mainInstance.s0_En_Npc2_01).position
-    })
+    cameraManager.hideAvatar()
+    // movePlayerTo({
+    //   newRelativePosition: this.talkMatPoint,
+    //   cameraTarget: Transform.get(this.gameController.mainInstance.s0_En_Npc2_01).position
+    // })
 
 
     this.setQuestStartDialog()
@@ -198,6 +200,9 @@ export class QuestMaterials {
   async cameraTargetsMaterialsObjectives() {
     // -- Camera --
     // Camera shots at both boxes on each side for a couple of seconds. Then goes back to mat
+    
+    const talkPlayerPoint = Vector3.add(this.talkMatPoint, Vector3.create(0, 0.75, 0))
+    const cameraTarget = Vector3.add(getWorldPosition(this.mat.entity), Vector3.create(0, 0.75, 0))
 
     await cameraManager.cameraOrbit(
       this.gameController.mainInstance.s0_Z3_Quest_BoxMat_art_3__01,
@@ -209,6 +214,11 @@ export class QuestMaterials {
       undefined
     )
     
+    movePlayerTo({
+        newRelativePosition: talkPlayerPoint,
+        cameraTarget: Transform.get(this.gameController.mainInstance.s0_En_Npc2_01).position
+    })
+    
     await cameraManager.cameraOrbit(
       this.gameController.mainInstance.s0_Z3_Quest_BoxTri_art_3__01,
       Vector3.create(0, 1.5, 5),
@@ -218,10 +228,7 @@ export class QuestMaterials {
       0,
       undefined
     )
-    
-    const talkPlayerPoint = Vector3.add(this.talkMatPoint, Vector3.create(0, 0.75, 0))
-    const cameraTarget = Vector3.add(getWorldPosition(this.mat.entity), Vector3.create(0, 0.75, 0))
-    
+
     await cameraManager.blockCamera(
       talkPlayerPoint,
       Quaternion.fromLookAt(talkPlayerPoint, cameraTarget),
@@ -229,6 +236,7 @@ export class QuestMaterials {
       0
     )
     
+    cameraManager.showAvatar()
     cameraManager.forceThirdPerson()
     await wait_ms(100)
     cameraManager.freeCamera()
@@ -483,7 +491,8 @@ export class QuestMaterials {
     
     cameraManager.lockPlayer()
 
-    const talkPlayerPoint = Vector3.add(this.talkMatPoint, Vector3.create(0, 0.75, 0))
+    // const talkPlayerPoint = Vector3.add(this.talkMatPoint, Vector3.create(0, 0.75, 0))
+    const talkPlayerPoint = Vector3.add(Transform.get(engine.PlayerEntity).position, Vector3.create(0, 1.5, 0))
     const cameraTarget = Vector3.add(getWorldPosition(this.mat.entity), Vector3.create(0, 0.75, 0))
     
     await cameraManager.blockCamera(
@@ -492,10 +501,11 @@ export class QuestMaterials {
       true,
       0.5
     )
-    movePlayerTo({
-      newRelativePosition: this.talkMatPoint,
-      cameraTarget: Transform.get(this.gameController.mainInstance.s0_En_Npc2_01).position
-    })
+    cameraManager.hideAvatar()
+    // movePlayerTo({
+    //   newRelativePosition: this.talkMatPoint,
+    //   cameraTarget: Transform.get(this.gameController.mainInstance.s0_En_Npc2_01).position
+    // })
 
     this.gameController.uiController.widgetTasks.showTick(true, 0)
     this.gameController.uiController.widgetTasks.showTick(true, 2)
@@ -636,6 +646,7 @@ export class QuestMaterials {
       0
     )
 
+    cameraManager.showAvatar()
     await wait_ms(500)
     cameraManager.forceThirdPerson()
     await wait_ms(100)

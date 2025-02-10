@@ -16,6 +16,8 @@ import { randomNumbers } from '../utils/globalLibrary'
 import { sendTrak } from '../utils/segment'
 import { NPC } from '../imports/components/npc.class'
 import { lockPlayer, unlockPlayer } from '../utils/blockPlayer'
+import { cameraManager, getWorldPosition, wait_ms } from '../cinematic/cameraManager'
+import { movePlayerTo } from '~system/RestrictedActions'
 
 export class QuestPortal {
   tobor: NPC
@@ -119,18 +121,34 @@ export class QuestPortal {
     this.robotPortal()
   }
 
-  robotPortal() {
+  async robotPortal() {
     this.bubbleDynamic.closeBubbleInTime()
     sendTrak('z4_quest4_00', this.gameController.timeStamp)
     engine.removeSystem(this.bubbleDynamic.respSystem)
     AudioManager.instance().playOnce('tobor_talk', { volume: 0.6, parent: this.tobor.entity })
     openDialogWindow(this.tobor.entity, this.gameController.dialogs.toborEndDialog, 0)
 
-    lockPlayer()
+    cameraManager.lockPlayer()
     // -- Camera --
     //Camera talk with Tobor
+
+    const talkPlayerPoint = Vector3.add(Transform.get(engine.PlayerEntity).position, Vector3.create(0, 1.5, 0))
+    const cameraTarget = Vector3.add(getWorldPosition(this.tobor.entity), Vector3.create(0, 1, 0))
+    
+    await cameraManager.blockCamera(
+      talkPlayerPoint,
+      Quaternion.fromLookAt(talkPlayerPoint, cameraTarget),
+      true,
+      0.5
+    )
+    cameraManager.hideAvatar()
+    // movePlayerTo({
+    //   newRelativePosition: this.talkMatPoint,
+    //   cameraTarget: Transform.get(this.gameController.mainInstance.s0_En_Npc2_01).position
+    // })
+
   }
-  robotToPortalCallBack() {
+  async robotToPortalCallBack() {
     Animator.stopAllAnimations(this.gameController.mainInstance.s0_Z3_Quest_Portal_Art_01)
 
     Animator.playSingleAnimation(this.gameController.mainInstance.s0_Z3_Quest_Portal_Art_01, 'Portal_Activate')
@@ -139,9 +157,16 @@ export class QuestPortal {
     this.displayEvents()
     AudioManager.instance().audio.portal_ambiental.setVolumeSmooth(0, 2000)
 
-    unlockPlayer()
+    // unlockPlayer()
     // -- Camera --
     //Restore camera to player
+    cameraManager.showAvatar()
+    await wait_ms(100)
+    cameraManager.forceThirdPerson()
+    await wait_ms(100)
+    cameraManager.freeCamera()
+
+    cameraManager.unlockPlayer()
   }
 
 
