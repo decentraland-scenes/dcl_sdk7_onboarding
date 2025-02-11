@@ -1,6 +1,6 @@
 import { Quaternion, Vector3 } from '@dcl/sdk/math'
 import { GameController } from '../controllers/gameController'
-import { Animator, Entity, InputAction, MeshRenderer, Transform, engine, pointerEventsSystem } from '@dcl/sdk/ecs'
+import { Animator, Entity, InputAction, MeshRenderer, PointerEvents, Transform, engine, pointerEventsSystem } from '@dcl/sdk/ecs'
 import { BubbleDynamic, BubbleTalk } from '../imports/bubble'
 import { openDialogWindow } from 'dcl-npc-toolkit'
 import { CHOOSE_PORTAL } from '../jsonData/textsTutorialBubble'
@@ -277,7 +277,8 @@ export class QuestPortal {
     Animator.playSingleAnimation(this.tobor.entity, 'Talk')
     openDialogWindow(this.tobor.entity, this.gameController.dialogs.toborEndDialog, 4)
   }
-  tellPlayerToGoThroughPortal() {
+  async tellPlayerToGoThroughPortal() {
+    PointerEvents.deleteFrom(this.tobor.npcChild)
     this.bubbleTalk.closeBubbleInTime()
     Animator.playSingleAnimation(this.tobor.entity, 'Talk')
     openDialogWindow(this.tobor.entity, this.gameController.dialogs.toborEndDialog, 3)

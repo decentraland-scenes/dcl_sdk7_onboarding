@@ -466,7 +466,11 @@ export class Dialogs {
         text: PORTAL_ISLAND_3,
         portrait: talkingTrebor,
         typeSpeed: 30,
-        isEndOfDialog: true
+        isEndOfDialog: true,
+        triggeredByNext: () => {
+
+          this.gameController.questPortal.setupFinalDialog()
+        },
       },
 
       { //4
