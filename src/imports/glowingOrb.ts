@@ -1,8 +1,9 @@
 import { ColliderLayer, engine, Entity, InputAction, inputSystem, Material, MeshCollider, MeshRenderer, PBMaterial_PbrMaterial, PointerEvents, pointerEventsSystem, PointerEventType, Transform, VisibilityComponent } from "@dcl/sdk/ecs";
 import { SpawnIsland } from "../quest/questStartIsland";
-import { Vector3, Color4 } from "@dcl/sdk/math";
+import { Vector3, Color4, Quaternion } from "@dcl/sdk/math";
 import { lerp } from "../utils/lerp";
 import * as utils from '@dcl-sdk/utils'
+import { directionVectorBetweenTwoPoints } from "../utils/globalLibrary";
 
 export class GlowingOrb {
     entity: Entity
@@ -18,6 +19,7 @@ export class GlowingOrb {
     private _evenScaleLoop = false
     private _questProgressAlpha = 0
     private _hover = false
+    private _hoverAngle = false
     private _deactivateWithAnim = false
     private _deactivateAnimAlpha = 0
     constructor(questStartIsland: SpawnIsland){
@@ -94,18 +96,29 @@ export class GlowingOrb {
 
         //this.activate()
     }
+    private checkLookAtWithCameraRotation(): boolean {
+
+        //Calculate forward direction of camera
+        const forwardCamera = Vector3.rotate(Vector3.Forward(), Transform.get(engine.CameraEntity).rotation)
+        const forwardToOrb = directionVectorBetweenTwoPoints(Transform.get(this.entity).position, Transform.get(engine.CameraEntity).position)
+        //Calculate angle between centerDirection and cameraRotation
+        return Vector3.getAngleBetweenVectors(forwardToOrb, forwardCamera, Vector3.Up()) < 0.3
+    }
     private updateSystem(dt: number) {
         //Input & quest
         if(this._completedQuest == false) {
 
+            this._hoverAngle = this.checkLookAtWithCameraRotation()
+            
             if (inputSystem.isTriggered( InputAction.IA_POINTER, PointerEventType.PET_HOVER_ENTER, this.outerEntity )) {
                 this._hover = true;
             }
             else if (inputSystem.isTriggered( InputAction.IA_POINTER, PointerEventType.PET_HOVER_LEAVE, this.outerEntity )) {
                 this._hover = false;
             }
+                
             
-            if(this._hover) {
+            if(this._hover || this._hoverAngle) {
                 this._questProgressAlpha += dt*0.5
                 if(this._questProgressAlpha >= 1) {
                     this._questProgressAlpha = 1
