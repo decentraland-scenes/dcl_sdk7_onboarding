@@ -16,7 +16,7 @@ export enum AudioNames {
   Bridge_sound = 'assets/audio/Bridge_sound_ok.mp3',
   button_interact = 'assets/audio/Button_Interact.mp3',
   chatbox = 'assets/audio/chatbox.mp3',
-  island_ambiental = 'assets/audio/v3/Ambient.mp3',
+  island_ambiental = 'assets/audio/music/RAC - Genesis Plaza 1.mp3',
   pop_1 = 'assets/audio/pop_1.mp3',
   pop_2 = 'assets/audio/pop_2.mp3',
   pop_up_close = 'assets/audio/pop_up_close.mp3',
@@ -37,10 +37,11 @@ export class AudioManager {
     pop_1: new AudioEntity(AudioNames.pop_1, { volume: 0.6, pitch: 1, loop: false, autoPlay: false }),
     chatbox: new AudioEntity(AudioNames.chatbox, { volume: 0.6, pitch: 1, loop: false, autoPlay: false }),
     island_ambiental: new AudioEntity(AudioNames.island_ambiental, {
-      volume: 1,
+      volume: 0.04,
       pitch: 1,
       loop: true,
-      autoPlay: false
+      autoPlay: false,
+      global: true
     }),
     npc_1_salute: new AudioEntity(AudioNames.npc_1_salute, { volume: 0.6, pitch: 1, loop: false, autoPlay: false }),
     npc_2_salute: new AudioEntity(AudioNames.npc_2_salute, { volume: 0.6, pitch: 1, loop: false, autoPlay: false }),
@@ -88,7 +89,7 @@ export class AudioManager {
   playMainAmbience(bSmooth: boolean = false) {
     if (!bSmooth) {
       this.stopAllAmbience()
-      this.audio.island_ambiental.playGlobal({ volume: 0.4 })
+      this.audio.island_ambiental.playGlobal({ volume: 0.04 })
       return
     }
 
@@ -97,7 +98,7 @@ export class AudioManager {
     }
 
     this.audio.island_ambiental.playGlobal({ volume: 0 })
-    this.audio.island_ambiental.setVolumeSmooth(0.4, 2000)
+    this.audio.island_ambiental.setVolumeSmooth(0.04, 2000)
   }
 
   playPortalAmbience(bSmooth: boolean = false) {

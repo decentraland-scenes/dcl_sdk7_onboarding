@@ -9,6 +9,7 @@ export type AudioSourceOptions = {
     loop?: boolean;
     pitch?: number; //Pitch, default: 1.0, range from 0.0 to MaxFloat
     autoPlay?: boolean;
+    global?: boolean;
 }
 
 /**
@@ -28,6 +29,7 @@ export type PlayAudioOptions = {
     volume?: number;
     loop?: boolean;
     pitch?: number;
+    global?: boolean;
 }
 
 /* It's a class that creates an entity with an audio source and audio clip, and has methods to play,
@@ -52,6 +54,9 @@ export class AudioEntity {
         }
         if (options?.hasOwnProperty('pitch')) {
             AudioSource.getMutable(this.entity).pitch = options.pitch;
+        }
+        if (options?.hasOwnProperty('global')) {
+            AudioSource.getMutable(this.entity).global = options.global;
         }
         if (options?.autoPlay) {
             this.play()
@@ -158,14 +163,16 @@ export class AudioEntity {
 
         AudioSource.playSound(this.entity,this.audioClip)
     }
-    playGlobal(options?: Omit<Omit<PlayAudioOptions, "position">, "parent">) {
+    playGlobal(options?: Omit<Omit<Omit<PlayAudioOptions, "position">, "parent">, "global">) {
         const opt: PlayAudioOptions = options || {}
         opt.parent = engine.PlayerEntity
+        opt.global = true
         this.play(opt);
     }
-    playOnceGlobal(options?: Omit<Omit<Omit<PlayAudioOptions, "loop">, "position">, "parent">) {
+    playOnceGlobal(options?: Omit<Omit<Omit<Omit<PlayAudioOptions, "loop">, "position">, "parent">, "global">) {
         const opt: PlayAudioOptions = options || {}
         opt.parent = engine.PlayerEntity
+        opt.global = true
         this.playOnce(opt);
     }
     stop() {
