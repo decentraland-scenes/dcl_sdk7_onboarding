@@ -205,6 +205,8 @@ export class SpawnIsland {
         }
       }
     }, undefined, 'check-island-loading-state')
+
+    this.getBridgeArrow()
   }
   respawnTrigger() {
     cameraManager.lockPlayer()
@@ -701,7 +703,7 @@ export class SpawnIsland {
     }, 3000)
   }
   activateBridge() {
-    this.getBridgeArrow()
+    this.activateBridgeArrow()
     PointerEvents.deleteFrom(this.gameController.mainInstance.s0_Z3_Str_Bridge_Art_01)
     AudioManager.instance().playBridge(this.gameController.mainInstance.s0_Z3_Str_Bridge_Art_01)
     Animator.getClip(this.gameController.mainInstance.s0_Z3_Str_Bridge_Art_01, 'Bridge On').speed = 1
@@ -715,14 +717,19 @@ export class SpawnIsland {
     Animator.playSingleAnimation(this.gameController.mainInstance.s0_Z3_Str_Bridge_Art_01, 'Bridge Animation')
     Animator.getClip(this.gameController.mainInstance.s0_Z3_Str_Bridge_Art_01, 'Bridge Animation').weight = 1
   }
-  getBridgeArrow() {
+  activateBridgeArrow() {
+    this.arrows.forEach(arrow => {
+      VisibilityComponent.getMutable(arrow).visible = true
+    })
+  }
+  private getBridgeArrow() {
     let zOffset = 1.85
     let scale = 0.3
     const xOffsets = [-2.3, -0.6, 0.7, 2.3, -2.3, -0.6, 0.7, 2.3]
+    const texture = Material.Texture.Common({
+      src: 'assets/textures/arrow2.png'
+    })
     for (let i = 0; i < 9; i++) {
-      const texture = Material.Texture.Common({
-        src: 'assets/textures/arrow2.png'
-      })
       const arrow = engine.addEntity()
       MeshRenderer.setPlane(arrow)
       Transform.create(arrow, { parent: this.gameController.mainInstance.s0_Z3_Str_Bridge_Art_01 })
@@ -735,6 +742,7 @@ export class SpawnIsland {
         alphaTexture: texture,
         transparencyMode: MaterialTransparencyMode.MTM_ALPHA_TEST
       })
+      VisibilityComponent.create(arrow, { visible: false })
       if (i == 4) zOffset = -1.85
 
       if (i == 8) {

@@ -555,13 +555,13 @@ export class QuestEmote {
     let zOffset = 1.85
     let scale = 0.3
     const xOffsets = [-2.3, -0.6, 0.7, 2.3, -2.3, -0.6, 0.7, 2.3]
+    const texture = Material.Texture.Common({
+      src: 'assets/textures/arrow2.png'
+    })
     for (let i = 0; i < 9; i++) {
       const arrow = engine.addEntity()
       MeshRenderer.setPlane(arrow)
       Transform.create(arrow, { parent: this.gameController.mainInstance.s0_Z3_Str_Bridge_Art_1__01 })
-      const texture = Material.Texture.Common({
-        src: 'assets/textures/arrow2.png'
-      })
       Material.setPbrMaterial(arrow, {
         texture: texture,
         albedoColor: Color4.Yellow(),
