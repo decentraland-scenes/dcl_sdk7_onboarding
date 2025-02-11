@@ -247,14 +247,14 @@ export class SpawnIsland {
 
     // -- Camera --
     //The tutorial begins with a cinematic that shows detailed views and traveling shots of the scenario. Then, it focuses on where the avatar has appeared along with Tobor.
-    cameraManager.cameraOrbit(
+    /*cameraManager.cameraOrbit(
       this.gameController.spawnIsland.tobor.entity, 
       Vector3.create(0, 7, -11), 
       -10 - 40, 
       190 - 40, 
       15000,
       0
-    )
+    )*/
     
     await wait_ms(500)
     Animator.stopAllAnimations(this.tobor.entity)
@@ -265,14 +265,16 @@ export class SpawnIsland {
   async introductionMiddleChangeCamera() {
     // -- Camera --
     //Camera pans to the player’s character
-    await cameraManager.cameraOrbit(
+    /*await cameraManager.cameraOrbit(
       engine.PlayerEntity, 
       Vector3.create(0, 2.5, -5), 
       90 + 40, 
       105 + 40, 
       10000,
       1
-    )
+    )*/
+   
+    await cameraManager.freeCamera()
   }
 
   async finishedIntroDialog() {
@@ -282,19 +284,19 @@ export class SpawnIsland {
     let camPosition = Vector3.add(Transform.get(engine.PlayerEntity).position, Vector3.create(0, 2, 0))
     let cameraRotation = Quaternion.fromLookAt(camPosition, Vector3.add(Transform.get(this.tobor.entity).position, Vector3.create(0, 1.25, 0)))
     
-    await cameraManager.blockCamera(
+    /*await cameraManager.blockCamera(
       camPosition, 
       cameraRotation, 
       true, 
       0
-    )
+    )*/
 
-    await wait_ms(500)
-    cameraManager.forceThirdPerson()
+    //await wait_ms(500)
+    //cameraManager.forceThirdPerson()
     await wait_ms(100)
     await cameraManager.freeCamera()
     
-    await wait_ms(500)
+    //await wait_ms(500)
     AudioManager.instance().playOnce('tobor_talk', { volume: 0.6, parent: this.tobor.entity })
     Animator.stopAllAnimations(this.tobor.entity)
     Animator.getClip(this.tobor.entity, 'Talk').playing = true

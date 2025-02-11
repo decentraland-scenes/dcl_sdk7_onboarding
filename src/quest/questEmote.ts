@@ -251,7 +251,7 @@ export class QuestEmote {
         parent: engine.PlayerEntity,
         position: Vector3.create(0, 1.25, 0)
       })
-      await cameraManager.cameraOrbit(
+      /*await cameraManager.cameraOrbit(
         orbitPivotEntity, 
         Vector3.create(0, 0.5, -3.5), 
         30, 
@@ -267,7 +267,7 @@ export class QuestEmote {
       movePlayerTo({
         newRelativePosition: this.talkPlayerPoint,
         cameraTarget: Vector3.create(Transform.get(this.bezier.entity).position.x, this.talkCameraPoint.y, Transform.get(this.bezier.entity).position.z)
-      })
+      })*/
       
       sendTrak('z1_quest1_01', this.gameController.timeStamp)
       this.bubbleTalk.openBubble(ZONE_1_EMOTE_1, true)
@@ -289,7 +289,7 @@ export class QuestEmote {
         parent: engine.PlayerEntity,
         position: Vector3.create(0, 1.25, 0)
       })
-      await cameraManager.cameraOrbit(
+      /*await cameraManager.cameraOrbit(
         orbitPivotEntity, 
         Vector3.create(0, 0.5, -3.5), 
         50, 
@@ -306,7 +306,7 @@ export class QuestEmote {
       movePlayerTo({
         newRelativePosition: this.talkPlayerPoint,
         cameraTarget: Vector3.create(Transform.get(this.bezier.entity).position.x, this.talkCameraPoint.y, Transform.get(this.bezier.entity).position.z)
-      })
+      })*/
       
       sendTrak('z1_quest1_02', this.gameController.timeStamp)
       this.bubbleTalk.closeBubbleInTime()
@@ -329,7 +329,7 @@ export class QuestEmote {
         parent: engine.PlayerEntity,
         position: Vector3.create(0, 1.25, 0)
       })
-      await cameraManager.cameraOrbit(
+      /*await cameraManager.cameraOrbit(
         orbitPivotEntity, 
         Vector3.create(0, 0.5, -3.5), 
         70, 
@@ -346,7 +346,7 @@ export class QuestEmote {
       movePlayerTo({
         newRelativePosition: this.talkPlayerPoint,
         cameraTarget: Vector3.create(Transform.get(this.bezier.entity).position.x, this.talkCameraPoint.y, Transform.get(this.bezier.entity).position.z)
-      })      
+      })   */   
       
       sendTrak('z1_quest1_03', this.gameController.timeStamp)
       this.bubbleTalk.closeBubbleInTime()
