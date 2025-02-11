@@ -31,7 +31,7 @@ export class KeyBoardUI {
     let stepValue = 0.05
     let alpha = 1
 
-    this.uiController.gameController.spawnIsland.startSpawnIsland()
+    //this.uiController.gameController.spawnIsland.startSpawnIsland()
     await wait_ms(250)
     
     let interval = utils.timers.setInterval(() => {

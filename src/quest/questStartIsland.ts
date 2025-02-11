@@ -234,7 +234,7 @@ export class SpawnIsland {
       cameraManager.forceThirdPerson()
       await wait_ms(100)
       await cameraManager.freeCamera()
-      return
+      //return
     }
 
 
