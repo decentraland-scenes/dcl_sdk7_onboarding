@@ -550,7 +550,7 @@ export class SpawnIsland {
         if (tween === 5) {
           this.tobor.activateBillBoard(true)
           this.targeterCircle.showCircle(true)
-          this.dialogAtPilar()
+          this.setupDialogAtPilarTargeter()
           pointerEventsSystem.onPointerDown(
             {
               entity: this.tobor.npcChild,
@@ -562,18 +562,7 @@ export class SpawnIsland {
             () => {
               pointerEventsSystem.removeOnPointerDown(this.tobor.npcChild)
               console.log('CLICKED')
-              AudioManager.instance().playOnce('tobor_talk', {
-                volume: 0.6,
-                parent: this.tobor.entity
-              })
-              this.targeterCircle.showCircle(false)
-              this.questIndicator.hide()
-              sendTrak('z0_quest0_02', this.gameController.timeStamp)
-              openDialogWindow(this.gameController.spawnIsland.tobor.entity, this.gameController.dialogs.toborDialog, 3)
-              utils.timers.setTimeout(() => {
-                this.gameController.uiController.widgetTasks.setText(4, 0)
-                this.gameController.uiController.widgetTasks.showTick(false, 0)
-              }, 2000)
+              this.toborTalkAfterJumpQuest()
             }
           )
           console.log('tobor on  pilar')
@@ -612,12 +601,36 @@ export class SpawnIsland {
     utils.timers.setTimeout(() => {
       this.gameController.uiController.widgetTasks.setText(3, 0)
       this.gameController.uiController.widgetTasks.showTasks(true, TaskType.Simple)
-      this.dialogAtPilar()
+      this.setupDialogAtPilarTargeter()
     }, 1500)
   }
-  dialogAtPilar() {
+  setupDialogAtPilarTargeter() {
     this.questIndicator.updateStatus(IndicatorState.ARROW)
     this.questIndicator.showWithAnim()
+  }
+  private async toborTalkAfterJumpQuest() {
+    cameraManager.lockPlayer()
+
+    const cameraPoint = Vector3.create(203.90, 65.88, 128.46)
+    await cameraManager.blockCamera(
+      cameraPoint, 
+      Quaternion.fromLookAt(cameraPoint, getWorldPosition(this.gameController.questEmote.bezier.entity)), 
+      true, 
+      0.5
+    )
+
+    AudioManager.instance().playOnce('tobor_talk', {
+      volume: 0.6,
+      parent: this.tobor.entity
+    })
+    this.targeterCircle.showCircle(false)
+    this.questIndicator.hide()
+    sendTrak('z0_quest0_02', this.gameController.timeStamp)
+    openDialogWindow(this.gameController.spawnIsland.tobor.entity, this.gameController.dialogs.toborDialog, 3)
+    utils.timers.setTimeout(() => {
+      this.gameController.uiController.widgetTasks.setText(4, 0)
+      this.gameController.uiController.widgetTasks.showTick(false, 0)
+    }, 2000)
   }
   async onFinishCompleteQuestDialog() {
     this.targeterCircle.showCircle(false)
@@ -684,6 +697,7 @@ export class SpawnIsland {
     cameraManager.forceThirdPerson()
     await wait_ms(100)
     await cameraManager.freeCamera()
+    cameraManager.unlockPlayer()
 
     Animator.playSingleAnimation(this.gameController.questEmote.bezier.entity, 'Idle')
   }
