@@ -7,6 +7,6 @@ export function main() {
 }
 
 async function startGame(gameController: GameController){
-  await wait_ms(1000)
+  await wait_ms(100)
   gameController.spawnIsland.startSpawnIsland()
 }

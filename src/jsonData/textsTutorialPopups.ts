@@ -43,16 +43,16 @@ export const SECOND_ISLAND_1 = 'It’s easy to make friends at Decentraland’s 
 export const SECOND_ISLAND_2 = 'Let me teach you how to express yourself so you can party in Decentraland.'
 export const SECOND_ISLAND_3 = 'Press <b>B</b> to open the Emote Wheel and select one of your moves!'
 export const SECOND_ISLAND_4 = 'Well done! You really know how to party.'
-export const SECOND_ISLAND_5 = 'That deserves a reward. Your very first NFT Emote!!'
-export const SECOND_ISLAND_6 = 'NFTs take a while to reach your backpack from the blockchain. You will get a notification when its available'
+export const SECOND_ISLAND_5 = 'That deserves a reward. Your very first Emote!!'
+export const SECOND_ISLAND_6 = 'Emotes and wearables take a while to reach your backpack. You will get a notification when its available'
 export const SECOND_ISLAND_7 = 'Your next task is to talk with my friend Mat, crossing the next bridge.'
 export const SECOND_ISLAND_8 = 'Good Luck!'
 export const SECOND_ISLAND_9 = 'You can find Mat on the next island.'
 export const SECOND_ISLAND_10 = 'You can find Mat on the next island.'
-export const SECOND_ISLAND_11 = 'And by the way you forgot your NFT emote.'
+export const SECOND_ISLAND_11 = 'And by the way you forgot your emote.'
 
 // Dialogs  Mat island
-export const THIRD_ISLAND_0 = "Hey, I'm Mat. I have a business in the metaverse selling NFT wearables."
+export const THIRD_ISLAND_0 = "Hey, I'm Mat. I have a business in the metaverse selling wearables."
 export const THIRD_ISLAND_1 = 'There are thousands of community created wearables for sale.'
 export const THIRD_ISLAND_2 =
   'I’m running low on materials and meshes. If you find them for me I can make it worth your while.'
