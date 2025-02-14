@@ -339,6 +339,7 @@ export class BubbleDynamic {
   }
 
   respSystem = (dt: number): void => {
+    if (!this.active) return
     const playerPos = Transform.get(engine.PlayerEntity).position
     const bubblePos = Transform.get(this.parent).position
 
@@ -353,6 +354,15 @@ export class BubbleDynamic {
     const t = (clampedDistance - minDistance) / (maxDistance - minDistance)
     const newScale = Vector3.lerp(minScale, maxScale, t)
     Transform.getMutable(this.centerEntity).scale = newScale
+  }
+
+  openBubble(): void {
+    if (this.active) return
+    this.active = true
+
+    Transform.getMutable(this.centerEntity).scale = Vector3.create(0.25, 0.25, 0.25)
+    Transform.createOrReplace(this.textEntity, { position: Vector3.create(-0.8, 0.8, -0.04), parent: this.centerEntity })
+    Transform.createOrReplace(this.titleEntity, { position: Vector3.create(-1.1, 1.17, -0.04), parent: this.centerEntity })
   }
 
   closeBubbleInTime(): void {

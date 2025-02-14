@@ -92,8 +92,28 @@ export class QuestPuzzle {
     cameraManager.lockPlayer()
     
     // const talkPlayerPoint = Vector3.add(this.talkKitPlayerPoint, Vector3.create(0, 0.75, 0))
-    const talkPlayerPoint = Vector3.add(Transform.get(engine.PlayerEntity).position, Vector3.create(0, 1.5, 0))
+    const playerPos = Transform.get(engine.PlayerEntity).position
+    let talkPlayerPoint = Vector3.create(playerPos.x, 78.5, playerPos.z)
     const cameraTarget = Vector3.add(getWorldPosition(this.kit.entity), Vector3.create(0, 0.75, 0))
+    
+    // evaluate talkPlayerPoint, reposition if it is too close to NPC
+    const minRadius = 2.25
+    let distanceSqToTarget = Vector3.distanceSquared(talkPlayerPoint, cameraTarget)
+    if(distanceSqToTarget < minRadius * minRadius){
+        const direction = Vector3.normalize(
+            Vector3.create(
+                talkPlayerPoint.x - cameraTarget.x,
+                0,
+                talkPlayerPoint.z - cameraTarget.z
+            )
+        )
+        
+        talkPlayerPoint = Vector3.create(
+            cameraTarget.x + direction.x * minRadius,
+            talkPlayerPoint.y,
+            cameraTarget.z + direction.z * minRadius
+        )
+    }
 
     await cameraManager.blockCamera(
       talkPlayerPoint,
@@ -349,11 +369,32 @@ export class QuestPuzzle {
     //Camera talk with Kit
 
     // const talkPlayerPoint = Vector3.add(this.talkKitPlayerPoint, Vector3.create(0, 0.75, 0))
-    const talkPlayerPoint = Vector3.add(Transform.get(engine.PlayerEntity).position, Vector3.create(0, 1.5, 0))
-    const cameraTargetToKit = Vector3.add(getWorldPosition(this.kit.entity), Vector3.create(0, 0.75, 0))
+    const playerPos = Transform.get(engine.PlayerEntity).position
+    let talkPlayerPoint = Vector3.create(playerPos.x, 78.5, playerPos.z) 
+    const cameraTarget = Vector3.add(getWorldPosition(this.kit.entity), Vector3.create(0, 0.75, 0))
+    
+    // evaluate talkPlayerPoint, reposition if it is too close to NPC
+    const minRadius = 2.25
+    let distanceSqToTarget = Vector3.distanceSquared(talkPlayerPoint, cameraTarget)
+    if(distanceSqToTarget < minRadius * minRadius){
+        const direction = Vector3.normalize(
+            Vector3.create(
+                talkPlayerPoint.x - cameraTarget.x,
+                0,
+                talkPlayerPoint.z - cameraTarget.z
+            )
+        )
+        
+        talkPlayerPoint = Vector3.create(
+            cameraTarget.x + direction.x * minRadius,
+            talkPlayerPoint.y,
+            cameraTarget.z + direction.z * minRadius
+        )
+    }
+    
     await cameraManager.blockCamera(
       talkPlayerPoint,
-      Quaternion.fromLookAt(talkPlayerPoint, cameraTargetToKit),
+      Quaternion.fromLookAt(talkPlayerPoint, cameraTarget),
       true,
       0.5
     )
@@ -388,7 +429,43 @@ export class QuestPuzzle {
     this.gameController.questPortal.initQuestPortal()
     this.gameController.uiController.popUpControls.hideCameraControlsUI()
 
-    // -- Camera --
+    // Camera move to tobor
+    const afterCameraTarget = getWorldPosition(this.gameController.questPortal.tobor.entity)
+    const cameraPoint2 = Vector3.create(115.8,84,120)
+
+    await cameraManager.blockCamera(
+        cameraPoint2, 
+        Quaternion.fromLookAt(cameraPoint2, afterCameraTarget), 
+        true, 
+        4
+    )
+    
+    // Camera orbit to tobor
+    await cameraManager.cameraOrbit(
+        this.gameController.questPortal.tobor.entity,
+        Vector3.subtract(cameraPoint2, afterCameraTarget),
+        0,
+        20,
+        3000,
+        0
+    )
+
+    // Camera back to kit
+    const talkPlayerPoint = Vector3.add(this.talkKitPlayerPoint, Vector3.create(0, 0.75, 0))
+    const cameraTargetToKit = Vector3.add(getWorldPosition(this.kit.entity), Vector3.create(0, 0.75, 0))
+    
+    movePlayerTo({
+      newRelativePosition: this.talkKitPlayerPoint,
+      cameraTarget: Transform.get(this.gameController.mainInstance.s0_En_Npc3_01).position
+    })
+    await wait_ms(500)
+    await cameraManager.blockCamera(
+      talkPlayerPoint,
+      Quaternion.fromLookAt(talkPlayerPoint, cameraTargetToKit),
+      true,
+      0
+    )
+
     //Restore camera to player
     cameraManager.showAvatar()
     await wait_ms(100)
@@ -397,6 +474,7 @@ export class QuestPuzzle {
     cameraManager.freeCamera()
 
     cameraManager.unlockPlayer()
+    this.gameController.questPortal.bubbleDynamic.openBubble()
   }
 
   activatePilar() {

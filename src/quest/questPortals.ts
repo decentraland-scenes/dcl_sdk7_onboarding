@@ -99,6 +99,7 @@ export class QuestPortal {
     this.bubbleTalk = new BubbleTalk(this.tobor.bubbleAttach)
     this.bubbleTalk.closeBubbleInTime()
     this.bubbleDynamic = new BubbleDynamic(this.tobor.entity)
+    this.bubbleDynamic.closeBubbleInTime()
     engine.addSystem(this.bubbleDynamic.respSystem)
     Transform.getMutable(this.tobor.entity).scale = Vector3.create(0, 0, 0)
   }
@@ -131,9 +132,28 @@ export class QuestPortal {
     cameraManager.lockPlayer()
     // -- Camera --
     //Camera talk with Tobor
-
-    const talkPlayerPoint = Vector3.add(Transform.get(engine.PlayerEntity).position, Vector3.create(0, 1.5, 0))
+    const playerPos = Transform.get(engine.PlayerEntity).position
+    let talkPlayerPoint = Vector3.create(playerPos.x, 82.5, playerPos.z)
     const cameraTarget = Vector3.add(getWorldPosition(this.tobor.entity), Vector3.create(0, 1, 0))
+
+    // evaluate talkPlayerPoint, reposition if it is too close to NPC
+    const minRadius = 2.25
+    let distanceSqToTarget = Vector3.distanceSquared(talkPlayerPoint, cameraTarget)
+    if(distanceSqToTarget < minRadius * minRadius){
+        const direction = Vector3.normalize(
+            Vector3.create(
+                talkPlayerPoint.x - cameraTarget.x,
+                0,
+                talkPlayerPoint.z - cameraTarget.z
+            )
+        )
+        
+        talkPlayerPoint = Vector3.create(
+            cameraTarget.x + direction.x * minRadius,
+            82.5,
+            cameraTarget.z + direction.z * minRadius
+        )
+    }
     
     await cameraManager.blockCamera(
       talkPlayerPoint,

@@ -231,13 +231,13 @@ export class SpawnIsland {
     this.gameController.uiController.keyBoardUI.canClick = true
   }
   async startSpawnIsland() {
-    if(Vector3.distance(Transform.get(engine.PlayerEntity).position, this.SPAWN_POINT) > 10) {
-      cameraManager.unlockPlayer()
-      cameraManager.forceThirdPerson()
-      await wait_ms(100)
-      await cameraManager.freeCamera()
-      //return
-    }
+    // if(Vector3.distance(Transform.get(engine.PlayerEntity).position, this.SPAWN_POINT) > 10) {
+    //   cameraManager.unlockPlayer()
+    //   cameraManager.forceThirdPerson()
+    //   await wait_ms(100)
+    //   await cameraManager.freeCamera()
+    //   //return
+    // }
 
 
     this.gameController.uiController.widgetTasks.showTasks(false, TaskType.Simple)
@@ -276,7 +276,7 @@ export class SpawnIsland {
       1
     )*/
    
-    await cameraManager.freeCamera()
+    // await cameraManager.freeCamera()
   }
 
   async finishedIntroDialog() {
@@ -611,13 +611,39 @@ export class SpawnIsland {
   private async toborTalkAfterJumpQuest() {
     cameraManager.lockPlayer()
 
-    const cameraPoint = Vector3.create(203.90, 65.88, 128.46)
+    let talkPlayerPoint = Vector3.add(Transform.get(engine.PlayerEntity).position, Vector3.create(0, 1.75, 0))
+    const cameraTarget = Vector3.add(getWorldPosition(this.tobor.entity), Vector3.create(0, 1.25, 0))
+    // const cameraPoint = Vector3.create(203.90, 65.88, 128.46)
+    
+    // evaluate talkPlayerPoint, reposition if it is too close to NPC
+    const minRadius = 2.25
+    let distanceSqToTarget = Vector3.distanceSquared(talkPlayerPoint, cameraTarget)
+    if(distanceSqToTarget < minRadius * minRadius){
+        const direction = Vector3.normalize(
+            Vector3.create(
+                talkPlayerPoint.x - cameraTarget.x,
+                0,
+                talkPlayerPoint.z - cameraTarget.z
+            )
+        )
+        
+        talkPlayerPoint = Vector3.create(
+            cameraTarget.x + direction.x * minRadius,
+            talkPlayerPoint.y,
+            cameraTarget.z + direction.z * minRadius
+        )
+    }
+    
+    console.log('tobor talk after jump quest')
     await cameraManager.blockCamera(
-      cameraPoint, 
-      Quaternion.fromLookAt(cameraPoint, getWorldPosition(this.gameController.questEmote.bezier.entity)), 
+      talkPlayerPoint, 
+      // Quaternion.fromLookAt(cameraPoint, getWorldPosition(this.gameController.questEmote.bezier.entity)), 
+      Quaternion.fromLookAt(talkPlayerPoint, cameraTarget), 
       true, 
       0.5
     )
+    cameraManager.hideAvatar()
+    movePlayerTo({newRelativePosition: talkPlayerPoint, cameraTarget: cameraTarget})
 
     AudioManager.instance().playOnce('tobor_talk', {
       volume: 0.6,
@@ -631,6 +657,18 @@ export class SpawnIsland {
       this.gameController.uiController.widgetTasks.setText(4, 0)
       this.gameController.uiController.widgetTasks.showTick(false, 0)
     }, 2000)
+  }
+  async lookTowardBridge(){
+    // const cameraPoint = Vector3.create(203.90, 65.88, 128.46)
+    const cameraPoint = Vector3.add(Transform.get(engine.PlayerEntity).position, Vector3.create(0, 1.75, 0))
+    
+    console.log('tobor talk after jump quest')
+    await cameraManager.blockCamera(
+      cameraPoint, 
+      Quaternion.fromLookAt(cameraPoint, getWorldPosition(this.gameController.questEmote.bezier.entity)), 
+      true, 
+      0.5
+    )
   }
   async onFinishCompleteQuestDialog() {
     this.targeterCircle.showCircle(false)
@@ -692,6 +730,7 @@ export class SpawnIsland {
       true, 
       0
     )
+    cameraManager.showAvatar()
 
     await wait_ms(500)
     cameraManager.forceThirdPerson()

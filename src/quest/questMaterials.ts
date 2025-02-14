@@ -145,8 +145,27 @@ export class QuestMaterials {
     cameraManager.lockPlayer()
 
     // const talkPlayerPoint = Vector3.add(this.talkMatPoint, Vector3.create(0, 0.75, 0))
-    const talkPlayerPoint = Vector3.add(Transform.get(engine.PlayerEntity).position, Vector3.create(0, 1.5, 0))
+    let talkPlayerPoint = Vector3.add(Transform.get(engine.PlayerEntity).position, Vector3.create(0, 1.5, 0))
     const cameraTarget = Vector3.add(getWorldPosition(this.mat.entity), Vector3.create(0, 0.75, 0))
+
+    // evaluate talkPlayerPoint, reposition if it is too close to NPC
+    const minRadius = 2.25
+    let distanceSqToTarget = Vector3.distanceSquared(talkPlayerPoint, cameraTarget)
+    if(distanceSqToTarget < minRadius * minRadius){
+        const direction = Vector3.normalize(
+            Vector3.create(
+                talkPlayerPoint.x - cameraTarget.x,
+                0,
+                talkPlayerPoint.z - cameraTarget.z
+            )
+        )
+        
+        talkPlayerPoint = Vector3.create(
+            cameraTarget.x + direction.x * minRadius,
+            talkPlayerPoint.y,
+            cameraTarget.z + direction.z * minRadius
+        )
+    }
     
     await cameraManager.blockCamera(
       talkPlayerPoint,
@@ -492,9 +511,28 @@ export class QuestMaterials {
     cameraManager.lockPlayer()
 
     // const talkPlayerPoint = Vector3.add(this.talkMatPoint, Vector3.create(0, 0.75, 0))
-    const talkPlayerPoint = Vector3.add(Transform.get(engine.PlayerEntity).position, Vector3.create(0, 1.5, 0))
+    let talkPlayerPoint = Vector3.add(Transform.get(engine.PlayerEntity).position, Vector3.create(0, 1.5, 0))
     const cameraTarget = Vector3.add(getWorldPosition(this.mat.entity), Vector3.create(0, 0.75, 0))
     
+    // evaluate talkPlayerPoint, reposition if it is too close to NPC
+    const minRadius = 2.25
+    let distanceSqToTarget = Vector3.distanceSquared(talkPlayerPoint, cameraTarget)
+    if(distanceSqToTarget < minRadius * minRadius){
+        const direction = Vector3.normalize(
+            Vector3.create(
+                talkPlayerPoint.x - cameraTarget.x,
+                0,
+                talkPlayerPoint.z - cameraTarget.z
+            )
+        )
+        
+        talkPlayerPoint = Vector3.create(
+            cameraTarget.x + direction.x * minRadius,
+            talkPlayerPoint.y,
+            cameraTarget.z + direction.z * minRadius
+        )
+    }
+
     await cameraManager.blockCamera(
       talkPlayerPoint,
       Quaternion.fromLookAt(talkPlayerPoint, cameraTarget),

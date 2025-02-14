@@ -219,7 +219,10 @@ export class Dialogs {
       {
         text: START_ISLAND_4,
         portrait: talkingTrebor,
-        typeSpeed: this.typeSpeed
+        typeSpeed: this.typeSpeed,
+        triggeredByNext: () => {
+          this.gameController.spawnIsland.lookTowardBridge()
+        }
       },
       {
         text: START_ISLAND_5,
