@@ -12,6 +12,7 @@ import { EmoteControlsUI } from './controls/emoteControls'
 import { InteractLockControlsUI } from './controls/interactControls'
 import { RunControlsUI } from './controls/runControls'
 import { CameraControlsUI } from './controls/cameraControls'
+import { scalePixelWidth } from '../utils/globalLibrary'
 
 
 
@@ -200,11 +201,11 @@ export class PopUpControls {
                 flexDirection: 'row-reverse',
                 alignContent: 'flex-start',
                 position: { bottom: '0%', right: '0%' },
-                padding: { bottom: '29px' }
+                padding: { bottom: scalePixelWidth(29, canvasInfo) }
                 }}
-                /*uiBackground={{
-                    color: Color4.create(1, 0, 0, 1)
-                }}*/
+                //uiBackground={{
+                //    color: Color4.create(1, 0, 0, 1)
+                //}}
             >
                 {this.moveControlsUI.generateUI(canvasInfo)}
                 {this.jumpControlsUI.generateUI(canvasInfo)}

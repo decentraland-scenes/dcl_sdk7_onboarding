@@ -1,12 +1,14 @@
 import ReactEcs, { PositionUnit, UiEntity } from "@dcl/sdk/react-ecs"
-import { KEYCODE_FORWARD_IMG, KEYCODE_LEFT_IMG, KEYCODE_RIGHT_IMG, KEYCODE_BACKWARD_IMG, KEYCODE_SPACE_IMG, KEYCODE_LEFT_SHIFT_IMG, KEYCODE_V_IMG, KEYCODE_B_IMG, BIG_KEY_BACKGROUND_SIZE, LARGE_KEY_BACKGROUND_SIZE, SMALL_KEY_BACKGROUND_SIZE, KEY_BACKGROUND_IMG, CONTROLS_BACKGROUND_ORANGE_IMG, CONTROLS_BACKGROUND_RED_IMG, KEYCODE_NUMBER_IMG } from "./controlsAssetsConfig"
+import { KEYCODE_FORWARD_IMG, KEYCODE_LEFT_IMG, KEYCODE_RIGHT_IMG, KEYCODE_BACKWARD_IMG, KEYCODE_SPACE_IMG, KEYCODE_LEFT_SHIFT_IMG, KEYCODE_V_IMG, KEYCODE_B_IMG, BIG_KEY_BACKGROUND_SIZE, LARGE_KEY_BACKGROUND_SIZE, SMALL_KEY_BACKGROUND_SIZE, KEY_BACKGROUND_IMG, CONTROLS_BACKGROUND_ORANGE_IMG, CONTROLS_BACKGROUND_RED_IMG, KEYCODE_NUMBER_IMG, KEYCODE_FORWARD_IMG_SIZE, KEYCODE_LEFT_IMG_SIZE, KEYCODE_BACKWARD_IMG_SIZE, KEYCODE_RIGHT_IMG_SIZE, KEYCODE_LEFT_SHIFT_IMG_SIZE, KEYCODE_SPACE_IMG_SIZE, KEYCODE_V_IMG_SIZE, KEYCODE_B_IMG_SIZE, KEYCODE_NUMBER_IMG_SIZE, KEY_UI_SCALE } from "./controlsAssetsConfig"
 import { Color4 } from "@dcl/sdk/math"
+import { scalePixelHeight, scalePixelWidth } from "../../utils/globalLibrary"
+import { DeepReadonlyObject, PBUiCanvasInformation } from "@dcl/sdk/ecs"
 
 export enum KeyType {
     W, A, S, D, V, B, SPACE, LEFT_SHIFT, NUMBER
 }
 
-export function getKeyImg(key: KeyControlWidget){
+export function getKeyCodeImg(key: KeyControlWidget){
     switch (key.keyType) {
       case KeyType.W:
         return KEYCODE_FORWARD_IMG
@@ -28,6 +30,31 @@ export function getKeyImg(key: KeyControlWidget){
         return KEYCODE_NUMBER_IMG
       default:
         return KEYCODE_FORWARD_IMG
+    }
+}
+
+export function getKeyCodeImgSize(key: KeyControlWidget){
+    switch (key.keyType) {
+        case KeyType.W:
+            return KEYCODE_FORWARD_IMG_SIZE
+        case KeyType.S:
+            return KEYCODE_BACKWARD_IMG_SIZE
+        case KeyType.A:
+            return KEYCODE_LEFT_IMG_SIZE
+        case KeyType.D:
+            return KEYCODE_RIGHT_IMG_SIZE
+        case KeyType.SPACE:
+            return KEYCODE_SPACE_IMG_SIZE
+        case KeyType.LEFT_SHIFT:
+            return KEYCODE_LEFT_SHIFT_IMG_SIZE
+        case KeyType.V:
+            return KEYCODE_V_IMG_SIZE
+        case KeyType.B:
+            return KEYCODE_B_IMG_SIZE
+        case KeyType.NUMBER:
+            return KEYCODE_NUMBER_IMG_SIZE
+        default:
+            return KEYCODE_FORWARD_IMG_SIZE
     }
 }
 
@@ -114,7 +141,7 @@ export class KeyControlWidget {
     setFinishProgressCB(callback: (() => void) | undefined){
         this._onFinishProgress = callback
     }
-    generateKeyControlUI(): ReactEcs.JSX.Element {
+    generateKeyControlUI(canvasInfo: DeepReadonlyObject<PBUiCanvasInformation>): ReactEcs.JSX.Element {
         return (
           <UiEntity
           //BACKGROUND
@@ -122,8 +149,8 @@ export class KeyControlWidget {
               positionType: 'relative',
               alignSelf: 'center',
               justifyContent: 'center',
-              height: getKeySize(this).height * this.animScale,
-              width: getKeySize(this).width * this.animScale,
+              height: scalePixelHeight(getKeySize(this).height, canvasInfo) * this.animScale * KEY_UI_SCALE,
+              width: scalePixelWidth(getKeySize(this).width, canvasInfo) * this.animScale * KEY_UI_SCALE,
               position: { top: '0%', left: '0%' }
             }}
             uiBackground={{
@@ -153,12 +180,12 @@ export class KeyControlWidget {
               uiTransform={{
                 positionType: 'relative',
                 alignSelf: 'center',
-                width: '100%',
-                height: '100%',
+                width: scalePixelWidth(getKeyCodeImgSize(this).width, canvasInfo) * KEY_UI_SCALE,
+                height: scalePixelHeight(getKeyCodeImgSize(this).height, canvasInfo) * KEY_UI_SCALE,
               }}
               uiBackground={{
-                texture: { src: getKeyImg(this)},
-                textureMode: 'center',
+                texture: { src: getKeyCodeImg(this)},
+                textureMode: 'stretch',
                   //color: Color4.create(22, 21, 24, 1)
               }}
             />

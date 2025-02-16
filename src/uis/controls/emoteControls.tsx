@@ -1,8 +1,9 @@
 import { DeepReadonlyObject, PBUiCanvasInformation } from "@dcl/sdk/ecs";
 import { Color4 } from "@dcl/sdk/math";
 import ReactEcs, { UiEntity, Label } from "@dcl/sdk/react-ecs";
-import { KEY_TEXT_FONT_SIZE, CONTROLS_BACKGROUND_IMG, TITLE_TEXT_FONT_SIZE, CONTROLS_BACKGROUND_SLICES } from "./controlsAssetsConfig";
+import { KEY_TEXT_FONT_SIZE, CONTROLS_BACKGROUND_IMG, TITLE_TEXT_FONT_SIZE, CONTROLS_BACKGROUND_SLICES, KEY_UI_SCALE } from "./controlsAssetsConfig";
 import { KeyControlWidget, KeyType } from "./keyControl";
+import { scalePixelWidth, scalePixelHeight } from "../../utils/globalLibrary";
 
 
 export class EmoteControlsUI {
@@ -34,13 +35,18 @@ export class EmoteControlsUI {
                 //BACKGROUND
                 uiTransform={{
                     flexDirection: 'column',
-                    width: '423px',
-                    height: '168px',
+                    width: scalePixelWidth(423, canvasInfo) * KEY_UI_SCALE,
+                    height: scalePixelHeight(168, canvasInfo) * KEY_UI_SCALE,
                     alignSelf: 'flex-end',
                     justifyContent: 'flex-start',
                     positionType: 'relative',
-                    margin: { right: '35px' },
-                    padding: { top: '10px', left: '10px', right: '10px', bottom: '15px'},
+                    margin: { right: scalePixelWidth(35, canvasInfo) * KEY_UI_SCALE },
+                    padding: { 
+                        top: scalePixelHeight(10, canvasInfo) * KEY_UI_SCALE, 
+                        left: scalePixelWidth(10, canvasInfo) * KEY_UI_SCALE, 
+                        right: scalePixelWidth(10, canvasInfo) * KEY_UI_SCALE, 
+                        bottom: scalePixelHeight(15, canvasInfo) * KEY_UI_SCALE
+                    },
                     display: 'flex'
                 }}
                 uiBackground={{
@@ -55,10 +61,13 @@ export class EmoteControlsUI {
                     uiTransform={{
                         flexDirection: 'row',
                         width: '100%',
-                        height: '43px',
+                        height: scalePixelHeight(43, canvasInfo) * KEY_UI_SCALE,
                         positionType: 'relative',
                         alignContent: 'center',
-                        padding: {left: '14px', right: '14px'},
+                        padding: {
+                            left: scalePixelWidth(14, canvasInfo) * KEY_UI_SCALE, 
+                            right: scalePixelWidth(14, canvasInfo) * KEY_UI_SCALE
+                        },
                         position: { top: '0%', left: '0%' },
                         display: 'flex'
                     }}
@@ -70,13 +79,13 @@ export class EmoteControlsUI {
                         uiTransform={{
                             positionType: 'relative',
                             alignSelf: 'center',
-                            width: '24px',
-                            height: '24px',
+                            width: scalePixelWidth(24, canvasInfo) * KEY_UI_SCALE,
+                            height: scalePixelHeight(24, canvasInfo) * KEY_UI_SCALE,
                             //margin: {left: '14px', right: '14px'},
                         }}
                         uiBackground={{
                             texture: { src: 'assets/ui/controls/UI_Emotes_Icon.png'},
-                            textureMode: 'center',
+                            textureMode: 'stretch',
                             //color: Color4.create(22, 21, 24, 1)
                         }}
                         />
@@ -86,14 +95,14 @@ export class EmoteControlsUI {
                             positionType: 'relative',
                             alignSelf: 'flex-start',
                             height: '95%',
-                            margin: { left: '5px' },
+                            margin: { left: scalePixelWidth(5, canvasInfo) * KEY_UI_SCALE },
                         }}
                         /*uiBackground={{
                             color: Color4.create(1, 0, 0, 1)
                         }}*/
                         textAlign='middle-left'
                         value="<b>PLAY EMOTES</b>"
-                        fontSize={TITLE_TEXT_FONT_SIZE}
+                        fontSize={scalePixelHeight(TITLE_TEXT_FONT_SIZE, canvasInfo) * KEY_UI_SCALE}
                         font="monospace"
                         color={Color4.White()}
                         />
@@ -103,10 +112,13 @@ export class EmoteControlsUI {
                         uiTransform={{
                             flexDirection: 'row',
                             width: '100%',
-                            height: '40px',
+                            height: scalePixelHeight(40, canvasInfo) * KEY_UI_SCALE,
                             positionType: 'relative',
-                            margin: { top: '10px'},
-                            padding: { left: '10px', right: '10px'},
+                            margin: { top: scalePixelHeight(10, canvasInfo) * KEY_UI_SCALE},
+                            padding: { 
+                                left: scalePixelWidth(10, canvasInfo) * KEY_UI_SCALE, 
+                                right: scalePixelWidth(10, canvasInfo) * KEY_UI_SCALE
+                            },
                             position: { top: '0%', left: '0%' },
                             display: 'flex'
                         }}
@@ -117,21 +129,21 @@ export class EmoteControlsUI {
                         <Label
                             uiTransform={{
                             positionType: 'relative',
-                            margin: { left: '5px' },
+                            margin: { left: scalePixelWidth(5, canvasInfo) * KEY_UI_SCALE },
                             }}
                             value="<b>Press</b>"
-                            fontSize={KEY_TEXT_FONT_SIZE}
+                            fontSize={scalePixelHeight(KEY_TEXT_FONT_SIZE, canvasInfo) * KEY_UI_SCALE}
                             font="sans-serif"
                             color={Color4.White()}
                         />
-                        {this.keyB.generateKeyControlUI()}
+                        {this.keyB.generateKeyControlUI(canvasInfo)}
                         <Label
                             uiTransform={{
                             positionType: 'relative',
-                            margin: { left: '5px' },
+                            margin: { left: scalePixelWidth(5, canvasInfo) * KEY_UI_SCALE },
                             }}
                             value="<b>To Open The Emote Wheel</b>"
-                            fontSize={KEY_TEXT_FONT_SIZE}
+                            fontSize={scalePixelHeight(KEY_TEXT_FONT_SIZE, canvasInfo) * KEY_UI_SCALE}
                             font="sans-serif"
                             color={Color4.White()}
                         />
@@ -142,10 +154,13 @@ export class EmoteControlsUI {
                         uiTransform={{
                             flexDirection: 'row',
                             width: '100%',
-                            height: '40px',
+                            height: scalePixelHeight(40, canvasInfo) * KEY_UI_SCALE,
                             positionType: 'relative',
-                            margin: { top: '10px'},
-                            padding: { left: '10px', right: '10px'},
+                            margin: { top: scalePixelHeight(10, canvasInfo) * KEY_UI_SCALE},
+                            padding: { 
+                                left: scalePixelWidth(10, canvasInfo) * KEY_UI_SCALE, 
+                                right: scalePixelWidth(10, canvasInfo) * KEY_UI_SCALE
+                            },
                             position: { top: '0%', left: '0%' },
                             display: 'flex'
                         }}
@@ -156,32 +171,32 @@ export class EmoteControlsUI {
                         <Label
                             uiTransform={{
                             positionType: 'relative',
-                            margin: { left: '5px' },
+                            margin: { left: scalePixelWidth(5, canvasInfo) * KEY_UI_SCALE },
                             }}
                             value="<b>Press</b>"
-                            fontSize={KEY_TEXT_FONT_SIZE}
+                            fontSize={scalePixelHeight(KEY_TEXT_FONT_SIZE, canvasInfo) * KEY_UI_SCALE}
                             font="sans-serif"
                             color={Color4.White()}
                         />
-                        {this.keyB2.generateKeyControlUI()}
+                        {this.keyB2.generateKeyControlUI(canvasInfo)}
                         <Label
                             uiTransform={{
                             positionType: 'relative',
-                            margin: { left: '5px' },
+                            margin: { left: scalePixelWidth(5, canvasInfo) * KEY_UI_SCALE },
                             }}
                             value="<b>And</b>"
-                            fontSize={KEY_TEXT_FONT_SIZE}
+                            fontSize={scalePixelHeight(KEY_TEXT_FONT_SIZE, canvasInfo) * KEY_UI_SCALE}
                             font="sans-serif"
                             color={Color4.White()}
                         />
-                        {this.keyNumber.generateKeyControlUI()}
+                        {this.keyNumber.generateKeyControlUI(canvasInfo)}
                         <Label
                             uiTransform={{
                             positionType: 'relative',
-                            margin: { left: '5px' },
+                            margin: { left: scalePixelWidth(5, canvasInfo) * KEY_UI_SCALE },
                             }}
                             value="<b>As A Emote Shortcut</b>"
-                            fontSize={KEY_TEXT_FONT_SIZE}
+                            fontSize={scalePixelHeight(KEY_TEXT_FONT_SIZE, canvasInfo) * KEY_UI_SCALE}
                             font="sans-serif"
                             color={Color4.White()}
                         />

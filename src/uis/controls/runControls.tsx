@@ -1,8 +1,9 @@
 import { DeepReadonlyObject, PBUiCanvasInformation } from "@dcl/sdk/ecs";
 import { Color4 } from "@dcl/sdk/math";
 import ReactEcs, { UiEntity, Label } from "@dcl/sdk/react-ecs";
-import { KEY_TEXT_FONT_SIZE, CONTROLS_BACKGROUND_IMG, TITLE_TEXT_FONT_SIZE, CONTROLS_BACKGROUND_SLICES } from "./controlsAssetsConfig";
+import { KEY_TEXT_FONT_SIZE, CONTROLS_BACKGROUND_IMG, TITLE_TEXT_FONT_SIZE, CONTROLS_BACKGROUND_SLICES, KEY_UI_SCALE } from "./controlsAssetsConfig";
 import { KeyControlWidget, KeyType } from "./keyControl";
+import { scalePixelWidth, scalePixelHeight } from "../../utils/globalLibrary";
 
 
 export class RunControlsUI {
@@ -22,13 +23,18 @@ export class RunControlsUI {
             //BACKGROUND
             uiTransform={{
                 flexDirection: 'column',
-                width: '345px',
-                height: '118px',
+                width: scalePixelWidth(345, canvasInfo) * KEY_UI_SCALE,
+                height: scalePixelHeight(118, canvasInfo) * KEY_UI_SCALE,
                 alignSelf: 'flex-end',
                 justifyContent: 'flex-start',
                 positionType: 'relative',
-                margin: { right: '35px' },
-                padding: { top: '10px', left: '10px', right: '10px', bottom: '15px'},
+                margin: { right: scalePixelWidth(35, canvasInfo) * KEY_UI_SCALE },
+                padding: { 
+                    top: scalePixelHeight(10, canvasInfo) * KEY_UI_SCALE, 
+                    left: scalePixelWidth(10, canvasInfo) * KEY_UI_SCALE, 
+                    right: scalePixelWidth(10, canvasInfo) * KEY_UI_SCALE, 
+                    bottom: scalePixelHeight(15, canvasInfo) * KEY_UI_SCALE
+                },
                 display: 'flex'
             }}
             uiBackground={{
@@ -43,10 +49,13 @@ export class RunControlsUI {
                 uiTransform={{
                     flexDirection: 'row',
                     width: '100%',
-                    height: '43px',
+                    height: scalePixelHeight(43, canvasInfo) * KEY_UI_SCALE,
                     positionType: 'relative',
                     alignContent: 'center',
-                    padding: {left: '14px', right: '14px'},
+                    padding: {
+                        left: scalePixelWidth(14, canvasInfo) * KEY_UI_SCALE, 
+                        right: scalePixelWidth(14, canvasInfo) * KEY_UI_SCALE
+                    },
                     position: { top: '0%', left: '0%' },
                     display: 'flex'
                 }}
@@ -58,13 +67,13 @@ export class RunControlsUI {
                     uiTransform={{
                         positionType: 'relative',
                         alignSelf: 'center',
-                        width: '24px',
-                        height: '24px',
+                        width: scalePixelWidth(24, canvasInfo) * KEY_UI_SCALE,
+                        height: scalePixelHeight(24, canvasInfo) * KEY_UI_SCALE,
                         //margin: {left: '14px', right: '14px'},
                     }}
                     uiBackground={{
                         texture: { src: 'assets/ui/controls/UI_Run_Icon.png'},
-                        textureMode: 'center',
+                        textureMode: 'stretch',
                         //color: Color4.create(22, 21, 24, 1)
                     }}
                     />
@@ -74,14 +83,14 @@ export class RunControlsUI {
                         positionType: 'relative',
                         alignSelf: 'flex-start',
                         height: '95%',
-                        margin: { left: '5px' },
+                        margin: { left: scalePixelWidth(5, canvasInfo) * KEY_UI_SCALE },
                     }}
                     /*uiBackground={{
                         color: Color4.create(1, 0, 0, 1)
                     }}*/
                     textAlign='middle-left'
                     value="<b>RUN</b>"
-                    fontSize={TITLE_TEXT_FONT_SIZE}
+                    fontSize={scalePixelHeight(TITLE_TEXT_FONT_SIZE, canvasInfo) * KEY_UI_SCALE}
                     font="monospace"
                     color={Color4.White()}
                     />
@@ -91,10 +100,13 @@ export class RunControlsUI {
                     uiTransform={{
                         flexDirection: 'row',
                         width: '100%',
-                        height: '40px',
+                        height: scalePixelHeight(40, canvasInfo) * KEY_UI_SCALE,
                         positionType: 'relative',
-                        margin: { top: '10px'},
-                        padding: { left: '10px', right: '10px'},
+                        margin: { top: scalePixelHeight(10, canvasInfo) * KEY_UI_SCALE},
+                        padding: { 
+                            left: scalePixelWidth(10, canvasInfo) * KEY_UI_SCALE, 
+                            right: scalePixelWidth(10, canvasInfo) * KEY_UI_SCALE
+                        },
                         position: { top: '0%', left: '0%' },
                         display: 'flex'
                     }}
@@ -102,21 +114,21 @@ export class RunControlsUI {
                     <Label
                         uiTransform={{
                         positionType: 'relative',
-                        margin: { left: '5px' },
+                        margin: { left: scalePixelWidth(5, canvasInfo) * KEY_UI_SCALE },
                         }}
                         value="<b>Hold</b>"
-                        fontSize={KEY_TEXT_FONT_SIZE}
+                        fontSize={scalePixelHeight(KEY_TEXT_FONT_SIZE, canvasInfo) * KEY_UI_SCALE}
                         font="sans-serif"
                         color={Color4.White()}
                     />
-                    {this.keyShift.generateKeyControlUI()}
+                    {this.keyShift.generateKeyControlUI(canvasInfo)}
                     <Label
                         uiTransform={{
                         positionType: 'relative',
-                        margin: { left: '5px' },
+                        margin: { left: scalePixelWidth(5, canvasInfo) * KEY_UI_SCALE },
                         }}
                         value="<b>to run while moving</b>"
-                        fontSize={KEY_TEXT_FONT_SIZE}
+                        fontSize={scalePixelHeight(KEY_TEXT_FONT_SIZE, canvasInfo) * KEY_UI_SCALE}
                         font="sans-serif"
                         color={Color4.White()}
                     />
