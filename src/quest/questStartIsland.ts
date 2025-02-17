@@ -673,6 +673,7 @@ export class SpawnIsland {
   async onFinishCompleteQuestDialog() {
     this.targeterCircle.showCircle(false)
     this.questIndicator.hide()
+    PointerEvents.deleteFrom(this.gameController.mainInstance.s0_Z3_Str_Bridge_Art_01)
 
     // camera move to start position
     const moveToPosition = Vector3.create(203.60,64.89,129.5)
@@ -757,7 +758,7 @@ export class SpawnIsland {
   }
   activateBridge() {
     this.activateBridgeArrow()
-    PointerEvents.deleteFrom(this.gameController.mainInstance.s0_Z3_Str_Bridge_Art_01)
+    //PointerEvents.deleteFrom(this.gameController.mainInstance.s0_Z3_Str_Bridge_Art_01)
     AudioManager.instance().playBridge(this.gameController.mainInstance.s0_Z3_Str_Bridge_Art_01)
     Animator.getClip(this.gameController.mainInstance.s0_Z3_Str_Bridge_Art_01, 'Bridge On').speed = 1
     Animator.getClip(this.gameController.mainInstance.s0_Z3_Str_Bridge_Art_01, 'Bridge On').shouldReset = false

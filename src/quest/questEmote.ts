@@ -449,7 +449,7 @@ export class QuestEmote {
   }
   activateBridge() {
     this.getBridgeArrow()
-    PointerEvents.deleteFrom(this.gameController.mainInstance.s0_Z3_Str_Bridge_Art_1__01)
+    //PointerEvents.deleteFrom(this.gameController.mainInstance.s0_Z3_Str_Bridge_Art_1__01)
     AudioManager.instance().playBridge(this.gameController.mainInstance.s0_Z3_Str_Bridge_Art_1__01)
     Animator.getClip(this.gameController.mainInstance.s0_Z3_Str_Bridge_Art_1__01, 'Bridge On').speed = 1
     Animator.getClip(this.gameController.mainInstance.s0_Z3_Str_Bridge_Art_1__01, 'Bridge On').shouldReset = false
@@ -484,6 +484,7 @@ export class QuestEmote {
   }
   async cameraAndBridgeAnim() {
     console.log('cameraAndBridgeAnim')
+    PointerEvents.deleteFrom(this.gameController.mainInstance.s0_Z3_Str_Bridge_Art_1__01)
     cameraManager.lockPlayer()
     
     // const cameraPoint = this.bridgeCameraPoint
