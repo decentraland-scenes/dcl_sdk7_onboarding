@@ -135,10 +135,12 @@ export class PortalEvents {
     //depending on if the call of the api has scene_name or title for (places and events)
     if (event.name) {
       eventCoords = event.x.toString() + ',' + event.y.toString()
-      TextShape.getMutable(this.title).text = splitTextIntoLines(event.name, 16, 0)
+      TextShape.getMutable(this.title).text = splitTextIntoLines(event.name, 16, 1)
+      //TextShape.getMutable(this.title).text = event.name
     } else if (event.title) {
       eventCoords = event.base_position
-      TextShape.getMutable(this.title).text = splitTextIntoLines(event.title, 16, 0)
+      TextShape.getMutable(this.title).text = splitTextIntoLines(event.title, 16, 1)
+      //TextShape.getMutable(this.title).text = event.title
     }
     var hoverText = ''
     PointerEvents.createOrReplace(this.clickPanel, {
