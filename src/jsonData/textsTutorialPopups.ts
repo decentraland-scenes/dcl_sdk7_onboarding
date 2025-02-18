@@ -66,7 +66,7 @@ export const THIRD_ISLAND_6 = 'Thanks for collecting the materials and meshes, n
 export const THIRD_ISLAND_7 = 'Your next task is to talk to Kit, find him on the last island.'
 export const THIRD_ISLAND_8 = 'Thanks for your help.'
 
-export const THIRD_ISLAND_9 = 'Take this one as thanks for your help.'
+export const THIRD_ISLAND_9 = 'Take this wearable as thanks for your help.'
 export const THIRD_ISLAND_10 = 'Kit should be in the next island.'
 export const THIRD_ISLAND_11 = 'With the materials that you gave me, I can create awesome wearables. Thanks!'
 export const THIRD_ISLAND_12 = 'Oh! You forgot your wearable.'
