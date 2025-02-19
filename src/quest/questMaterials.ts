@@ -183,7 +183,7 @@ export class QuestMaterials {
     this.setQuestStartDialog()
     sendTrak('z2_quest2_00', this.gameController.timeStamp)
     this.gameController.uiController.popUpControls.hideAllControlsUI()
-    this.gameController.uiController.popUpControls.showInteractLockControlsUI()
+    
   }
   spawnBlockToNextIsalnd() {
     Transform.createOrReplace(this.blocker, {
@@ -205,11 +205,7 @@ export class QuestMaterials {
   setQuestStartDialog() {
     AudioManager.instance().playOnce('npc_2_salute', { volume: 0.6, parent: this.mat.entity })
     this.gameController.uiController.widgetTasks.showTick(true, 0)
-    utils.timers.setTimeout(() => {
-      this.gameController.uiController.widgetTasks.showTick(false, 0)
-      this.gameController.uiController.widgetTasks.setText(7, 0)
-      this.gameController.uiController.widgetTasks.showTasks(true, TaskType.Simple)
-    }, 1500)
+
     openDialogWindow(this.mat.entity, this.gameController.dialogs.matDialog, 0)
     Animator.stopAllAnimations(this.mat.entity)
     Animator.getClip(this.mat.entity, 'Talk').playing = true
@@ -217,6 +213,11 @@ export class QuestMaterials {
     this.questIndicator.hide()
   }
   async cameraTargetsMaterialsObjectives() {
+
+    this.gameController.uiController.widgetTasks.showTick(false, 0)
+    this.gameController.uiController.widgetTasks.setText(7, 0)
+    this.gameController.uiController.widgetTasks.showTasks(true, TaskType.Simple)
+    this.gameController.uiController.popUpControls.showInteractLockControlsUI()
     // -- Camera --
     // Camera shots at both boxes on each side for a couple of seconds. Then goes back to mat
     
@@ -338,8 +339,11 @@ export class QuestMaterials {
       },
       async () => {
         console.log('clicked entity')
-        // this.pickPiece()
-
+        this.materialsCollected++
+        this.gameController.uiController.widgetTasks.setStepCount(this.materialsCollected)
+        if (this.materialsCollected == 2) {
+          this.gameController.uiController.widgetTasks.showTick(true, 0)
+        }
         AudioManager.instance().playOnce('pickup_box', {
           volume: 0.8,
           parent: this.gameController.mainInstance.s0_Z3_Quest_BoxMat_art_3__01
@@ -396,7 +400,11 @@ export class QuestMaterials {
       },
       async () => {
         console.log('clicked entity')
-        // this.pickPiece()
+        this.materialsCollected++
+        this.gameController.uiController.widgetTasks.setStepCount(this.materialsCollected)
+        if (this.materialsCollected == 2) {
+          this.gameController.uiController.widgetTasks.showTick(true, 0)
+        }
         AudioManager.instance().playOnce('pickup_box', {
 
           volume: 0.8,
@@ -432,8 +440,6 @@ export class QuestMaterials {
     )
   }
   pickPiece() {
-    this.materialsCollected++
-    this.gameController.uiController.widgetTasks.setStepCount(this.materialsCollected)
 
     if (this.materialsCollected == 2) {
       this.pickedAllPieces()
@@ -448,12 +454,12 @@ export class QuestMaterials {
     }
   }
   pickedAllPieces() {
-    this.gameController.uiController.widgetTasks.showTick(true, 0)
+    
     utils.timers.setTimeout(() => {
       this.gameController.uiController.widgetTasks.showTick(false, 0)
       this.gameController.uiController.widgetTasks.setText(8, 0)
       this.gameController.uiController.widgetTasks.showTasks(true, TaskType.Simple)
-    }, 1500)
+    }, 2000)
     openDialogWindow(this.mat.entity, this.gameController.dialogs.matDialog, 5)
     utils.timers.setTimeout(() => {
       closeDialog(this.mat.entity)
@@ -499,11 +505,9 @@ export class QuestMaterials {
   }
   async talkNpcCompleteQuest() {
 
-    // lockPlayer()
-    // movePlayerTo({
-    //   newRelativePosition: this.talkMatPoint,
-    //   cameraTarget: Transform.get(this.gameController.mainInstance.s0_En_Npc2_01).position
-    // })
+    this.gameController.uiController.widgetTasks.showTick(true, 0)
+    this.gameController.uiController.widgetTasks.showTick(true, 2)
+ 
 
     // -- Camera --
     //Camera talk with Mat
@@ -545,13 +549,6 @@ export class QuestMaterials {
     //   cameraTarget: Transform.get(this.gameController.mainInstance.s0_En_Npc2_01).position
     // })
 
-    this.gameController.uiController.widgetTasks.showTick(true, 0)
-    this.gameController.uiController.widgetTasks.showTick(true, 2)
-    utils.timers.setTimeout(() => {
-      this.gameController.uiController.widgetTasks.showTick(false, 0)
-      this.gameController.uiController.widgetTasks.setText(9, 0)
-      this.gameController.uiController.widgetTasks.showTasks(true, TaskType.Simple)
-    }, 1500)
     this.spawnparticles()
     Animator.stopAllAnimations(this.mat.entity)
     Animator.playSingleAnimation(this.mat.entity, 'Celebrate')
@@ -564,9 +561,7 @@ export class QuestMaterials {
     this.gameController.questPuzzle.questIndicator.updateStatus(IndicatorState.ARROW)
     this.gameController.questPuzzle.questIndicator.showWithAnim()
     this.gameController.uiController.popUpControls.hideInteractControlsUI()
-    utils.timers.setTimeout(() => {
-      this.gameController.uiController.popUpControls.showRunLockControlsUI()
-    }, 3000)
+    
   }
 
   setWalletConnection() {
@@ -610,6 +605,7 @@ export class QuestMaterials {
     else this.afterEndQuestClick()
   }
   async lookAtNextQuest() {
+    this.gameController.uiController.widgetTasks.showTasks(false, TaskType.Simple)
     executeTask(async () => {
       this.gameController.questPuzzle.questIndicator.updateStatus(IndicatorState.ARROW)
       this.gameController.questPuzzle.questIndicator.showWithAnim()
@@ -720,6 +716,10 @@ export class QuestMaterials {
     }
   }
   async questFinished() {
+    this.gameController.uiController.widgetTasks.showTick(false, 0)
+    this.gameController.uiController.widgetTasks.setText(9, 0)
+    this.gameController.uiController.widgetTasks.showTasks(true, TaskType.Simple)
+    this.gameController.uiController.popUpControls.showRunLockControlsUI()
     // -- Camera --
     //Restore camera to player
 
@@ -768,5 +768,6 @@ export class QuestMaterials {
     Animator.getClip(this.mat.entity, 'Idle').playing = true
     openDialogWindow(this.mat.entity, this.gameController.dialogs.matDialog, 11)
     PointerEvents.deleteFrom(this.mat.npcChild)
+
   }
 }

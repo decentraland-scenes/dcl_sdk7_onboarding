@@ -243,7 +243,7 @@ export const textQuests: Tasks[] = [
           en: 'Choose your next experience'
         },
         missionInfo: {
-          en: 'Cross one of the portals to Decentraland.'
+          en: 'Cross one of the portals \nto Decentraland.'
         },
         fontSize: 14,
         vAlign: '0%',

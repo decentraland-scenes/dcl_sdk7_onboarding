@@ -334,7 +334,7 @@ export class SpawnIsland {
     if(this.isMoveQuestCompleted) return;
     this.isMoveQuestCompleted = true;
 
-
+    this.gameController.uiController.widgetTasks.showTick(true, 0)
     sendTrak('z0_quest0_01', this.gameController.timeStamp)
     // -- Camera --
     //Camera transitions to Tobor
@@ -359,12 +359,15 @@ export class SpawnIsland {
     await wait_ms(500)
     this.bubbleTalk.closeBubbleInTime()
     this.gameController.uiController.popUpControls.hideAllControlsUI()
-
+    
 
     AudioManager.instance().playOnce('tobor_talk', { volume: 0.6, parent: this.tobor.entity })
     Animator.stopAllAnimations(this.tobor.entity)
     Animator.getClip(this.tobor.entity, 'Talk').playing = true
     openDialogWindow(this.tobor.entity, this.gameController.dialogs.toborCameraDialog, 0)
+
+    await wait_ms(1000)
+    this.gameController.uiController.widgetTasks.showTasks(false, TaskType.Simple)
   }
   // ---- Camera Quest ----
   async startCameraQuest() {
@@ -381,6 +384,7 @@ export class SpawnIsland {
     this.bubbleTalk.openBubble(CAMERA_QUEST_0, true)
     this.gameController.uiController.popUpControls.showLookControlsUI()
     //Camera task UI
+    this.gameController.uiController.widgetTasks.showTasks(true, TaskType.Simple)
     this.gameController.uiController.widgetTasks.showTick(false, 0)
     this.gameController.uiController.widgetTasks.setText(1, 0)
     //Spawn gloing orb
@@ -415,6 +419,7 @@ export class SpawnIsland {
     openDialogWindow(this.tobor.entity, this.gameController.dialogs.toborJumpDialog, 0)
 
     utils.timers.setTimeout(()=>{
+      this.gameController.uiController.widgetTasks.showTasks(false, TaskType.Simple)
       this.orb.deactivateWithAnim()
     }, 1000)
   }
@@ -467,6 +472,9 @@ export class SpawnIsland {
     cameraManager.unlockPlayer()
 
     this.gameController.uiController.popUpControls.showJumpControlsUI()
+    this.gameController.uiController.popUpControls.showJumpControlsUI()
+    this.gameController.uiController.widgetTasks.setText(2, 0)
+    this.gameController.uiController.widgetTasks.showTasks(true, TaskType.Simple)
     
 
     PointerEvents.createOrReplace(this.gameController.mainInstance.s0_tree_fall_art_01, {
@@ -508,7 +516,8 @@ export class SpawnIsland {
     this.gameController.uiController.popUpControls.hideCursorLockControlsUI()
   }*/
   startMoveForwardJumpQuest() {
-    //this.gameController.uiController.popUpControls.showMoveControlsUI()
+    
+    
     this.tobor.activateBillBoard(false)
 
     Tween.createOrReplace(this.tobor.entity, {
@@ -577,9 +586,7 @@ export class SpawnIsland {
   }
   jumpquest() {
     //this.gameController.uiController.popUpControls.spaceContainerVisible = true
-    this.gameController.uiController.popUpControls.showJumpControlsUI()
-    this.gameController.uiController.widgetTasks.setText(2, 0)
-    this.gameController.uiController.widgetTasks.showTasks(true, TaskType.Simple)
+    
     Transform.getMutable(this.gameController.mainInstance.s0_Fence_Art_02).scale = Vector3.create(0, 0, 0)
     Transform.getMutable(this.gameController.mainInstance.s0_Fence_Art_02).position = Vector3.create(0, 0, 0)
     let obstacletrigger = engine.addEntity()
@@ -650,6 +657,7 @@ export class SpawnIsland {
     cameraManager.hideAvatar()
     movePlayerTo({newRelativePosition: talkPlayerPoint, cameraTarget: cameraTarget})
 
+    this.gameController.uiController.widgetTasks.showTick(true, 0)
     AudioManager.instance().playOnce('tobor_talk', {
       volume: 0.6,
       parent: this.tobor.entity
@@ -658,12 +666,10 @@ export class SpawnIsland {
     this.questIndicator.hide()
     sendTrak('z0_quest0_04', this.gameController.timeStamp)
     openDialogWindow(this.gameController.spawnIsland.tobor.entity, this.gameController.dialogs.toborDialog, 3)
-    utils.timers.setTimeout(() => {
-      this.gameController.uiController.widgetTasks.setText(4, 0)
-      this.gameController.uiController.widgetTasks.showTick(false, 0)
-    }, 2000)
+    
   }
   async lookTowardBridge(){
+    this.gameController.uiController.widgetTasks.showTasks(false, TaskType.Simple)
     // const cameraPoint = Vector3.create(203.90, 65.88, 128.46)
     const cameraPoint = Vector3.add(Transform.get(engine.PlayerEntity).position, Vector3.create(0, 1.75, 0))
     
@@ -696,7 +702,6 @@ export class SpawnIsland {
     this.activatePilar()
     Animator.stopAllAnimations(this.tobor.entity)
     Animator.getClip(this.tobor.entity, 'Robot_Idle').playing = true
-    this.gameController.uiController.widgetTasks.showTasks(true, TaskType.Simple)
     this.gameController.spawnIsland.bubbleTalk.openBubble(HELP_BEIZER, false)
     this.gameController.questEmote.questIndicator.updateStatus(IndicatorState.ARROW)
     this.gameController.questEmote.questIndicator.showWithAnim()
@@ -745,6 +750,10 @@ export class SpawnIsland {
     cameraManager.unlockPlayer()
 
     Animator.playSingleAnimation(this.gameController.questEmote.bezier.entity, 'Idle')
+
+    this.gameController.uiController.widgetTasks.setText(4, 0)
+    this.gameController.uiController.widgetTasks.showTick(false, 0)
+    this.gameController.uiController.widgetTasks.showTasks(true, TaskType.Simple)
   }
   onCloseRewardUI() {
     //this.onFinishCompleteQuestDialog()

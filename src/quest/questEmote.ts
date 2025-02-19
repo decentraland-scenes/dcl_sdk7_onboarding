@@ -210,9 +210,9 @@ export class QuestEmote {
     this.questIndicator.hide()
 
 
-    await wait_ms(1500)
-    this.gameController.uiController.widgetTasks.setText(5, 0)
-    this.gameController.uiController.widgetTasks.showTasks(true, TaskType.Simple)
+    await wait_ms(2000)
+    this.gameController.uiController.widgetTasks.showTasks(false, TaskType.Simple)
+    
   }
   async startEmoteQuest() {
     //this.gameController.uiController.popUpControls.emoteContainerVisible = true
@@ -224,6 +224,9 @@ export class QuestEmote {
     cameraManager.unlockPlayer()
 
     this.gameController.uiController.popUpControls.showEmoteLockControlsUI()
+    this.gameController.uiController.widgetTasks.setText(5, 0)
+    this.gameController.uiController.widgetTasks.showTick(false, 0)
+    this.gameController.uiController.widgetTasks.showTasks(true, TaskType.Simple)
     this.emoteQuest()
   }
   emoteQuest() {
@@ -411,12 +414,7 @@ export class QuestEmote {
     //this.gameController.uiController.popUpControls.emoteContainerVisible = false
     this.gameController.uiController.popUpControls.hideEmoteLockControlsUI()
 
-    await wait_ms(1500)
-    this.gameController.uiController.widgetTasks.showTick(false, 0)
-    this.gameController.uiController.widgetTasks.setText(6, 0)
-    this.gameController.uiController.widgetTasks.showTasks(true, TaskType.Simple)
-
-    await wait_ms(1500)
+    await wait_ms(3000)
     Animator.stopAllAnimations(this.bezier.entity)
     Animator.getClip(this.bezier.entity, 'Talk').playing = true
   }
@@ -486,6 +484,8 @@ export class QuestEmote {
     console.log('cameraAndBridgeAnim')
     PointerEvents.deleteFrom(this.gameController.mainInstance.s0_Z3_Str_Bridge_Art_1__01)
     cameraManager.lockPlayer()
+
+    this.gameController.uiController.widgetTasks.showTasks(false, TaskType.Simple)
     
     // const cameraPoint = this.bridgeCameraPoint
     const cameraPoint = Vector3.create(170.2, 66.5, 114.4)
@@ -598,6 +598,9 @@ export class QuestEmote {
   async dialogQuestFinished() {
     this.bubbleTalk.openBubble(ZONE_1_EMOTE_4, true)
     cameraManager.unlockPlayer()
+    this.gameController.uiController.widgetTasks.showTick(false, 0)
+    this.gameController.uiController.widgetTasks.setText(6, 0)
+    this.gameController.uiController.widgetTasks.showTasks(true, TaskType.Simple)
 
     pointerEventsSystem.onPointerDown(
       {

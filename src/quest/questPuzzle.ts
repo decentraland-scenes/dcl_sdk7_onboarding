@@ -166,17 +166,14 @@ export class QuestPuzzle {
   private setUpInitQuest() {
     sendTrak('z3_quest3_00', this.gameController.timeStamp)
     this.gameController.uiController.widgetTasks.showTick(true, 0)
-    utils.timers.setTimeout(() => {
-      this.gameController.uiController.widgetTasks.showTick(false, 0)
-      this.gameController.uiController.widgetTasks.setText(10, 0)
-      this.gameController.uiController.widgetTasks.showTasks(true, TaskType.Simple)
-    }, 1500)
+
     this.questIndicator.hide()
     this.targeterCircle.showCircle(false)
     openDialogWindow(this.kit.entity, this.gameController.dialogs.kitDialog, 0)
     Animator.getClip(this.kit.entity, 'Talk').playing = true
   }
   async cameraLooksAtPortals() {
+    this.gameController.uiController.widgetTasks.showTasks(false, TaskType.Simple)
     // -- Camera --
     //Camera travels to the portals and pan. https://www.notion.so/decentraland/Tutorial-Improvements-14c5f41146a58044b29cfb1b33dcf027?pvs=4#1535f41146a5803ab4eacb2b3335436a
     //Wait for camera to look at portals
@@ -244,6 +241,9 @@ export class QuestPuzzle {
       true,
       2
     )
+    this.gameController.uiController.widgetTasks.showTick(false, 0)
+    this.gameController.uiController.widgetTasks.setText(10, 0)
+    this.gameController.uiController.widgetTasks.showTasks(true, TaskType.Simple)
     await cameraManager.blockCamera(
       cameraTarget2,
       Quaternion.fromLookAt(cameraTarget1, cameraTarget2),
@@ -345,12 +345,7 @@ export class QuestPuzzle {
   private async talkToKitEndQuest() {
     this.gameController.uiController.widgetTasks.showTick(true, 0)
     this.gameController.uiController.widgetTasks.showTick(true, 3)
-    utils.timers.setTimeout(() => {
-      this.gameController.uiController.widgetTasks.showTick(false, 0)
-      this.gameController.uiController.widgetTasks.setText(12, 0)
-      this.gameController.uiController.widgetTasks.showTasks(false, TaskType.Multiple)
-      this.gameController.uiController.widgetTasks.showTasks(true, TaskType.Simple)
-    }, 2000)
+
     this.spawnparticles()
     this.questIndicator.hide()
     Animator.stopAllAnimations(this.kit.entity)
@@ -439,6 +434,11 @@ export class QuestPuzzle {
         true, 
         4
     )
+
+    this.gameController.uiController.widgetTasks.showTick(false, 0)
+    this.gameController.uiController.widgetTasks.setText(12, 0)
+    this.gameController.uiController.widgetTasks.showTasks(false, TaskType.Multiple)
+    this.gameController.uiController.widgetTasks.showTasks(true, TaskType.Simple)
     
     // Camera orbit to tobor
     await cameraManager.cameraOrbit(

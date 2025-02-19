@@ -18,6 +18,7 @@ import { NPC } from '../imports/components/npc.class'
 import { lockPlayer, unlockPlayer } from '../utils/blockPlayer'
 import { cameraManager, getWorldPosition, wait_ms } from '../cinematic/cameraManager'
 import { movePlayerTo } from '~system/RestrictedActions'
+import { TaskType } from '../uis/widgetTask'
 
 export class QuestPortal {
   tobor: NPC
@@ -128,6 +129,7 @@ export class QuestPortal {
   }
 
   async robotPortal() {
+    this.gameController.uiController.widgetTasks.showTick(true, 0)
     this.bubbleDynamic.closeBubbleInTime()
     sendTrak('z4_quest4_00', this.gameController.timeStamp)
     engine.removeSystem(this.bubbleDynamic.respSystem)
@@ -192,6 +194,10 @@ export class QuestPortal {
     cameraManager.freeCamera()
 
     cameraManager.unlockPlayer()
+
+    this.gameController.uiController.widgetTasks.showTick(false, 0)
+    this.gameController.uiController.widgetTasks.setText(13, 0)
+    this.gameController.uiController.widgetTasks.showTasks(true, TaskType.Simple)
   }
 
 
