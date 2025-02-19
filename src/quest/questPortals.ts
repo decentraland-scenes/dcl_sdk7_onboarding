@@ -174,8 +174,9 @@ export class QuestPortal {
     //   cameraTarget: Transform.get(this.gameController.mainInstance.s0_En_Npc2_01).position
     // })
 
+    this.startPortalAnimsAndEvents()
   }
-  async robotToPortalCallBack() {
+  private startPortalAnimsAndEvents() {
     Animator.stopAllAnimations(this.gameController.mainInstance.s0_Z3_Quest_Portal_Art_01)
 
     Animator.playSingleAnimation(this.gameController.mainInstance.s0_Z3_Quest_Portal_Art_01, 'Portal_Activate')
@@ -183,6 +184,9 @@ export class QuestPortal {
     activateLoopSoundPortal()
     this.displayEvents()
     AudioManager.instance().audio.portal_ambiental.setVolumeSmooth(0, 2000)
+  }
+  async robotToPortalCallBack() {
+    
 
     // unlockPlayer()
     // -- Camera --
