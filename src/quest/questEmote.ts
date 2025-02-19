@@ -406,7 +406,7 @@ export class QuestEmote {
     // })
     openDialogWindow(this.bezier.entity, this.gameController.dialogs.bezierDialog, 4)
     this.gameController.uiController.widgetTasks.showTick(true, 0)
-    this.gameController.uiController.widgetTasks.showTick(true, 1)
+    //this.gameController.uiController.widgetTasks.showTick(true, 1)
 
     this.bubbleTalk.closeBubbleInTime()
     Animator.stopAllAnimations(this.bezier.entity)

@@ -506,7 +506,7 @@ export class QuestMaterials {
   async talkNpcCompleteQuest() {
 
     this.gameController.uiController.widgetTasks.showTick(true, 0)
-    this.gameController.uiController.widgetTasks.showTick(true, 2)
+    //this.gameController.uiController.widgetTasks.showTick(true, 2)
  
 
     // -- Camera --

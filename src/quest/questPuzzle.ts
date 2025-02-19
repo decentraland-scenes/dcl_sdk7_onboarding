@@ -344,7 +344,7 @@ export class QuestPuzzle {
 
   private async talkToKitEndQuest() {
     this.gameController.uiController.widgetTasks.showTick(true, 0)
-    this.gameController.uiController.widgetTasks.showTick(true, 3)
+    //this.gameController.uiController.widgetTasks.showTick(true, 3)
 
     this.spawnparticles()
     this.questIndicator.hide()

@@ -3,6 +3,7 @@ import { Color4 } from '@dcl/sdk/math'
 import { Label, PositionUnit, ReactEcs, UiEntity } from '@dcl/sdk/react-ecs'
 import { getTaskTexts, Objectives } from '../jsonData/tasksTexts'
 import { UIController } from '../controllers/uiController'
+import { AudioManager } from '../imports/components/audio/audio.manager'
 
 export enum TaskType {
   Multiple = 0,
@@ -81,6 +82,10 @@ export class WidgetTasks {
     
     let isStep = this.currentTask.missionInfo.steps ? true : false
     this.infoUI = this.currentTask?.missionInfo?.en + (isStep ? ` (0/${this.currentTask.missionInfo.steps?.toString()})` : '')
+
+    
+    AudioManager.instance().playNewQuest()
+    
   }
   setStepCount(stepCount: number){
     this.infoUI = this.currentTask?.missionInfo?.en + ` (${stepCount}/${this.currentTask.missionInfo.steps?.toString()})`
@@ -119,6 +124,10 @@ export class WidgetTasks {
       case 3:
         this.checkImageVisible3 = visible
         break
+    }
+
+    if(visible){
+      AudioManager.instance().playCompleteQuest()
     }
   }
   widgetTask(): ReactEcs.JSX.Element {

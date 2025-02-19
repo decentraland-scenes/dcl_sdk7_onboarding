@@ -13,6 +13,7 @@ import { InteractLockControlsUI } from './controls/interactControls'
 import { RunControlsUI } from './controls/runControls'
 import { CameraControlsUI } from './controls/cameraControls'
 import { scalePixelWidth } from '../utils/globalLibrary'
+import { AudioManager } from '../imports/components/audio/audio.manager'
 
 
 
@@ -118,6 +119,7 @@ export class PopUpControls {
     }
     checkMoveQuestCompleted() {
       this.moveQuestSteps++
+      AudioManager.instance().playProgressQuest()
       this.uiController.widgetTasks.setStepCount(this.moveQuestSteps)
         if(
             this.moveControlsUI.keyW.bIsProgressCompleted && this.moveControlsUI.keyS.bIsProgressCompleted && 

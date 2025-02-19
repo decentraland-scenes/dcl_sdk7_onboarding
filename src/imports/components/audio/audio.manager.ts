@@ -35,6 +35,7 @@ export class AudioManager {
     pop_up_close: new AudioEntity(AudioNames.pop_up_close, { volume: 0.6, pitch: 1, loop: false, autoPlay: false }),
     Bridge_sound: new AudioEntity(AudioNames.Bridge_sound, { volume: 0.6, pitch: 1, loop: false, autoPlay: false }),
     pop_1: new AudioEntity(AudioNames.pop_1, { volume: 0.6, pitch: 1, loop: false, autoPlay: false }),
+    pop_2: new AudioEntity(AudioNames.pop_2, { volume: 0.6, pitch: 1, loop: false, autoPlay: false }),
     chatbox: new AudioEntity(AudioNames.chatbox, { volume: 0.6, pitch: 1, loop: false, autoPlay: false }),
     island_ambiental: new AudioEntity(AudioNames.island_ambiental, {
       volume: 0.04,
@@ -139,6 +140,16 @@ export class AudioManager {
 
   playPopupClose() {
     this.audio.pop_1.playOnceGlobal({ volume: 0.5, pitch: 0.5 })
+  }
+
+  playNewQuest() {
+    this.audio.pop_1.playOnceGlobal({ volume: 0.6, pitch: 1 })
+  }
+  playProgressQuest() {
+    this.audio.pop_2.playOnceGlobal({ volume: 0.4, pitch: 1 })
+  }
+  playCompleteQuest() {
+    this.audio.pop_1.playOnceGlobal({ volume: 0.6, pitch: 0.5 })
   }
 
   createAudioEntity(name: string, entity: Entity, src: string, options: AudioSourceOptions = {}) {
