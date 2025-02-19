@@ -300,7 +300,7 @@ export class QuestPuzzle {
   puzzleQuest() {
     if (this.connect_game.bStarted) return
     this.connect_game.startGame()
-    sendTrak('z3_quest3_01', this.gameController.timeStamp)
+    
     this.connect_game.completeEvent2PuzzleCallback = () => {
       this.gameController.uiController.popUpControls.puzzleConnectCablesVisible = false
       this.gameController.uiController.popUpControls.endPuzzle = true

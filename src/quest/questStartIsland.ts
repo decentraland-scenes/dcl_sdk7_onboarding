@@ -332,6 +332,8 @@ export class SpawnIsland {
     if(this.isMoveQuestCompleted) return;
     this.isMoveQuestCompleted = true;
 
+
+    sendTrak('z0_quest0_01', this.gameController.timeStamp)
     // -- Camera --
     //Camera transitions to Tobor
     cameraManager.lockPlayer()
@@ -389,6 +391,7 @@ export class SpawnIsland {
 
   async cameraQuestCompleted() {
 
+    sendTrak('z0_quest0_02', this.gameController.timeStamp)
     this.gameController.uiController.widgetTasks.showTick(true, 0)
 
     await wait_ms(500)
@@ -592,7 +595,7 @@ export class SpawnIsland {
     })
   }
   completeJumpQuest() {
-    sendTrak('z0_quest0_01', this.gameController.timeStamp)
+    sendTrak('z0_quest0_03', this.gameController.timeStamp)
     this.gameController.uiController.popUpControls.hideMoveControlsUI()
     this.gameController.uiController.popUpControls.hideJumpControlsUI()
     this.gameController.uiController.popUpControls.spaceContainerVisible = false
@@ -651,7 +654,7 @@ export class SpawnIsland {
     })
     this.targeterCircle.showCircle(false)
     this.questIndicator.hide()
-    sendTrak('z0_quest0_02', this.gameController.timeStamp)
+    sendTrak('z0_quest0_04', this.gameController.timeStamp)
     openDialogWindow(this.gameController.spawnIsland.tobor.entity, this.gameController.dialogs.toborDialog, 3)
     utils.timers.setTimeout(() => {
       this.gameController.uiController.widgetTasks.setText(4, 0)

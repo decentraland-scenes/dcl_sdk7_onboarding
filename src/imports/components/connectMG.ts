@@ -5,6 +5,7 @@ import { GameController } from '../../controllers/gameController'
 import { AudioManager } from './audio/audio.manager'
 import { delay } from './delay'
 import { ArrowTargeter } from './targeter'
+import { sendTrak } from '../../utils/segment'
 
 //This is the rotation order of the pieces
 const pieceState = [0, 45, 90, 135, 180, 225, 270, 315]
@@ -153,6 +154,8 @@ export class ConnectMiniGame {
         correct += 1
         if (!this.firstConection) {
           this.firstConection = true
+
+          sendTrak('z3_quest3_01', this.gameController.timeStamp)
           delay(() => {
             openDialogWindow(this.gameController.questPuzzle.kit.entity, this.gameController.dialogs.kitDialog, 5)
             // getHUD().wgPopUpControls.showCameraModeImage(false)

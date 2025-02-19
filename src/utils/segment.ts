@@ -30,7 +30,7 @@ class Segment {
 
     const data: SegemntTrack = {
       messageId: messageId(),
-      anonymousId: userData.userId,
+      user_id: userData.userId,
       timestamp: new Date().toJSON(),
       event,
       properties: {
@@ -80,7 +80,8 @@ function messageId() {
  * @property context
  */
 type SegemntTrack = {
-  anonymousId: string
+  user_id: string
+  //explorer_session_id: string
   event: string
   timestamp: string
   messageId: string
