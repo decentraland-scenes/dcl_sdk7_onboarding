@@ -36,6 +36,8 @@ export class QuestPortal {
   portal3: any
   portal: Entity = engine.addEntity()
   tobor_portal: Entity = engine.addEntity()
+  private bPortalsStarted = false
+  private bPortalsCreated = false
   constructor(gameController: GameController) {
     this.gameController = gameController
     this.claim = new ClaimCapRequest(this.gameController, configCap, configCap.campaign_key, configCap.claimServer)
@@ -50,6 +52,9 @@ export class QuestPortal {
         Animator.getClip(this.tobor.entity, 'Robot_Idle').playing = true
       },
       () => {
+        if(this.bPortalsStarted) return
+        
+        this.bPortalsStarted = true
         pointerEventsSystem.removeOnPointerDown(this.tobor.npcChild)
         this.bubbleTalk.closeBubbleInTime()
         this.startQuestPortal()
@@ -224,7 +229,8 @@ export class QuestPortal {
     this.randomIndex = randomNumbers(event.length)
 
     this.randomIndex = randomNumbers(event.length)
-    if (event) {
+    if (event && !this.bPortalsCreated) {
+      this.bPortalsCreated = true
       console.log('events loaded ')
       this.portal1 = new PortalEvents(this.eventpositions[0], event, this.titleSpots[1])
       this.portal1.displayEvent(this.portal1.events, this.randomIndex[0])
