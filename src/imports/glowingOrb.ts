@@ -100,9 +100,9 @@ export class GlowingOrb {
 
         //Calculate forward direction of camera
         const forwardCamera = Vector3.rotate(Vector3.Forward(), Transform.get(engine.CameraEntity).rotation)
-        const forwardToOrb = directionVectorBetweenTwoPoints(Transform.get(this.entity).position, Transform.get(engine.CameraEntity).position)
+        const forwardToOrb = directionVectorBetweenTwoPoints(Transform.get(engine.CameraEntity).position, Transform.get(this.entity).position)
         //Calculate angle between centerDirection and cameraRotation
-        return Vector3.getAngleBetweenVectors(forwardToOrb, forwardCamera, Vector3.Up()) < 0.3
+        return Math.abs(Vector3.getAngleBetweenVectors(forwardToOrb, forwardCamera, Vector3.Up())) < 0.3
     }
     private updateSystem(dt: number) {
         //Input & quest
