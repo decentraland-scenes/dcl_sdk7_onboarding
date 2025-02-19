@@ -276,7 +276,8 @@ export class SpawnIsland {
       1
     )*/
    
-    // await cameraManager.freeCamera()
+    cameraManager.freeCamera()
+    cameraManager.forceThirdPerson()
   }
 
   async finishedIntroDialog() {
@@ -296,6 +297,7 @@ export class SpawnIsland {
     //await wait_ms(500)
     //cameraManager.forceThirdPerson()
     await wait_ms(100)
+    cameraManager.freeCameraMode()
     await cameraManager.freeCamera()
     
     //await wait_ms(500)
