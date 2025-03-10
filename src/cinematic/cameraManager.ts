@@ -2,6 +2,7 @@ import { AvatarModifierArea, AvatarModifierType, CameraModeArea, CameraType, eng
 import { Quaternion, Vector3 } from "@dcl/sdk/math"
 import * as utils from '@dcl-sdk/utils'
 import { createCatmullRomSplineWithRotation, SplinePoint } from "../utils/catmullRomSpline"
+import { GameController } from "../controllers/gameController"
 
 enum CameraState {
     IDLE,
@@ -39,6 +40,7 @@ export const OrbitComponent = engine.defineComponent('OrbitComponent', OrbitData
 
 
 class CameraManager {
+    private gameController!: GameController
     private cameraInitialized: boolean = false
 
     private state: CameraState = CameraState.IDLE
@@ -52,12 +54,18 @@ class CameraManager {
     private forceCameraArea!: Entity
     private hideAvatarArea!: Entity
 
+    private skipRequested: boolean = false
+    private skipDetected: boolean = false
+    private skipFinalPosition: Vector3 = Vector3.Zero()
+    private skipFinalRotation: Quaternion = Quaternion.Identity()
+
     constructor() {}
 
-    initCamera() {
+    initCamera(gameController: GameController) {
         if (this.cameraInitialized) return
         this.cameraInitialized = true
         
+        this.gameController = gameController
         this.state = CameraState.IDLE
 
         // --SETUP ENTITIES--
@@ -187,6 +195,47 @@ class CameraManager {
         })
     }
 
+    requestSkip(finalPosition: Vector3, finalRotation: Quaternion){
+        this.skipRequested = true
+        this.skipFinalPosition = finalPosition
+        this.skipFinalRotation = finalRotation
+        
+        this.stopExistingAnimations()
+        this.gameController.uiController.skipCinematicUI.setOnFinishProgress(() => {
+            this.skipDetected = true
+            this.interruptCameraTransition()
+        })
+        this.gameController.uiController.skipCinematicUI.activateSkipCinematicUI()
+    }
+
+    isSkipRequested(){
+        return this.skipRequested
+    }
+
+    isSkipDetected(){
+        return this.skipDetected
+    }
+
+    resetSkipRequested(){
+        this.skipRequested = false
+        this.skipDetected = false
+        this.gameController.uiController.skipCinematicUI.deactivateSkipCinematicUI()
+    }
+
+    interruptCameraTransition(){
+        this.stopExistingAnimations()
+        this.setCurrentCamEntity()
+        
+        const currentCamTransform = Transform.getMutable(this.currentCam.camEntity)
+        currentCamTransform.position = this.skipFinalPosition
+        currentCamTransform.rotation = this.skipFinalRotation
+
+        VirtualCamera.getMutable(this.currentCam.camEntity).defaultTransition = { transitionMode: VirtualCamera.Transition.Time(0) }
+        MainCamera.createOrReplace(engine.CameraEntity, {
+            virtualCameraEntity: this.currentCam.camEntity,
+        })
+    }
+
     private generateOperationId(): string {
         return Date.now().toString() + Math.random().toString(36).substr(2, 9)
     }
@@ -223,8 +272,10 @@ class CameraManager {
 
     async blockCamera(position: Vector3, rotation: Quaternion, bForceFirstPerson: boolean = false, transitionSpeed = 0.5) {
         try {
-            const operationId = this.setActiveOperation(CameraState.BLOCKING)
+            if(this.isSkipDetected()) return
+
             this.stopExistingAnimations()
+            const operationId = this.setActiveOperation(CameraState.BLOCKING)
             // this.forcedFirstPersonInCameraBlock = bForceFirstPerson
             
             this.setCurrentCamEntity()
@@ -239,7 +290,7 @@ class CameraManager {
                 MainCamera.createOrReplace(engine.CameraEntity, {
                     virtualCameraEntity: this.currentCam.camEntity,
                 })
-                await wait_ms(transitionSpeed * 1000)
+                await this.waitWithSkipCheck(transitionSpeed * 1000)
                 return
             }
     
@@ -252,7 +303,7 @@ class CameraManager {
             MainCamera.createOrReplace(engine.CameraEntity, {
                 virtualCameraEntity: this.currentCam.camEntity,
             })
-            await wait_ms(transitionSpeed * 1000)
+            await this.waitWithSkipCheck(transitionSpeed * 1000)
             return
 
         } catch (error) {
@@ -261,8 +312,10 @@ class CameraManager {
     }
 
     async cameraOrbit(targetEntity: Entity, camOffset: Vector3, angleStart: number, angleStop: number, duration_ms: number, transitionSpeed = 0.5, finalCamera?: {position: Vector3, rotation: Quaternion}) {
-        const operationId = this.setActiveOperation(CameraState.ORBITING)
+        if(this.isSkipDetected()) return
+
         this.stopExistingAnimations()
+        const operationId = this.setActiveOperation(CameraState.ORBITING)
 
         console.log('cameraOrbit. start', this.activeOperationId)
         this.setCurrentCamEntity()
@@ -289,7 +342,7 @@ class CameraManager {
         })
 
         // wait for camera transition to complete
-        await wait_ms(transitionSpeed * 1000)
+        await this.waitWithSkipCheck(transitionSpeed * 1000)
         if(!this.isOperationValid(operationId)) {
             console.log('terminate operation. operation invalid:', operationId, '. New operation:', this.activeOperationId)
             return
@@ -334,8 +387,10 @@ class CameraManager {
     
     // rotationBlend = 0 => only control point rotations, 1 => only path-based rotation
     async startPathTrack(track: SplinePoint[], duration_ms: number, nbPoints: number = 10, loop: boolean = false, rotationBlend: number = 1, transitionSpeed: number = 0.5) {
-        const operationId = this.setActiveOperation(CameraState.PATH_TRACKING)
+        if(this.isSkipDetected()) return
+
         this.stopExistingAnimations()
+        const operationId = this.setActiveOperation(CameraState.PATH_TRACKING)
 
         console.log('startPathTrack. start', this.activeOperationId)
         this.setCurrentCamEntity()
@@ -380,7 +435,7 @@ class CameraManager {
             virtualCameraEntity: this.currentCam.camEntity,
         })
 
-        await wait_ms(transitionSpeed * 1000)
+        await this.waitWithSkipCheck(transitionSpeed * 1000)
         if(!this.isOperationValid(operationId)) {
             console.log('terminate operation. operation invalid:', operationId, '. New operation:', this.activeOperationId)
             return
@@ -408,6 +463,34 @@ class CameraManager {
         return
     }
 
+    async waitWithSkipCheck(ms: number): Promise<void>{
+        const  sysName = 'wait-with-skip-check-' + Math.random().toString(36).substr(2, 9)
+
+        return new Promise<void>((resolve) => {
+            let timeElapsed = 0
+            engine.addSystem((dt: number) => {
+                timeElapsed += dt * 1000
+                if(timeElapsed >= ms){
+                    resolve()
+                    engine.removeSystem(sysName)
+                    return
+                }
+
+                if(this.isSkipRequested() && this.skipDetected){
+                    resolve()
+                    engine.removeSystem(sysName)
+                    return
+                }
+
+                if(this.activeOperationId && !this.isOperationValid(this.activeOperationId)){
+                    resolve()
+                    engine.removeSystem(sysName)
+                    return
+                }
+            }, undefined, sysName)
+        })
+    }
+
     async checkIfLerpTransformComplete(entity: Entity){
         return new Promise <boolean>((resolve, reject) => {
             engine.addSystem(() => {
@@ -422,6 +505,8 @@ class CameraManager {
     
     stopExistingAnimations() {
         if(!this.activeOperationId) return
+
+        this.clearOperation(this.activeOperationId)
 
         // Clear existing animations
         // orbit use vanityRoot

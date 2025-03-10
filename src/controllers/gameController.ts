@@ -23,7 +23,7 @@ export class GameController {
   questPuzzle: QuestPuzzle
   constructor() {
     initCameraModiers()
-    cameraManager.initCamera()
+    cameraManager.initCamera(this)
     this.mainInstance = new MainInstace(this)
     this.dialogs = new Dialogs(this)
     this.spawnIsland = new SpawnIsland(this)

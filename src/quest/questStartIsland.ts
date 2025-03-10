@@ -3,6 +3,7 @@ import {
   EasingFunction,
   engine,
   Entity,
+  executeTask,
   GltfContainer,
   GltfContainerLoadingState,
   InputAction,
@@ -655,6 +656,7 @@ export class SpawnIsland {
       0.5
     )
     cameraManager.hideAvatar()
+    await wait_ms(100)
     movePlayerTo({newRelativePosition: talkPlayerPoint, cameraTarget: cameraTarget})
 
     this.gameController.uiController.widgetTasks.showTick(true, 0)
@@ -685,11 +687,17 @@ export class SpawnIsland {
     this.targeterCircle.showCircle(false)
     this.questIndicator.hide()
     PointerEvents.deleteFrom(this.gameController.mainInstance.s0_Z3_Str_Bridge_Art_01)
-
-    // camera move to start position
+    
     const moveToPosition = Vector3.create(203.60,64.89,129.5)
     const afterCameraTarget = getWorldPosition(this.gameController.questEmote.bezier.entity)
     const cameraPoint = Vector3.create(198.4, 65.5, 126.6)
+
+    // setup skip input handling
+    cameraManager.requestSkip(
+        Vector3.add(moveToPosition, Vector3.create(0, 1.75, 0)), 
+        Quaternion.fromLookAt(Vector3.add(moveToPosition, Vector3.create(0, 1.75, 0)), getWorldPosition(this.gameController.questEmote.bezier.entity)),
+    )
+
     await cameraManager.blockCamera(
       cameraPoint, 
       Quaternion.fromLookAt(cameraPoint, afterCameraTarget), 
@@ -697,7 +705,7 @@ export class SpawnIsland {
       1.25
     )
     
-    this.gameController.questEmote.npcSayHi()
+    // this.gameController.questEmote.npcSayHi()
     this.activateBridge()
     this.activatePilar()
     Animator.stopAllAnimations(this.tobor.entity)
@@ -712,6 +720,15 @@ export class SpawnIsland {
       cameraTarget: afterCameraTarget
     })
 
+    executeTask(async () => {
+        await wait_ms(3000)
+        if(cameraManager.isSkipDetected()) return
+        if(!cameraManager.isSkipRequested()) return
+
+        Animator.stopAllAnimations(this.gameController.questEmote.bezier.entity)
+        Animator.playSingleAnimation(this.gameController.questEmote.bezier.entity, 'Hi')
+    })
+
     // camera move to end position
     const cameraPoint2 = Vector3.create(173.4,71,110.5)
     const cameraRotation2 = Quaternion.fromLookAt(cameraPoint2, afterCameraTarget)
@@ -722,17 +739,15 @@ export class SpawnIsland {
         6.5
     )
 
-    Animator.playSingleAnimation(this.gameController.questEmote.bezier.entity, 'Hi')
-
-    // camera orbit to bezier
-    await cameraManager.cameraOrbit(
-        this.gameController.questEmote.bezier.entity,
-        Vector3.subtract(cameraPoint2, getWorldPosition(this.gameController.questEmote.bezier.entity)),
-        0,
-        -20,
-        3000,
-        0
-    )
+    // // camera orbit to bezier
+    // await cameraManager.cameraOrbit(
+    //     this.gameController.questEmote.bezier.entity,
+    //     Vector3.subtract(cameraPoint2, getWorldPosition(this.gameController.questEmote.bezier.entity)),
+    //     0,
+    //     -20,
+    //     3000,
+    //     0
+    // )
 
     await wait_ms(200)
     await cameraManager.blockCamera(
@@ -741,14 +756,17 @@ export class SpawnIsland {
       true, 
       0
     )
-    cameraManager.showAvatar()
 
-    await wait_ms(500)
+    cameraManager.resetSkipRequested()
+
+    await wait_ms(350)
+    cameraManager.showAvatar()
     cameraManager.forceThirdPerson()
     await wait_ms(100)
     await cameraManager.freeCamera()
     cameraManager.unlockPlayer()
 
+    Animator.stopAllAnimations(this.gameController.questEmote.bezier.entity)
     Animator.playSingleAnimation(this.gameController.questEmote.bezier.entity, 'Idle')
 
     this.gameController.uiController.widgetTasks.setText(4, 0)

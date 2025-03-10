@@ -11,6 +11,7 @@ import {
   PointerEvents,
   Transform,
   engine,
+  executeTask,
   pointerEventsSystem
 } from '@dcl/sdk/ecs'
 import { GameController } from '../controllers/gameController'
@@ -487,6 +488,12 @@ export class QuestEmote {
 
     this.gameController.uiController.widgetTasks.showTasks(false, TaskType.Simple)
     
+    cameraManager.requestSkip(
+      this.talkCameraPoint,
+      Quaternion.fromLookAt(this.talkCameraPoint, Vector3.add(getWorldPosition(this.bezier.entity), Vector3.create(0, 1.75, 0))),
+      
+    )
+
     // const cameraPoint = this.bridgeCameraPoint
     const cameraPoint = Vector3.create(170.2, 66.5, 114.4)
     const afterCameraTarget = getWorldPosition(this.gameController.questMaterial.mat.entity)
@@ -498,11 +505,22 @@ export class QuestEmote {
       1.75
     )
 
+    cameraManager.hideAvatar()
+
     this.activatePilar()
     //Bridge Turn ON
     this.activateBridge()
     this.gameController.questMaterial.questIndicator.updateStatus(IndicatorState.ARROW)
     this.gameController.questMaterial.questIndicator.showWithAnim()
+
+    executeTask(async () => {
+        await wait_ms(3500)
+        if(cameraManager.isSkipDetected()) return
+        if(!cameraManager.isSkipRequested()) return
+
+        Animator.stopAllAnimations(this.gameController.questMaterial.mat.entity)
+        Animator.playSingleAnimation(this.gameController.questMaterial.mat.entity, 'Hi')
+    })
 
     const cameraPoint2 = Vector3.create(167.1,73,147.6)
     await cameraManager.blockCamera(
@@ -512,24 +530,21 @@ export class QuestEmote {
         6
     )
 
-    Animator.playSingleAnimation(this.gameController.questMaterial.mat.entity, 'Hi')
-
-    await cameraManager.cameraOrbit(
-        this.gameController.questMaterial.mat.entity,
-        Vector3.subtract(cameraPoint2, getWorldPosition(this.gameController.questMaterial.mat.entity)),
-        0,
-        20,
-        3000,
-        0
-    )
+    // await cameraManager.cameraOrbit(
+    //     this.gameController.questMaterial.mat.entity,
+    //     Vector3.subtract(cameraPoint2, getWorldPosition(this.gameController.questMaterial.mat.entity)),
+    //     0,
+    //     20,
+    //     3000,
+    //     0
+    // )
 
     movePlayerTo({
       newRelativePosition: this.talkPlayerPoint,
       cameraTarget: Vector3.create(Transform.get(this.bezier.entity).position.x, this.talkCameraPoint.y, Transform.get(this.bezier.entity).position.z)
     })
 
-    await wait_ms(500)
-
+    await wait_ms(200)
     await cameraManager.blockCamera(
       this.talkCameraPoint,
       Quaternion.fromLookAt(this.talkCameraPoint, Vector3.add(getWorldPosition(this.bezier.entity), Vector3.create(0, 1.75, 0))),
@@ -537,10 +552,16 @@ export class QuestEmote {
       0
     )
 
-    await wait_ms(100)
+    cameraManager.resetSkipRequested()
+
+    await wait_ms(350)
+    cameraManager.showAvatar()
     cameraManager.forceThirdPerson()
     await wait_ms(100)
     await cameraManager.freeCamera()
+    
+    Animator.stopAllAnimations(this.gameController.questMaterial.mat.entity)
+    Animator.playSingleAnimation(this.gameController.questMaterial.mat.entity, 'Idle')
     
     openDialogWindow(this.bezier.entity, this.gameController.dialogs.bezierDialog, 8)
 

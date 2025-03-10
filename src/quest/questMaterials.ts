@@ -612,13 +612,22 @@ export class QuestMaterials {
   
       await wait_ms(1000)
       this.activatePilar()
-      await wait_ms(7000)
+      await wait_ms(8000)
+      if(cameraManager.isSkipDetected()) return
+      if(!cameraManager.isSkipRequested()) return
+      
+      Animator.stopAllAnimations(this.gameController.questPuzzle.kit.entity)
       Animator.playSingleAnimation(this.gameController.questPuzzle.kit.entity, 'Hi')
     })
     // -- Camera --
     //Camera pans to show the stair case traveling until it reaches Kit, waving at the camera
     
     cameraManager.lockPlayer()
+    
+    const talkPlayerPoint = Vector3.add(this.talkMatPoint, Vector3.create(0, 0.75, 0))
+    const cameraTarget = Vector3.add(getWorldPosition(this.mat.entity), Vector3.create(0, 0.75, 0))
+
+    cameraManager.requestSkip(talkPlayerPoint, Quaternion.fromLookAt(talkPlayerPoint, cameraTarget))
 
     let path = [
       { 
@@ -654,37 +663,38 @@ export class QuestMaterials {
       1.5
     )
     
-    await cameraManager.cameraOrbit(
-      this.gameController.questPuzzle.kit.entity,
-      Vector3.subtract(path[path.length - 1].position, getWorldPosition(this.gameController.questPuzzle.kit.entity)),
-      0,
-      40,
-      4000,
-      0,
-      undefined
-    )
+    // await cameraManager.cameraOrbit(
+    //   this.gameController.questPuzzle.kit.entity,
+    //   Vector3.subtract(path[path.length - 1].position, getWorldPosition(this.gameController.questPuzzle.kit.entity)),
+    //   0,
+    //   40,
+    //   4000,
+    //   0,
+    //   undefined
+    // )
 
-    const talkPlayerPoint = Vector3.add(this.talkMatPoint, Vector3.create(0, 0.75, 0))
-    const cameraTarget = Vector3.add(getWorldPosition(this.mat.entity), Vector3.create(0, 0.75, 0))
-    
     movePlayerTo({
       newRelativePosition: this.talkMatPoint,
       cameraTarget: Transform.get(this.gameController.mainInstance.s0_En_Npc2_01).position
     })
 
-    await wait_ms(500)
+    await wait_ms(200)
     await cameraManager.blockCamera(
       talkPlayerPoint,
       Quaternion.fromLookAt(talkPlayerPoint, cameraTarget),
       true,
       0
     )
+    cameraManager.resetSkipRequested()
 
+    await wait_ms(350)
     cameraManager.showAvatar()
-    await wait_ms(500)
     cameraManager.forceThirdPerson()
     await wait_ms(100)
     cameraManager.freeCamera()
+
+    Animator.stopAllAnimations(this.gameController.questPuzzle.kit.entity)
+    Animator.playSingleAnimation(this.gameController.questPuzzle.kit.entity, 'Idle')
 
     openDialogWindow(this.mat.entity, this.gameController.dialogs.matDialog, 9)
   }

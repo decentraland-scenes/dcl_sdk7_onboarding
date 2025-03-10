@@ -6,12 +6,14 @@ import { KeyBoardUI } from '../uis/keyboardUI'
 import { Popup } from '../uis/popupUI'
 import { WidgetTasks } from '../uis/widgetTask'
 import { engine, PointerLock } from '@dcl/sdk/ecs'
+import { SkipCinematicUI } from '../uis/skipCinematicUI'
 
 export class UIController {
   public gameController: GameController
   public popUpControls: PopUpControls
   public keyBoardUI: KeyBoardUI
   public popUpUI: Popup
+  public skipCinematicUI: SkipCinematicUI
   public isPointerLocked: boolean = false
   public widgetTasks: WidgetTasks
   uiComponent: () => ReactEcs.JSX.Element[]
@@ -21,6 +23,7 @@ export class UIController {
     this.keyBoardUI = new KeyBoardUI(this)
     this.popUpUI = new Popup(this)
     this.widgetTasks = new WidgetTasks(this)
+    this.skipCinematicUI = new SkipCinematicUI(this)
     this.uiComponent = () => [
       this.popUpControls.puzzleUI(),
       this.popUpControls.puzzleUIConnectCables(),
@@ -46,6 +49,7 @@ export class UIController {
       this.gameController.questPortal.claim.captchaUI.render(),
       this.gameController.questPortal.claim.retryUI.render(),
       this.gameController.questPortal.claim.onTheWay.render(),
+      this.skipCinematicUI.mainUi()
     ]
     ReactEcsRenderer.setUiRenderer(this.uiComponent)
     //this.keyBoardUI.isVisible = true
