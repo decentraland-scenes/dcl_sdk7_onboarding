@@ -250,7 +250,7 @@ export class ClaimCapRequest {
     await this.setUserData()
     console.log('Requesting Cap')
     let METHOD_NAME = 'claimToken'
-    const url = this.claimServer + '/api/campaigns/' + this.campaign.campaign + '/rewards'
+    const url = this.claimServer + '/api/rewards?campaign_id=' + this.campaign.campaign
     console.log(METHOD_NAME, 'sending req to: ', url)
 
     let realm = await getRealm({})
