@@ -41,6 +41,7 @@ import { blockCamera, forceFirstPerson, forceThirdPerson, freeCamera, freeCamera
 import { lockPlayer, unlockPlayer } from '../utils/blockPlayer'
 import { GlowingOrb } from '../imports/glowingOrb'
 import { cameraManager, getWorldPosition, wait_ms } from '../cinematic/cameraManager'
+import { onEnterScene } from '@dcl/sdk/src/players'
 
 export class SpawnIsland {
   tobor: NPC
@@ -244,7 +245,7 @@ export class SpawnIsland {
     this.gameController.uiController.widgetTasks.showTasks(false, TaskType.Simple)
 
     //Start ambiental sound
-    sendTrak('z0_quest0_00', this.gameController.timeStamp)
+    
     AudioManager.instance().playMainAmbience(true)
     AudioManager.instance().play('waterfall', { volume: 1, loop: true, position: Vector3.create(226.94, 70, 130.37) })
 
@@ -263,6 +264,7 @@ export class SpawnIsland {
     Animator.stopAllAnimations(this.tobor.entity)
     Animator.getClip(this.tobor.entity, 'Talk').playing = true
     openDialogWindow(this.tobor.entity, this.gameController.dialogs.toborCinematicDialog, 0)
+
   }
 
   async introductionMiddleChangeCamera() {

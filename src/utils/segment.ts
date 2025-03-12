@@ -1,4 +1,5 @@
 import { getPlayer } from '@dcl/sdk/src/players'
+import { Buffer } from 'buffer'
 
 let segment: Segment | null = null
 
@@ -49,7 +50,7 @@ class Segment {
       await fetch(`https://api.segment.io/v1/track`, {
         method: 'POST',
         headers: {
-          authorization: 'Basic ' + btoa(this.segmentKey + ':'),
+          authorization: 'Basic ' + Buffer.from(this.segmentKey+":", 'utf8').toString('base64'),
           'content-type': 'application/json'
         },
         body: JSON.stringify(data)
