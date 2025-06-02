@@ -30,19 +30,20 @@ class Segment {
     }
 
     const data: SegemntTrack = {
-      messageId: messageId(),
-      user_id: userData.userId,
+      //messageId: messageId(), //remove
+      userId: userData.userId, //Change to userId -> wallet
       timestamp: new Date().toJSON(),
       event,
       properties: {
         ...properties
       },
-      context: {
-        library: {
-          name: 'dcl-segment-gists',
-          version: '0.0.0-development'
-        }
-      }
+
+      //context: {
+      //  library: {
+      //    name: 'dcl-segment-gists',
+      //    version: '0.0.0-development'
+      //  }
+      //}
     }
 
     try {
@@ -81,11 +82,11 @@ function messageId() {
  * @property context
  */
 type SegemntTrack = {
-  user_id: string
+  userId: string
   //explorer_session_id: string
   event: string
   timestamp: string
-  messageId: string
+  messageId?: string
   properties: Record<string, any>
-  context: Record<string, any>
+  context?: Record<string, any>
 }
