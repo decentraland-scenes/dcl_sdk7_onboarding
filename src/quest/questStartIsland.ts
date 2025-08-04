@@ -554,7 +554,39 @@ export class SpawnIsland {
       ]
     })
     let tween = 0
+    let tweenSystemActive = true
+    
+    // Add timeout fallback for tween sequence
+    utils.timers.setTimeout(() => {
+      if (tween < 5 && tweenSystemActive) {
+        console.log('Tween sequence incomplete after 10 seconds, forcing completion')
+        tweenSystemActive = false
+        
+        // Force robot to final position and setup interaction
+        this.tobor.activateBillBoard(true)
+        this.targeterCircle.showCircle(true)
+        this.setupDialogAtPilarTargeter()
+        pointerEventsSystem.onPointerDown(
+          {
+            entity: this.tobor.npcChild,
+            opts: {
+              button: InputAction.IA_POINTER,
+              hoverText: 'Talk'
+            }
+          },
+          () => {
+            pointerEventsSystem.removeOnPointerDown(this.tobor.npcChild)
+            console.log('CLICKED')
+            this.toborTalkAfterJumpQuest()
+          }
+        )
+        console.log('tobor on pilar - forced by timeout')
+      }
+    }, 30000)
+    
     engine.addSystem(() => {
+      if (!tweenSystemActive) return
+      
       const tweenCompleted = tweenSystem.tweenCompleted(this.tobor.entity)
       if (tweenCompleted) {
         tween = tween + 1
@@ -565,6 +597,7 @@ export class SpawnIsland {
           this.jumpquest()
         }
         if (tween === 5) {
+          tweenSystemActive = false
           this.tobor.activateBillBoard(true)
           this.targeterCircle.showCircle(true)
           this.setupDialogAtPilarTargeter()
