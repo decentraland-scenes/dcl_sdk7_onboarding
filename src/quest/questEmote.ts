@@ -235,6 +235,8 @@ export class QuestEmote {
     AvatarEmoteCommand.onChange(engine.PlayerEntity, (emote) => {
       if (!emote) return
       if (this.currentEmote === emote.emoteUrn) return
+      // Ignore emotes if quest is completed (emoteMoves set to -1)
+      if (this.emoteMoves < 0) return
 
       cameraManager.lockPlayer()
 
@@ -418,6 +420,9 @@ export class QuestEmote {
     await wait_ms(3000)
     Animator.stopAllAnimations(this.bezier.entity)
     Animator.getClip(this.bezier.entity, 'Talk').playing = true
+    
+    // Ensure player is unlocked after quest completion
+    cameraManager.unlockPlayer()
   }
   spawnParticles() {
     const particle = engine.addEntity()
@@ -617,6 +622,10 @@ export class QuestEmote {
     // this.dialogQuestFinished()
   }
   async dialogQuestFinished() {
+    // Clean up emote listener to prevent player from getting stuck in later quests
+    // Set flag to ignore further emote events after quest completion
+    this.emoteMoves = -1
+    
     this.bubbleTalk.openBubble(ZONE_1_EMOTE_4, true)
     cameraManager.unlockPlayer()
     this.gameController.uiController.widgetTasks.showTick(false, 0)
