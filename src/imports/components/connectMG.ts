@@ -167,10 +167,6 @@ export class ConnectMiniGame {
           console.log('check all pieces')
           this.boardCompleted = true
         }
-        if (this.boardCompleted) {
-          console.log('board completed')
-          this.completeEvent2PuzzleCallback()
-        }
       }
     }
     this.gameController.uiController.widgetTasks.setStepCount(correct)
